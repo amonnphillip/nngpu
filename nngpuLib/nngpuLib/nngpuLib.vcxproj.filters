@@ -1,0 +1,129 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="conv">
+      <UniqueIdentifier>{2fdd20d8-73fb-495a-83d5-1b9948c3e547}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="fullyconnected">
+      <UniqueIdentifier>{546c0476-f7cd-4ab3-98ad-fdfaaafb349f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="relu">
+      <UniqueIdentifier>{b1271225-3abd-4b16-98b2-9ff720c7555c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="pool">
+      <UniqueIdentifier>{c9bb8b83-6327-4655-b822-b6673d898b0c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="input">
+      <UniqueIdentifier>{c63b1c89-287e-4f0b-9f14-7ece5336cf72}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="output">
+      <UniqueIdentifier>{ac95034b-e797-4377-a516-2110b28f5a07}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="conv\convlayer.cpp">
+      <Filter>conv</Filter>
+    </ClCompile>
+    <ClCompile Include="conv\convlayerconfig.cpp">
+      <Filter>conv</Filter>
+    </ClCompile>
+    <ClCompile Include="fullyconnected\fullyconnectedlayer.cpp">
+      <Filter>fullyconnected</Filter>
+    </ClCompile>
+    <ClCompile Include="fullyconnected\fullyconnectedlayerconfig.cpp">
+      <Filter>fullyconnected</Filter>
+    </ClCompile>
+    <ClCompile Include="input\inputlayer.cpp">
+      <Filter>input</Filter>
+    </ClCompile>
+    <ClCompile Include="input\inputlayerconfig.cpp">
+      <Filter>input</Filter>
+    </ClCompile>
+    <ClCompile Include="output\outputlayer.cpp">
+      <Filter>output</Filter>
+    </ClCompile>
+    <ClCompile Include="output\outputlayerconfig.cpp">
+      <Filter>output</Filter>
+    </ClCompile>
+    <ClCompile Include="pool\poollayer.cpp">
+      <Filter>pool</Filter>
+    </ClCompile>
+    <ClCompile Include="pool\poollayerconfig.cpp">
+      <Filter>pool</Filter>
+    </ClCompile>
+    <ClCompile Include="relu\relulayer.cpp">
+      <Filter>relu</Filter>
+    </ClCompile>
+    <ClCompile Include="relu\relulayerconfig.cpp">
+      <Filter>relu</Filter>
+    </ClCompile>
+    <ClCompile Include="layer.cpp" />
+    <ClCompile Include="layerexception.cpp" />
+    <ClCompile Include="nnetwork.cpp" />
+    <ClCompile Include="nngpu.cpp" />
+    <ClCompile Include="nntrainer.cpp" />
+    <ClCompile Include="nngpuwin.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <CudaCompile Include="conv\convlayer.cu">
+      <Filter>conv</Filter>
+    </CudaCompile>
+    <CudaCompile Include="fullyconnected\fullyconnectedlayer.cu">
+      <Filter>fullyconnected</Filter>
+    </CudaCompile>
+    <CudaCompile Include="pool\poollayer.cu">
+      <Filter>pool</Filter>
+    </CudaCompile>
+    <CudaCompile Include="relu\relulayer.cu">
+      <Filter>relu</Filter>
+    </CudaCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="conv\convlayer.h">
+      <Filter>conv</Filter>
+    </ClInclude>
+    <ClInclude Include="conv\convlayerconfig.h">
+      <Filter>conv</Filter>
+    </ClInclude>
+    <ClInclude Include="fullyconnected\fullyconnectedlayer.h">
+      <Filter>fullyconnected</Filter>
+    </ClInclude>
+    <ClInclude Include="fullyconnected\fullyconnectedlayerconfig.h">
+      <Filter>fullyconnected</Filter>
+    </ClInclude>
+    <ClInclude Include="input\inputlayer.h">
+      <Filter>input</Filter>
+    </ClInclude>
+    <ClInclude Include="input\inputlayerconfig.h">
+      <Filter>input</Filter>
+    </ClInclude>
+    <ClInclude Include="output\outputlayer.h">
+      <Filter>output</Filter>
+    </ClInclude>
+    <ClInclude Include="output\outputlayerconfig.h">
+      <Filter>output</Filter>
+    </ClInclude>
+    <ClInclude Include="pool\poollayer.h">
+      <Filter>pool</Filter>
+    </ClInclude>
+    <ClInclude Include="pool\poollayerconfig.h">
+      <Filter>pool</Filter>
+    </ClInclude>
+    <ClInclude Include="relu\relulayer.h">
+      <Filter>relu</Filter>
+    </ClInclude>
+    <ClInclude Include="relu\relulayerconfig.h">
+      <Filter>relu</Filter>
+    </ClInclude>
+    <ClInclude Include="innetworklayer.h" />
+    <ClInclude Include="layer.h" />
+    <ClInclude Include="layerexception.h" />
+    <ClInclude Include="layersize.h" />
+    <ClInclude Include="layertype.h" />
+    <ClInclude Include="nnetwork.h" />
+    <ClInclude Include="nntrainer.h" />
+    <ClInclude Include="nngpu.h" />
+    <ClInclude Include="nngpuwin.h" />
+    <ClInclude Include="layerdata.h" />
+  </ItemGroup>
+</Project>
