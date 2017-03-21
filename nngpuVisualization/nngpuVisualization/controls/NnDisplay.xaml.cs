@@ -55,9 +55,23 @@ namespace nngpuVisualization.controls
                             case (int)LayerType.Input:
                                 Dispatcher.Invoke(() => {
                                     NnInput control = new NnInput();
-                                    InnerGrid.Children.Add(control);
+                                    LayerContainer.Children.Add(control);
                                     _layerControls.Add(control);
                                 });
+                                break;
+                            case (int)LayerType.Output:
+                                Dispatcher.Invoke(() => {
+                                    NnOutput control = new NnOutput();
+                                    LayerContainer.Children.Add(control);
+                                    _layerControls.Add(control);
+                                });
+                                break;
+                            default:
+                                Dispatcher.Invoke(() => {
+                                    LayerContainer.Children.Add(new Rectangle());
+                                    _layerControls.Add(null);
+                                });
+
                                 break;
                         }
                         
@@ -84,9 +98,14 @@ namespace nngpuVisualization.controls
                                     control.Update(nnGpuWinInstance, layerIndex);
                                 });
                                 break;
+                            case (int)LayerType.Output:
+                                Dispatcher.Invoke(() => {
+                                    NnOutput control = _layerControls[layerIndex] as NnOutput;
+                                    control.Update(nnGpuWinInstance, layerIndex);
+                                });
+                                break;
                         }
                     }
-
 
                     Dispatcher.Invoke(() => {
                         this.InvalidateVisual();

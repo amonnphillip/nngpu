@@ -22,6 +22,7 @@ public:
 	void GetLayerCount(int* layerCount);
 	void InitializeTraining();
 	bool TrainNetworkInteration();
+	int GetTrainingIteration();
 	void DisposeNetwork();
 	void GetLayerDataSize(int layerIndex, int dataType, int* width, int* height, int* depth);
 	void GetLayerData(int layerIndex, int dataType, double* layerData);

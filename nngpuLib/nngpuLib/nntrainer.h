@@ -8,6 +8,7 @@ public:
 	~NNTrainer();
 	void Iterate(NNetwork* nn);
 	bool Trainingcomplete();
+	int GetTrainingIteration();
 
 private:
 	int iterationCount = 0;

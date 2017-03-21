@@ -126,6 +126,27 @@ namespace nngpuVisualization
             return type;
         }
 
+        public double[] GetLayerData(int layerIndex, int dataType)
+        {
+            int width = 0;
+            int height = 0;
+            int depth = 0;
+            NnGpuWin.GetLayerDataSize(_nn, layerIndex, dataType, out width, out height, out depth);
+
+            double[] data = new double[width * height * depth];
+            NnGpuWin.GetLayerData(_nn, layerIndex, dataType, data);
+
+            return data;
+        }
+
+        public int GetTrainingIteration()
+        {
+            int interation = 0;
+            NnGpuWin.GetTrainingIteration(_nn, out interation);
+
+            return interation;
+        }
+
         [DllImport("nngpuLib.dll")]
         private static extern IntPtr Initialize();
 
@@ -161,6 +182,9 @@ namespace nngpuVisualization
 
         [DllImport("nngpuLib.dll")]
         public static extern bool TrainNetworkInteration(IntPtr nn);
+
+        [DllImport("nngpuLib.dll")]
+        public static extern void GetTrainingIteration(IntPtr nn, out int interation);
 
         [DllImport("nngpuLib.dll")]
         public static extern void DisposeNetwork(IntPtr nn);

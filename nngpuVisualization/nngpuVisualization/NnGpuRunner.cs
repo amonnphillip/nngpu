@@ -20,6 +20,22 @@ namespace nngpuVisualization
         private static bool _workerRunning = false;
         private static BackgroundWorker _worker;
 
+        public static int UpdateInterval
+        {
+            get
+            {
+                return _updateInterval;
+            }
+            set
+            {
+                _updateInterval = value;
+            }
+        }
+        private static int _updateInterval = 1;
+
+        private static int _currentInterval = 0;
+
+
         public static void StartRunner(NnGpuRunnerStarted startedDelegate, NnGpuRunnerStopped stoppedDelegate, NnGpuRunnerTraningInterationsComplete interationCompleteDelegate)
         {
             Debug.Assert(_worker == null);
@@ -44,8 +60,14 @@ namespace nngpuVisualization
                         while(!_nnGpuWin.TrainingComplete)
                         {
                             _nnGpuWin.TrainIteration();
-                            backgroundWorker.ReportProgress(0);
-                            Thread.Sleep(1000);
+
+                            _currentInterval++;
+                            if (_currentInterval >= _updateInterval)
+                            {
+                                _currentInterval = 0;
+                                backgroundWorker.ReportProgress(0);
+                            }
+                            Thread.Sleep(100);
                         }
                     });
 
@@ -58,6 +80,8 @@ namespace nngpuVisualization
                 _worker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(
                     delegate (object sender, RunWorkerCompletedEventArgs args)
                     {
+                        int r = _nnGpuWin.GetTrainingIteration();
+
                         stoppedDelegate(_nnGpuWin);
                     });
 

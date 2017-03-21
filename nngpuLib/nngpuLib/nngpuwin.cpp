@@ -62,6 +62,11 @@ bool TrainNetworkInteration(NnGpu* nn)
 	return nn->TrainNetworkInteration();
 }
 
+void GetTrainingIteration(NnGpu* nn, int* interation)
+{
+	*interation = nn->GetTrainingIteration();
+}
+
 void DisposeNetwork(NnGpu* nn)
 {
 	nn->DisposeNetwork();

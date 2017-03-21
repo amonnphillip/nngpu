@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:nngpuVisualization.controls"
              mc:Ignorable="d" 
              d:DesignHeight="200" d:DesignWidth="200">
-    <Grid Width="200" Height="200" Background="Crimson">
+    <Grid Background="Crimson">
         <TextBlock Width="100" Height="20" Margin="0,0,100,180">Input</TextBlock>
         <Image x:Name="layerInputImg" Width="80" Height="80" Margin="0,20,120,100" Stretch="Fill" ></Image>
     </Grid>

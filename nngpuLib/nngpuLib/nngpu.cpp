@@ -87,7 +87,7 @@ void NnGpu::GetLayerCount(int* layerCount)
 {
 	assert(layerCount);
 
-	*layerCount = nn->GetLayerCount();
+	*layerCount = (int)nn->GetLayerCount();
 }
 
 void NnGpu::InitializeTraining()
@@ -100,6 +100,11 @@ bool NnGpu::TrainNetworkInteration()
 	trainer->Iterate(nn);
 
 	return trainer->Trainingcomplete();
+}
+
+int NnGpu::GetTrainingIteration()
+{
+	return trainer->GetTrainingIteration();
 }
 
 void NnGpu::DisposeNetwork()

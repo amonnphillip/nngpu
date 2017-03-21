@@ -70,3 +70,8 @@ bool NNTrainer::Trainingcomplete()
 {
 	return iterationCount >= interationMax;
 }
+
+int NNTrainer::GetTrainingIteration()
+{
+	return iterationCount;
+}
