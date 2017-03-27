@@ -106,28 +106,12 @@ void NnGpu::DisposeNetwork()
 	cudaDeviceReset();
 }
 
-void NnGpu::GetLayerData2(int layerIndex, int dataType, int dataIndex, int* count)
-{
-
-}
-
 void NnGpu::GetLayerData(int layerIndex, LayerDataType dataType, LayerDataList& layerDataList)
 {
 	INNetworkLayer* layer = nn->GetLayer(layerIndex);
 
 	if (layer != nullptr)
 	{
-		if (dataType == LayerDataType::Forward)
-		{
-			LayerData* layerData = new LayerData[1];
-			layerDataList.layerDataCount = 1;
-			layerDataList.layerData = layerData;
-
-			layerData->type = layer->GetLayerType();
-			layerData->width = layer->GetForwardWidth();
-			layerData->height = layer->GetForwardHeight();
-			layerData->depth = layer->GetForwardDepth();
-			layerData->data = layer->GetForwardHostMem(true);
-		}
+		layer->GetLayerData(layerDataList);
 	}
 }

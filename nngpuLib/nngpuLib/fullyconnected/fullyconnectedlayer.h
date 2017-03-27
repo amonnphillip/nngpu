@@ -3,6 +3,7 @@
 #include "innetworklayer.h"
 #include "fullyconnectedlayerconfig.h"
 #include "layer.h"
+#include "layerdata.h"
 
 class FullyConnectedNode
 {
@@ -46,6 +47,7 @@ public:
 	int GetWeightCount();
 	FullyConnectedNode* GetNodeMem();
 	virtual LayerType GetLayerType();
+	virtual void GetLayerData(LayerDataList& layerDataList);
 	void DebugPrint();
 };
 

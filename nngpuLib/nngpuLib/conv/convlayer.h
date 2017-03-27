@@ -4,6 +4,7 @@
 #include "convlayerconfig.h"
 #include "innetworklayer.h"
 #include "layer.h"
+#include "layerdata.h"
 
 class ConvNode
 {
@@ -52,5 +53,6 @@ public:
 	virtual int GetHeight();
 	virtual int GetDepth();
 	virtual LayerType GetLayerType();
+	virtual void GetLayerData(LayerDataList& layerDataList);
 	void DebugPrint();
 };

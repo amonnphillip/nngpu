@@ -125,6 +125,21 @@ LayerType OutputLayer::GetLayerType()
 	return Layer::GetLayerType();
 }
 
+void OutputLayer::GetLayerData(LayerDataList& layerDataList)
+{
+	LayerData* layerData = new LayerData[1];
+
+	layerDataList.layerDataCount = 1;
+	layerDataList.layerType = LayerType::Input;
+	layerDataList.layerData = layerData;
+
+	layerData->type = LayerDataType::Forward;
+	layerData->width = GetForwardWidth();
+	layerData->height = GetForwardHeight();
+	layerData->depth = GetForwardDepth();
+	layerData->data = GetForwardHostMem(true);
+}
+
 void OutputLayer::DebugPrint(double* expected, int expectedCount)
 {
 	assert(expectedCount == GetForwardNodeCount());

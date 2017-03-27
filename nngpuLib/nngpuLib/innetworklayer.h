@@ -1,6 +1,9 @@
 #pragma once
-#include "layertype.h"
+
 #include <string>
+
+#include "layertype.h"
+#include "layerdata.h"
 
 class INNetworkLayer
 {
@@ -23,4 +26,5 @@ public:
 	virtual int GetHeight() = 0;
 	virtual int GetDepth() = 0;
 	virtual LayerType GetLayerType() = 0;
+	virtual void GetLayerData(LayerDataList& layerDataList) = 0;
 };

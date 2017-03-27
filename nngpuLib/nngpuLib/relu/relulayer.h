@@ -3,6 +3,7 @@
 #include "innetworklayer.h"
 #include "relulayerconfig.h"
 #include "layer.h"
+#include "layerdata.h"
 
 class ReluNode
 {
@@ -37,6 +38,7 @@ public:
 	virtual int GetWidth();
 	virtual int GetHeight();
 	virtual int GetDepth();
+	virtual void GetLayerData(LayerDataList& layerDataList);
 	virtual LayerType GetLayerType();
 };
 

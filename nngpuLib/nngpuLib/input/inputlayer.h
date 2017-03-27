@@ -3,6 +3,7 @@
 #include "inputlayerconfig.h"
 #include "innetworklayer.h"
 #include "layer.h"
+#include "layerdata.h"
 
 class InputNode
 {
@@ -36,5 +37,6 @@ public:
 	virtual int GetHeight();
 	virtual int GetDepth();
 	virtual LayerType GetLayerType();
+	virtual void GetLayerData(LayerDataList& layerDataList);
 	void DebugPrint();
 };

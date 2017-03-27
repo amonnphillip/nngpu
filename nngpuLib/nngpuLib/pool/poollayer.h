@@ -3,6 +3,7 @@
 #include "innetworklayer.h"
 #include "poollayerconfig.h"
 #include "layer.h"
+#include "layerdata.h"
 
 class PoolNode
 {
@@ -41,6 +42,7 @@ public:
 	virtual int GetWidth();
 	virtual int GetHeight();
 	virtual int GetDepth();
+	virtual void GetLayerData(LayerDataList& layerDataList);
 	virtual LayerType GetLayerType();
 };
 

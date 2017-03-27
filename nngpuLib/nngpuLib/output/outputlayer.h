@@ -3,6 +3,7 @@
 #include "outputlayerconfig.h"
 #include "innetworklayer.h"
 #include "layer.h"
+#include "layerdata.h"
 
 struct OutputNode
 {
@@ -34,5 +35,6 @@ public:
 	virtual int GetHeight();
 	virtual int GetDepth();
 	virtual LayerType GetLayerType();
+	virtual void GetLayerData(LayerDataList& layerDataList);
 	void DebugPrint(double* expected, int expectedCount);
 };

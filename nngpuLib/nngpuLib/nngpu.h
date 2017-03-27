@@ -13,7 +13,6 @@ public:
 	void AddPoolLayer(int spatialExtent, int stride);
 	void AddFullyConnected(int size);
 	void AddOutput(int size);
-	void GetLayerData2(int layerIndex, int dataType, int dataIndex, int* count);
 	void GetLayerType(int layerIndex, int* layerType);
 	void GetLayerCount(int* layerCount);
 	void InitializeTraining();

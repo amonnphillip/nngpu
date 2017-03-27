@@ -1,9 +1,14 @@
 #pragma once
 
+enum LayerDataType {
+	Forward = 0,
+	Backward = 1
+};
+
 struct LayerData
 {
 public:
-	LayerType type;
+	LayerDataType type;
 	int width;
 	int height;
 	int depth;
@@ -14,6 +19,7 @@ struct LayerDataList
 {
 public:
 	int layerDataCount;
+	LayerType layerType;
 	LayerData* layerData;
 	void CleanUp()
 	{
@@ -26,7 +32,4 @@ public:
 	}
 };
 
-enum LayerDataType {
-	Forward = 0,
-	Backward = 1
-};
+

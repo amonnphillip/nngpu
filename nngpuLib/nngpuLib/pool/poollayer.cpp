@@ -183,6 +183,21 @@ int PoolLayer::GetDepth()
 	return layerDepth;
 }
 
+void PoolLayer::GetLayerData(LayerDataList& layerDataList)
+{
+	LayerData* layerData = new LayerData[1];
+
+	layerDataList.layerDataCount = 1;
+	layerDataList.layerType = LayerType::Input;
+	layerDataList.layerData = layerData;
+
+	layerData->type = LayerDataType::Forward;
+	layerData->width = GetForwardWidth();
+	layerData->height = GetForwardHeight();
+	layerData->depth = GetForwardDepth();
+	layerData->data = GetForwardHostMem(true);
+}
+
 LayerType PoolLayer::GetLayerType()
 {
 	return Layer::GetLayerType();
