@@ -31,7 +31,10 @@ namespace nngpuVisualization.controls
 
         public void Update(NnGpuWin nnGpuWinInstance, int layerIndex)
         {
-            double[] layerData = nnGpuWinInstance.GetLayerData(layerIndex, 0);
+
+            NnGpuLayerDataGroup laterDataGroup = nnGpuWinInstance.GetLayerData(layerIndex);
+
+            double[] layerData = laterDataGroup.layerData[0].data;
 
             BarContainer.Children.Clear();
 

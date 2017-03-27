@@ -92,8 +92,11 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="NnGpuLayerData.cs" />
+    <Compile Include="NnGpuMarshal.cs" />
     <Compile Include="NnGpuRunner.cs" />
     <Compile Include="NnGpuWin.cs" />
+    <Compile Include="NnGpuWinInterop.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

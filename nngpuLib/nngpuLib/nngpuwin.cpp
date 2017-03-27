@@ -1,6 +1,29 @@
+#include <windows.h>
 #include "nngpu.h"
 #include "nngpuwin.h"
 #include "layerdata.h"
+
+int MarshalSize(int width, int height, int depth)
+{
+	return (sizeof(double) * width * height * depth) + (sizeof(int) * 4);
+}
+
+int ToMarshalFormat(void* dest, int type, int width, int height, int depth, double* data)
+{
+	int* intPtr = (int*)dest;
+	*intPtr = type;
+	intPtr++;
+	*intPtr = width;
+	intPtr++;
+	*intPtr = height;
+	intPtr++;
+	*intPtr = depth;
+	intPtr++;
+	double* doublePtr = (double*)intPtr;
+	memcpy(doublePtr, data, sizeof(double) * width * height * depth);
+
+	return MarshalSize(width, height, depth);
+}
 
 NnGpu* Initialize()
 {
@@ -72,14 +95,31 @@ void DisposeNetwork(NnGpu* nn)
 	nn->DisposeNetwork();
 }
 
-void GetLayerDataSize(NnGpu* nn, int layerIndex, int dataType, int* width, int* height, int* depth)
+void GetLayerData(NnGpu* nn, int layerIndex, int** data)
 {
-	nn->GetLayerDataSize(layerIndex, dataType, width, height, depth);
-}
+	LayerDataList layerDataList;
+	nn->GetLayerData(layerIndex, LayerDataType::Forward, layerDataList);
 
-void GetLayerData(NnGpu* nn, int layerIndex, int dataType, double* layerData)
-{
-	nn->GetLayerData(layerIndex, dataType, layerData);
+	int size = 4;
+	for (int index = 0; index < layerDataList.layerDataCount; index++)
+	{
+		LayerData* ld = &layerDataList.layerData[index];
+		size += MarshalSize(ld->width, ld->height, ld->depth);
+	}
+
+	int* mem = (int*)GlobalAlloc(GMEM_FIXED, size);
+	*data = (int*)mem;
+
+	*mem = layerDataList.layerDataCount;
+	mem++;
+	
+	for (int index = 0; index < layerDataList.layerDataCount; index++)
+	{
+		LayerData* ld = &layerDataList.layerData[index];
+		mem += (ToMarshalFormat((void*)mem, ld->type, ld->width, ld->height, ld->depth, ld->data) / sizeof(int));
+	}
+
+	layerDataList.CleanUp();
 }
 
 

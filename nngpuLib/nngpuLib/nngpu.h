@@ -6,11 +6,6 @@
 class NnGpu
 {
 public:
-	enum LayerDataType {
-		Forward = 0,
-		Backward = 1
-	};
-
 	void InitializeNetwork();
 	void AddInputLayer(int width, int height, int depth);
 	void AddConvLayer(int filterWidth, int filterHeight, int filterDepth, int filterCount, int pad, int stride);
@@ -18,14 +13,14 @@ public:
 	void AddPoolLayer(int spatialExtent, int stride);
 	void AddFullyConnected(int size);
 	void AddOutput(int size);
+	void GetLayerData2(int layerIndex, int dataType, int dataIndex, int* count);
 	void GetLayerType(int layerIndex, int* layerType);
 	void GetLayerCount(int* layerCount);
 	void InitializeTraining();
 	bool TrainNetworkInteration();
 	int GetTrainingIteration();
 	void DisposeNetwork();
-	void GetLayerDataSize(int layerIndex, int dataType, int* width, int* height, int* depth);
-	void GetLayerData(int layerIndex, int dataType, double* layerData);
+	void GetLayerData(int layerIndex, LayerDataType dataType, LayerDataList& layerData);
 
 private:
 	NNetwork* nn;

@@ -31,7 +31,9 @@ namespace nngpuVisualization.controls
 
         public void Update(NnGpuWin nnGpuWinInstance, int layerIndex)
         {
-            BitmapSource image = nnGpuWinInstance.GetNetworkOutputAsImage(layerIndex, 0);
+            NnGpuLayerDataGroup laterDataGroup = nnGpuWinInstance.GetLayerData(layerIndex);
+
+            BitmapSource image = laterDataGroup.layerData[0].ToImage();
             layerInputImg.Source = image;
         }
     }

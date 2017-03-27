@@ -18,18 +18,6 @@ void NnGpu::InitializeNetwork()
 	cudaStatus = cudaSetDevice(0);
 
 	nn = new NNetwork();
-
-/*
-	// Create the (very small) network
-	nn = new NNetwork();
-	nn->Add<InputLayer, InputLayerConfig>(new InputLayerConfig(8, 8, 1));
-	//nn->Add<FullyConnectedLayer, FullyConnectedLayerConfig>(new FullyConnectedLayerConfig(8, 8, 1));
-	nn->Add<ConvLayer, ConvLayerConfig>(new ConvLayerConfig(3, 3, 1, 4, 1, 1));
-	nn->Add<ReluLayer>();
-	nn->Add<PoolLayer, PoolLayerConfig>(new PoolLayerConfig(2, 2));
-	//nn->Add<FullyConnectedLayer, FullyConnectedLayerConfig>(new FullyConnectedLayerConfig(2));
-	nn->Add<FullyConnectedLayer, FullyConnectedLayerConfig>(new FullyConnectedLayerConfig(2));
-	nn->Add<OutputLayer, OutputLayerConfig>(new OutputLayerConfig(2));*/
 }
 
 void NnGpu::AddInputLayer(int width, int height, int depth)
@@ -118,22 +106,12 @@ void NnGpu::DisposeNetwork()
 	cudaDeviceReset();
 }
 
-void NnGpu::GetLayerDataSize(int layerIndex, int dataType, int* width, int* height, int* depth)
+void NnGpu::GetLayerData2(int layerIndex, int dataType, int dataIndex, int* count)
 {
-	INNetworkLayer* layer = nn->GetLayer(layerIndex);
 
-	if (layer != nullptr)
-	{
-		if (dataType == LayerDataType::Forward)
-		{
-			*width = layer->GetForwardWidth();
-			*height = layer->GetForwardHeight();
-			*depth = layer->GetForwardDepth();
-		}
-	}
 }
 
-void NnGpu::GetLayerData(int layerIndex, int dataType, double* layerData)
+void NnGpu::GetLayerData(int layerIndex, LayerDataType dataType, LayerDataList& layerDataList)
 {
 	INNetworkLayer* layer = nn->GetLayer(layerIndex);
 
@@ -141,10 +119,15 @@ void NnGpu::GetLayerData(int layerIndex, int dataType, double* layerData)
 	{
 		if (dataType == LayerDataType::Forward)
 		{
-			int size = layer->GetForwardNodeCount();
-			double* layerHostMem = layer->GetForwardHostMem(true);
+			LayerData* layerData = new LayerData[1];
+			layerDataList.layerDataCount = 1;
+			layerDataList.layerData = layerData;
 
-			memcpy(layerData, layerHostMem, (size_t)size * sizeof(double));
+			layerData->type = layer->GetLayerType();
+			layerData->width = layer->GetForwardWidth();
+			layerData->height = layer->GetForwardHeight();
+			layerData->depth = layer->GetForwardDepth();
+			layerData->data = layer->GetForwardHostMem(true);
 		}
 	}
 }
