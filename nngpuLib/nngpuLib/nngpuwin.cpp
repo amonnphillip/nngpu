@@ -100,7 +100,7 @@ void GetLayerData(NnGpu* nn, int layerIndex, int** data)
 	LayerDataList layerDataList;
 	nn->GetLayerData(layerIndex, LayerDataType::Forward, layerDataList);
 
-	int size = 4;
+	int size = 8;
 	for (int index = 0; index < layerDataList.layerDataCount; index++)
 	{
 		LayerData* ld = &layerDataList.layerData[index];
@@ -112,7 +112,9 @@ void GetLayerData(NnGpu* nn, int layerIndex, int** data)
 
 	*mem = layerDataList.layerDataCount;
 	mem++;
-	
+	*mem = layerDataList.layerType;
+	mem++;
+
 	for (int index = 0; index < layerDataList.layerDataCount; index++)
 	{
 		LayerData* ld = &layerDataList.layerData[index];

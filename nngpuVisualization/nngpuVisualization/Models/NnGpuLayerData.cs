@@ -13,7 +13,7 @@ namespace nngpuVisualization
 {
     public class NnGpuLayerData
     {
-        public int type;
+        public NnGpuLayerDataType type;
         public int width;
         public int height;
         public int depth;
@@ -55,11 +55,7 @@ namespace nngpuVisualization
 
             return System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(handle, IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
         }
-    }
 
-    public class NnGpuLayerDataGroup
-    {
-        public int count;
-        public NnGpuLayerData[] layerData;
+
     }
 }

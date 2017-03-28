@@ -61,7 +61,7 @@ void NNTrainer::Iterate(NNetwork* nn)
 
 
 	nn->Forward(input, inputCount);
-	nn->Backward(expected, expectedCount, 0.01);
+	nn->Backward(expected, expectedCount, 0.001);
 
 	iterationCount++;
 }

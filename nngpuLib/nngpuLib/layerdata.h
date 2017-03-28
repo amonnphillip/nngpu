@@ -2,7 +2,8 @@
 
 enum LayerDataType {
 	Forward = 0,
-	Backward = 1
+	Backward = 1,
+	ConvFilter = 2
 };
 
 struct LayerData
@@ -23,12 +24,7 @@ public:
 	LayerData* layerData;
 	void CleanUp()
 	{
-		LayerData* l = layerData;
-		for (int index = 0; index < layerDataCount; index++)
-		{
-			delete l;
-			l++;
-		}
+		delete layerData;
 	}
 };
 

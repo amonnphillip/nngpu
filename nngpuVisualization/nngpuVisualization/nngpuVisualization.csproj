@@ -57,6 +57,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="controls\NnConv.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="controls\NnDisplay.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -77,6 +81,9 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="controls\NnConv.xaml.cs">
+      <DependentUpon>NnConv.xaml</DependentUpon>
+    </Compile>
     <Compile Include="controls\NnDisplay.xaml.cs">
       <DependentUpon>NnDisplay.xaml</DependentUpon>
     </Compile>
@@ -92,7 +99,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="NnGpuLayerData.cs" />
+    <Compile Include="Models\NnGpuLayerData.cs" />
+    <Compile Include="Models\NnGpuLayerDataGroup.cs" />
+    <Compile Include="Models\NnGpuLayerDataType.cs" />
+    <Compile Include="Models\NnGpuLayerType.cs" />
     <Compile Include="NnGpuMarshal.cs" />
     <Compile Include="NnGpuRunner.cs" />
     <Compile Include="NnGpuWin.cs" />
@@ -128,6 +138,9 @@
       <Project>{199a53c3-3ae6-4992-95de-dea6f69cc40e}</Project>
       <Name>nngpuLib</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Collections\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

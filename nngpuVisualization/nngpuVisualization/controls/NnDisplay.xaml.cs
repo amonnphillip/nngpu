@@ -59,6 +59,13 @@ namespace nngpuVisualization.controls
                                     _layerControls.Add(control);
                                 });
                                 break;
+                            case (int)LayerType.Convolution:
+                                Dispatcher.Invoke(() => {
+                                    NnConv control = new NnConv();
+                                    LayerContainer.Children.Add(control);
+                                    _layerControls.Add(control);
+                                });
+                                break;
                             case (int)LayerType.Output:
                                 Dispatcher.Invoke(() => {
                                     NnOutput control = new NnOutput();
@@ -95,6 +102,12 @@ namespace nngpuVisualization.controls
                             case (int)LayerType.Input:
                                 Dispatcher.Invoke(() => {
                                     NnInput control = _layerControls[layerIndex] as NnInput;
+                                    control.Update(nnGpuWinInstance, layerIndex);
+                                });
+                                break;
+                            case (int)LayerType.Convolution:
+                                Dispatcher.Invoke(() => {
+                                    NnConv control = _layerControls[layerIndex] as NnConv;
                                     control.Update(nnGpuWinInstance, layerIndex);
                                 });
                                 break;

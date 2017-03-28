@@ -38,7 +38,6 @@ void OutputLayer::Backward(double* input, int inputSize, double learnRate)
 {
 	assert(inputSize == nodeCount);
 
-	// TODO: Optimize
 	double* forward = forwardHostMem.get();
 	double* backward = backwardHostMem.get();
 	for (int index = 0; index < nodeCount; index++)
@@ -127,17 +126,23 @@ LayerType OutputLayer::GetLayerType()
 
 void OutputLayer::GetLayerData(LayerDataList& layerDataList)
 {
-	LayerData* layerData = new LayerData[1];
+	LayerData* layerData = new LayerData[2];
 
-	layerDataList.layerDataCount = 1;
-	layerDataList.layerType = LayerType::Input;
+	layerDataList.layerDataCount = 2;
+	layerDataList.layerType = LayerType::Output;
 	layerDataList.layerData = layerData;
 
-	layerData->type = LayerDataType::Forward;
-	layerData->width = GetForwardWidth();
-	layerData->height = GetForwardHeight();
-	layerData->depth = GetForwardDepth();
-	layerData->data = GetForwardHostMem(true);
+	layerData[0].type = LayerDataType::Forward;
+	layerData[0].width = GetForwardWidth();
+	layerData[0].height = GetForwardHeight();
+	layerData[0].depth = GetForwardDepth();
+	layerData[0].data = GetForwardHostMem(true);
+
+	layerData[1].type = LayerDataType::Backward;
+	layerData[1].width = GetBackwardNodeCount();
+	layerData[1].height = 1;
+	layerData[1].depth = 1;
+	layerData[1].data = backwardHostMem.get();
 }
 
 void OutputLayer::DebugPrint(double* expected, int expectedCount)

@@ -230,10 +230,10 @@ LayerType ConvLayer::GetLayerType()
 
 void ConvLayer::GetLayerData(LayerDataList& layerDataList)
 {
-	LayerData* layerData = new LayerData[1];
+	LayerData* layerData = new LayerData[2 + (filterDepth * filterCount)];
 
-	layerDataList.layerDataCount = 1;
-	layerDataList.layerType = LayerType::Input;
+	layerDataList.layerDataCount = 2 + (filterDepth * filterCount);
+	layerDataList.layerType = LayerType::Convolution;
 	layerDataList.layerData = layerData;
 
 	layerData->type = LayerDataType::Forward;
@@ -241,6 +241,31 @@ void ConvLayer::GetLayerData(LayerDataList& layerDataList)
 	layerData->height = GetForwardHeight();
 	layerData->depth = GetForwardDepth();
 	layerData->data = GetForwardHostMem(true);
+	layerData++;
+
+	layerData->type = LayerDataType::Backward;
+	layerData->width = backwardCount;
+	layerData->height = 1;
+	layerData->depth = 1;
+	layerData->data = GetBackwardHostMem(true);
+	layerData++;
+
+	double* filter = filterHostMem.get();
+	for (int depthIndex = 0; depthIndex < filterDepth; depthIndex++)
+	{
+		for (int countIndex = 0; countIndex < filterCount; countIndex++)
+		{
+			layerData->type = LayerDataType::ConvFilter;
+			layerData->width = filterWidth;
+			layerData->height = filterHeight;
+			layerData->depth = 1;
+			layerData->data = filter;
+
+			layerData++;
+		}
+
+		filter += filterSize;
+	}
 }
 
 

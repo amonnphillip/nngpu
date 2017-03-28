@@ -19,13 +19,15 @@ namespace nngpuVisualization
             NnGpuLayerDataGroup layerDataGroup = new NnGpuLayerDataGroup();
             
             layerDataGroup.count = Marshal.ReadInt32(obj);
+            obj += 4;
+            layerDataGroup.type = (NnGpuLayerType)Marshal.ReadInt32(obj);
             layerDataGroup.layerData = new NnGpuLayerData[layerDataGroup.count];
 
             obj += 4;
             for (int index = 0;index < layerDataGroup.count; index ++)
             {
                 NnGpuLayerData layerData = new NnGpuLayerData();
-                layerData.type = Marshal.ReadInt32(obj);
+                layerData.type = (NnGpuLayerDataType)Marshal.ReadInt32(obj);
                 obj += 4;
                 layerData.width = Marshal.ReadInt32(obj);
                 obj += 4;
@@ -38,6 +40,8 @@ namespace nngpuVisualization
                 layerData.data = data;
 
                 layerDataGroup.layerData[index] = layerData;
+
+                obj += layerData.width * layerData.height * layerData.depth * 8;
             }
 
             return layerDataGroup;
