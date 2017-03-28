@@ -21,11 +21,29 @@ namespace nngpuVisualization
 
         public BitmapSource ToImage()
         {
+            double scale = 1;
+            double floor = double.MaxValue;
+            double top = double.MinValue;
+            for (int index = 0;index < data.Length;index ++)
+            {
+                if (data[index] < floor)
+                {
+                    floor = data[index];
+                }
+
+                if (data[index] > top)
+                {
+                    top = data[index];
+                }
+            }
+
+            scale = 255 / (top - floor);
+
             byte[] imageData = new byte[width * height * 4];
             int i = 0;
             for (int x = 0; x < imageData.Length; x += 4)
             {
-                byte c = (byte)(data[i] * 255);
+                byte c = (byte)((data[i] - floor) * scale);
                 if (c > 255)
                 {
                     c = 255;

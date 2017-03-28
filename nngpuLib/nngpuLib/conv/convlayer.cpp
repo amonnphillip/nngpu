@@ -262,9 +262,8 @@ void ConvLayer::GetLayerData(LayerDataList& layerDataList)
 			layerData->data = filter;
 
 			layerData++;
+			filter += filterSize;
 		}
-
-		filter += filterSize;
 	}
 }
 
