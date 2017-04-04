@@ -7,13 +7,16 @@ extern void PoolLayer_Backward(double* nextlayerBackward, double *output, int* b
 
 PoolLayer::PoolLayer(PoolLayerConfig* config, INNetworkLayer* previousLayer)
 {
-	layerWidth = (previousLayer->GetWidth() - config->GetSpatialExtent()) / config->GetStride() + 1;
-	layerHeight = (previousLayer->GetHeight() - config->GetSpatialExtent()) / config->GetStride() + 1;
-	layerDepth = previousLayer->GetDepth();
+	layerWidth = (previousLayer->GetForwardWidth() - config->GetSpatialExtent()) / config->GetStride() + 1;
+	layerHeight = (previousLayer->GetForwardHeight() - config->GetSpatialExtent()) / config->GetStride() + 1;
+	layerDepth = previousLayer->GetForwardDepth();
 	spatiallExtent = config->GetSpatialExtent();
 	stride = config->GetStride();
 
 	backwardCount = previousLayer->GetForwardNodeCount();
+	backwardWidth = previousLayer->GetForwardWidth();
+	backwardHeight = previousLayer->GetForwardHeight();
+	backwardDepth = previousLayer->GetForwardDepth();
 	forwardCount = layerWidth * layerHeight * layerDepth;
 	nodeCount = forwardCount;
 
@@ -33,7 +36,7 @@ PoolLayer::PoolLayer(PoolLayerConfig* config, INNetworkLayer* previousLayer)
 	int* backData = backDataHostMem.get();
 	for (int index = 0; index < nodeCount; index++)
 	{
-		*backData = 1;
+		*backData = 0;
 		backData++;
 	}
 
@@ -65,6 +68,14 @@ void PoolLayer::Forward(INNetworkLayer* previousLayer, INNetworkLayer* nextLayer
 	for (int index = 0; index < forwardCount; index++)
 	{
 		*forward = negativeInfinity;
+		forward++;
+	}
+
+	int* backData = backDataHostMem.get();
+	for (int index = 0; index < nodeCount; index++)
+	{
+		*backData = 0;
+		backData++;
 	}
 
 	if (cudaMemcpy(forwardDeviceMem, forwardHostMem.get(), forwardCount * sizeof(double), cudaMemcpyHostToDevice) != cudaError::cudaSuccess)
@@ -72,12 +83,18 @@ void PoolLayer::Forward(INNetworkLayer* previousLayer, INNetworkLayer* nextLayer
 		throw std::runtime_error("PoolLayer forward cudaMemcpy returned an error");
 	}
 
-	PoolLayer_Forward(previousLayer->GetForwardDeviceMem(), forwardDeviceMem, backDataDeviceMem, nodeCount, layerWidth, layerHeight, layerDepth, stride, previousLayer->GetWidth(), previousLayer->GetHeight(), previousLayer->GetDepth());
+	if (cudaMemcpy(backDataDeviceMem, backDataHostMem.get(), nodeCount * sizeof(int), cudaMemcpyHostToDevice) != cudaError::cudaSuccess)
+	{
+		throw std::runtime_error("PoolLayer forward cudaMemcpy returned an error");
+	}
 
+	PoolLayer_Forward(previousLayer->GetForwardDeviceMem(), forwardDeviceMem, backDataDeviceMem, nodeCount, layerWidth, layerHeight, layerDepth, stride, previousLayer->GetWidth(), previousLayer->GetHeight(), previousLayer->GetDepth());
+/*
 	if (cudaMemcpy(forwardHostMem.get(), forwardDeviceMem, forwardCount * sizeof(double), cudaMemcpyDeviceToHost) != cudaError::cudaSuccess)
 	{
 		throw std::runtime_error("PoolLayer forward cudaMemcpy returned an error");
 	}
+*/
 }
 
 void PoolLayer::Backward(double* input, int inputSize, double learnRate)
@@ -96,15 +113,21 @@ void PoolLayer::Backward(INNetworkLayer* previousLayer, INNetworkLayer* nextLaye
 
 	if (cudaMemcpy(backwardDeviceMem, backwardHostMem.get(), backwardCount * sizeof(double), cudaMemcpyHostToDevice) != cudaError::cudaSuccess)
 	{
-		throw std::runtime_error("FullyConnectedLayer backward cudaMemcpy returned an error");
+		throw std::runtime_error("PoolLayer backward cudaMemcpy returned an error");
 	}
 
 	PoolLayer_Backward(nextLayer->GetBackwardDeviceMem(), backwardDeviceMem, backDataDeviceMem, nodeCount);
-
+/*
 	if (cudaMemcpy(backwardHostMem.get(), backwardDeviceMem, backwardCount * sizeof(double), cudaMemcpyDeviceToHost) != cudaError::cudaSuccess)
 	{
-		throw std::runtime_error("FullyConnectedLayer backward cudaMemcpy returned an error");
+		throw std::runtime_error("PoolLayer backward cudaMemcpy returned an error");
 	}
+
+	if (cudaMemcpy(backDataHostMem.get(), backDataDeviceMem, nodeCount * sizeof(int), cudaMemcpyDeviceToHost) != cudaError::cudaSuccess)
+	{
+		throw std::runtime_error("PoolLayer backward cudaMemcpy returned an error");
+	}
+*/
 }
 
 double* PoolLayer::GetForwardHostMem(bool copyFromDevice)
@@ -126,7 +149,7 @@ double* PoolLayer::GetBackwardHostMem(bool copyFromDevice)
 	{
 		if (cudaMemcpy(backwardHostMem.get(), backwardDeviceMem, backwardCount * sizeof(double), cudaMemcpyDeviceToHost) != cudaError::cudaSuccess)
 		{
-			throw std::runtime_error("FullyConnectedLayer backward cudaMemcpy returned an error");
+			throw std::runtime_error("PoolLayer backward cudaMemcpy returned an error");
 		}
 	}
 
@@ -185,10 +208,10 @@ int PoolLayer::GetDepth()
 
 void PoolLayer::GetLayerData(LayerDataList& layerDataList)
 {
-	LayerData* layerData = new LayerData[1];
+	LayerData* layerData = new LayerData[2];
 
-	layerDataList.layerDataCount = 1;
-	layerDataList.layerType = LayerType::Input;
+	layerDataList.layerDataCount = 2;
+	layerDataList.layerType = LayerType::Pool;
 	layerDataList.layerData = layerData;
 
 	layerData->type = LayerDataType::Forward;
@@ -196,6 +219,20 @@ void PoolLayer::GetLayerData(LayerDataList& layerDataList)
 	layerData->height = GetForwardHeight();
 	layerData->depth = GetForwardDepth();
 	layerData->data = GetForwardHostMem(true);
+	layerData++;
+
+	layerData->type = LayerDataType::Backward;
+	layerData->width = backwardWidth;
+	layerData->height = backwardHeight;
+	layerData->depth = backwardDepth;
+	layerData->data = GetBackwardHostMem(true);
+	//layerData++;
+
+	//layerData->type = LayerDataType::PoolBackData;
+	//layerData->width = nodeCount;
+	//layerData->height = 1;
+	//layerData->depth = 1;
+	//layerData->data = backDataHostMem.get();
 }
 
 LayerType PoolLayer::GetLayerType()

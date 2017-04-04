@@ -23,6 +23,9 @@ namespace nngpuVisualization.controls
         private const double BarUintHeight = 20;
         private const double BarWidth = 40;
 
+        private const int MaxPoints = 100;
+
+
         private List<double[]> Outputs { get; set; }
 
         public NnOutput()
@@ -41,13 +44,13 @@ namespace nngpuVisualization.controls
             double[] layerDataBackward = laterDataGroup.layerData[1].data;
 
             Outputs.Insert(0, layerDataBackward);
-            if (Outputs.Count > 100)
+            if (Outputs.Count > MaxPoints)
             {
-                Outputs.RemoveAt(100);
+                Outputs.RemoveAt(MaxPoints);
             }
 
-            if (double.IsNaN(BarContainer.Width) ||
-                double.IsNaN(BarContainer.Height))
+            if (double.IsNaN(BarContainer.ActualWidth) ||
+                double.IsNaN(BarContainer.ActualHeight))
             {
                 return;
             }
@@ -95,11 +98,13 @@ namespace nngpuVisualization.controls
 
             BarContainer.Children.Clear();
 
+            double xscale = this.ActualWidth / ((double)MaxPoints);
+
             Line baseline = new Line();
             baseline.X1 = 0;
-            baseline.Y1 = BarContainer.Height / 2;
-            baseline.X2 = BarContainer.Width;
-            baseline.Y2 = BarContainer.Height / 2;
+            baseline.Y1 = BarContainer.ActualHeight / 2;
+            baseline.X2 = BarContainer.ActualWidth;
+            baseline.Y2 = BarContainer.ActualHeight / 2;
             baseline.Stroke = new SolidColorBrush(Color.FromRgb(0, 0, 0));
             baseline.StrokeThickness = 1;
             BarContainer.Children.Add(baseline);
@@ -108,8 +113,8 @@ namespace nngpuVisualization.controls
             double lastPointY = 0;
             for (int index = 0; index < Outputs.Count; index++)
             {
-                double dataPointX = (index + 1) * 50;
-                double dataPointY = ((aves[index] * -1) * scale) + (BarContainer.Height / 2);
+                double dataPointX = index * xscale;
+                double dataPointY = ((aves[index] * -1) * scale) + (BarContainer.ActualHeight / 2);
 
                 if (index > 0)
                 {

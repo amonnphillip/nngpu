@@ -15,7 +15,7 @@ public:
 	void AddOutput(int size);
 	void GetLayerType(int layerIndex, int* layerType);
 	void GetLayerCount(int* layerCount);
-	void InitializeTraining();
+	void InitializeTraining(unsigned char* imageData, int imageDataLength, unsigned char* labelData, int labelDataLength);
 	bool TrainNetworkInteration();
 	int GetTrainingIteration();
 	void DisposeNetwork();

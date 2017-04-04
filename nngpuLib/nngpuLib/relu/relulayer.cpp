@@ -37,12 +37,25 @@ void ReluLayer::Forward(double* input, int inputSize)
 
 void ReluLayer::Forward(INNetworkLayer* previousLayer, INNetworkLayer* nextLayer)
 {
-	ReluLayer_Forward(nodeDeviceMem, previousLayer->GetForwardDeviceMem(), forwardDeviceMem, nodeCount);
+	double* forward = forwardHostMem.get();
+	for (int index = 0; index < forwardCount; index++)
+	{
+		*forward = 0;
+		forward++;
+	}
 
+	if (cudaMemcpy(forwardDeviceMem, forwardHostMem.get(), forwardCount * sizeof(double), cudaMemcpyHostToDevice) != cudaError::cudaSuccess)
+	{
+		throw std::runtime_error("ReluLayer forward cudaMemcpy returned an error");
+	}
+
+	ReluLayer_Forward(nodeDeviceMem, previousLayer->GetForwardDeviceMem(), forwardDeviceMem, nodeCount);
+/*
 	if (cudaMemcpy(forwardHostMem.get(), forwardDeviceMem, forwardCount * sizeof(double), cudaMemcpyDeviceToHost) != cudaError::cudaSuccess)
 	{
 		throw std::runtime_error("ReluLayer forward cudaMemcpy returned an error");
 	}
+*/
 }
 
 void ReluLayer::Backward(double* input, int inputSize, double learnRate)
@@ -65,11 +78,12 @@ void ReluLayer::Backward(INNetworkLayer* previousLayer, INNetworkLayer* nextLaye
 	}
 
 	ReluLayer_Backward(nodeDeviceMem, forwardDeviceMem, nextLayer->GetBackwardDeviceMem(), backwardDeviceMem, nodeCount, learnRate);
-
+/*
 	if (cudaMemcpy(backwardHostMem.get(), backwardDeviceMem, backwardCount * sizeof(double), cudaMemcpyDeviceToHost) != cudaError::cudaSuccess)
 	{
 		throw std::runtime_error("ReluLayer backward cudaMemcpy returned an error");
 	}
+*/
 }
 
 double* ReluLayer::GetForwardHostMem(bool copyFromDevice)
@@ -150,9 +164,9 @@ int ReluLayer::GetDepth()
 
 void ReluLayer::GetLayerData(LayerDataList& layerDataList)
 {
-	LayerData* layerData = new LayerData[1];
+	LayerData* layerData = new LayerData[2];
 
-	layerDataList.layerDataCount = 1;
+	layerDataList.layerDataCount = 2;
 	layerDataList.layerType = LayerType::Input;
 	layerDataList.layerData = layerData;
 
@@ -161,6 +175,12 @@ void ReluLayer::GetLayerData(LayerDataList& layerDataList)
 	layerData->height = GetForwardHeight();
 	layerData->depth = GetForwardDepth();
 	layerData->data = GetForwardHostMem(true);
+
+	layerData->type = LayerDataType::Backward;
+	layerData->width = GetForwardWidth();
+	layerData->height = GetForwardHeight();
+	layerData->depth = GetForwardDepth();
+	layerData->data = GetBackwardHostMem(true);
 }
 
 LayerType ReluLayer::GetLayerType()

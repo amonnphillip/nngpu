@@ -31,7 +31,7 @@ void OutputLayer::Forward(INNetworkLayer* previousLayer, INNetworkLayer* nextLay
 {
 	assert(previousLayer->GetForwardNodeCount() == nodeCount);
 
-	memcpy(forwardHostMem.get(), previousLayer->GetForwardHostMem(false), nodeCount * sizeof(double));
+	memcpy(forwardHostMem.get(), previousLayer->GetForwardHostMem(true), nodeCount * sizeof(double));
 }
 
 void OutputLayer::Backward(double* input, int inputSize, double learnRate)

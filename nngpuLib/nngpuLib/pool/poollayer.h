@@ -15,6 +15,9 @@ private:
 	int nodeCount = 0;
 	int forwardCount = 0;
 	int backwardCount = 0;
+	int backwardWidth = 0;
+	int backwardHeight = 0;
+	int backwardDepth = 0;
 	int layerWidth = 0;
 	int layerHeight = 0;
 	int layerDepth = 0;

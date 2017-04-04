@@ -31,9 +31,11 @@ namespace nngpuVisualization
                 _updateInterval = value;
             }
         }
-        private static int _updateInterval = 1;
+        private static int _updateInterval = 10;
 
         private static int _currentInterval = 0;
+
+        private static int _threadDelayMs = 0;
 
 
         public static void StartRunner(NnGpuRunnerStarted startedDelegate, NnGpuRunnerStopped stoppedDelegate, NnGpuRunnerTraningInterationsComplete interationCompleteDelegate)
@@ -67,7 +69,11 @@ namespace nngpuVisualization
                                 _currentInterval = 0;
                                 backgroundWorker.ReportProgress(0);
                             }
-                            Thread.Sleep(100);
+
+                            if (_threadDelayMs > 0)
+                            {
+                                Thread.Sleep(_threadDelayMs);
+                            }
                         }
                     });
 

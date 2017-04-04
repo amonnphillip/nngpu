@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
+using System.IO.Compression;
+using System.IO;
 
 namespace nngpuVisualization
 {
@@ -38,18 +40,46 @@ namespace nngpuVisualization
         }
         private bool _trainingComplete = false;
 
+        public byte[] LoadAndDecompressFile(string filePathAndName)
+        {
+            byte[] decompressedData;
+            FileInfo zippedImages = new FileInfo(filePathAndName);
+            using (FileStream fileStream = zippedImages.OpenRead())
+            {
+                using (GZipStream decompressedStream = new GZipStream(fileStream, CompressionMode.Decompress))
+                {
+                    using (MemoryStream decompressedMem = new MemoryStream())
+                    {
+                        decompressedStream.CopyTo(decompressedMem);
+                        decompressedData = decompressedMem.ToArray();
+                    }
+                }
+            }
+
+            return decompressedData;
+        }
+
         public void InitializeNetwork()
         {
+
+
+            byte[] imageData = LoadAndDecompressFile("data\\train-images-idx3-ubyte.gz");
+            byte[] labelData = LoadAndDecompressFile("data\\train-labels-idx1-ubyte.gz");
+
+
+
+
+
             _nn = NnGpuWinInterop.Initialize();
             NnGpuWinInterop.InitializeNetwork(_nn);
-            NnGpuWinInterop.AddInputLayer(_nn, 8, 8, 1);
-            NnGpuWinInterop.AddConvLayer(_nn, 3, 3, 1, 4, 1, 1);
+            NnGpuWinInterop.AddInputLayer(_nn, 28, 28, 1);
+            NnGpuWinInterop.AddConvLayer(_nn, 3, 3, 1, 32, 1, 1);
             NnGpuWinInterop.AddReluLayer(_nn);
             NnGpuWinInterop.AddPoolLayer(_nn, 2, 2);
-            NnGpuWinInterop.AddFullyConnected(_nn, 2);
-            NnGpuWinInterop.AddOutput(_nn, 2);
+            NnGpuWinInterop.AddFullyConnected(_nn, 10);
+            NnGpuWinInterop.AddOutput(_nn, 10);
 
-            NnGpuWinInterop.InitializeTraining(_nn);
+            NnGpuWinInterop.InitializeTraining(_nn, imageData, imageData.Length, labelData, labelData.Length);
         }
 
         public void TrainIteration()

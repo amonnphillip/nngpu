@@ -3,7 +3,8 @@
 enum LayerDataType {
 	Forward = 0,
 	Backward = 1,
-	ConvFilter = 2
+	ConvFilter = 2,
+	PoolBackData = 3
 };
 
 struct LayerData

@@ -39,7 +39,7 @@ __global__ void ConvLayer_Forward_cu(ConvNode *node, double* filters, LayerSize 
 	output[((blockIdx.y * layerSize.width) + blockIdx.x) * layerSize.depth + blockIdx.z] = val;
 }
 
-__global__ void ConvLayer_Backward_cu(ConvNode *node, double* filters, double* backFilters, LayerSize filterSize, int filterCount, LayerSize layerSize, LayerSize nextLayerSize, double *previousLayerOutput, double *nextLayerOutput, double *output, int pad, int learnRate)
+__global__ void ConvLayer_Backward_cu(ConvNode *node, double* filters, double* backFilters, LayerSize filterSize, int filterCount, LayerSize layerSize, LayerSize previousLayerSize, LayerSize nextLayerSize, double *previousLayerOutput, double *nextLayerOutput, double *output, int pad, int learnRate)
 {
 	int posx = blockIdx.x - pad;
 	int posy = blockIdx.y - pad;
@@ -58,7 +58,7 @@ __global__ void ConvLayer_Backward_cu(ConvNode *node, double* filters, double* b
 			{
 				for (int d = 0; d < filterSize.depth; d++)
 				{
-					int index1 = ((layerSize.width * (filterPosy + posy)) + filterPosx + posx) * layerSize.depth + d;
+					int index1 = ((layerSize.width * (filterPosy + posy)) + filterPosx + posx) * previousLayerSize.depth + d;
 					int index2 = ((filterSize.width * filterPosy) + filterPosx) * filterSize.depth + d;
 
 					backFilter[index2] += previousLayerOutput[index1] * gradient;
@@ -83,7 +83,7 @@ __global__ void ConvLayer_Update_Backward_filter_cu(double* filters, double* bac
 	}
 }
 
-void ConvLayer_Forward(ConvNode *node, double* filters, LayerSize filterSize, int filterCount, LayerSize layerSize, LayerSize previousLayerSize, double *previousLayerOutput, double *output, int pad)
+void ConvLayer_Forward(ConvNode *node, double* filters, LayerSize filterSize, int filterCount, LayerSize layerSize, LayerSize previousLayerSize, LayerSize nextLayerSize, double *previousLayerOutput, double *output, int pad)
 {
 	dim3 blocks(layerSize.width, layerSize.height, filterCount);
 	ConvLayer_Forward_cu <<<blocks, 1>>>(node, filters, filterSize, layerSize, previousLayerSize, previousLayerOutput, output, pad);
@@ -99,10 +99,10 @@ void ConvLayer_Forward(ConvNode *node, double* filters, LayerSize filterSize, in
 	}
 }
 
-void ConvLayer_Backward(ConvNode *node, double* filters, double* backFilters, LayerSize filterSize, int filterCount, LayerSize layerSize, LayerSize nextLayerSize, double *previousLayerOutput, double *nextLayerOutput, double *output, int pad, double learnRate)
+void ConvLayer_Backward(ConvNode *node, double* filters, double* backFilters, LayerSize filterSize, int filterCount, LayerSize layerSize, LayerSize previousLayerSize, LayerSize nextLayerSize, double *previousLayerOutput, double *nextLayerOutput, double *output, int pad, double learnRate)
 {
 	dim3 blocks(layerSize.width, layerSize.height, filterCount);
-	ConvLayer_Backward_cu <<<blocks, 1>>>(node, filters, backFilters, filterSize, filterCount, layerSize, nextLayerSize, previousLayerOutput, nextLayerOutput, output, pad, learnRate);
+	ConvLayer_Backward_cu <<<blocks, 1>>>(node, filters, backFilters, filterSize, filterCount, layerSize, previousLayerSize, nextLayerSize, previousLayerOutput, nextLayerOutput, output, pad, learnRate);
 
 	ConvLayer_Update_Backward_filter_cu <<<filterCount, 1 >>>(filters, backFilters, filterSize, learnRate);
 

@@ -7,6 +7,20 @@
 #include "convlayer.h"
 #include "outputlayer.h"
 
+
+#define MAGIC_NUMBER 0
+#define NUMBER_OF_ITEMS 4
+#define NUMBER_OF_ROWS 8
+#define NUMBER_OF_COLUMNS 12
+#define IMAGE_DATA 16
+
+#define MAGIC_NUMBER 0
+#define NUMBER_OF_ITEMS 4
+#define LABEL_DATA 8
+
+
+#define GETINT(a) (int)((((unsigned int)a[0]) << 24) + (((unsigned int)a[1]) << 16) + (((unsigned int)a[2]) << 8) + ((unsigned int)(a[3])))
+
 NNTrainer::NNTrainer()
 {
 
@@ -17,46 +31,62 @@ NNTrainer::~NNTrainer()
 
 }
 
+void NNTrainer::Initialize(unsigned char* imageData, int imageDataLength, unsigned char* labelData, int labelDataLength)
+{
+	trainingImageData = new unsigned char[imageDataLength];
+	memcpy(trainingImageData, imageData, (size_t)imageDataLength);
+
+	trainingLabelData = new unsigned char[labelDataLength];
+	memcpy(trainingLabelData, labelData, (size_t)labelDataLength);
+
+	trainingImageCount = GETINT((trainingImageData + NUMBER_OF_ITEMS));
+	trainingImageWidth = GETINT((trainingImageData + NUMBER_OF_COLUMNS));
+	trainingImageHeight = GETINT((trainingImageData + NUMBER_OF_ROWS));
+
+	trainingLabelCount = GETINT((trainingLabelData + NUMBER_OF_ITEMS));
+}
+
+unsigned char* NNTrainer::GetImage(int imageIndex)
+{
+	assert(trainingImageData);
+	assert(imageIndex < trainingImageCount);
+
+	return trainingImageData + IMAGE_DATA + (trainingImageWidth * trainingImageHeight * imageIndex);
+}
+
+unsigned char NNTrainer::GetLabel(int labelIndex)
+{
+	assert(trainingLabelData);
+	assert(labelIndex < trainingLabelCount);
+
+	return *(trainingLabelData + LABEL_DATA + labelIndex);
+}
+
 void NNTrainer::Iterate(NNetwork* nn)
 {
-	const int inputCount = 64;
-	const int expectedCount = 2;
-	double* input;
-	double* expected;
+	const int inputCount = trainingImageWidth * trainingImageHeight;
+	const int expectedCount = 10;
 
-	if (iterationCount & 1)
+	double* input = new double[inputCount];
+	double* expected = new double[expectedCount];
+
+	unsigned  char* imageData = GetImage(iterationCount);
+	for (int index = 0; index < inputCount; index++)
 	{
-		double inputAlt[] = {
-			1, 1,  0, 0,  0, 0, 0, 0,
-			1, 1,  0, 0,  0, 0, 0, 0,
-			0, 0,  0, 0,  0, 0, 0, 0,
-			0, 0,  0, 0,  0, 0, 0, 0,
-			0, 0,  0, 0,  0, 0, 0, 0,
-			0, 0,  0, 0,  0, 0, 0, 0,
-			0, 0,  0, 0,  0, 0, 0, 0,
-			0, 0,  0, 0,  0, 0, 0, 0,
-		};
-		input = inputAlt;
-
-		double expectedAlt[] = { 1, 0 };
-		expected = expectedAlt;
+		input[index] = ((double)imageData[index]) / 255;
 	}
-	else
-	{
-		double inputAlt[] = {
-			0, 0,  1, 1,  0, 0, 0, 0,
-			0, 0,  1, 1,  0, 0, 0, 0,
-			1, 1,  0, 0,  0, 0, 0, 0,
-			1, 1,  0, 0,  0, 0, 0, 0,
-			0, 0,  0, 0,  0, 0, 0, 0,
-			0, 0,  0, 0,  0, 0, 0, 0,
-			0, 0,  0, 0,  0, 0, 0, 0,
-			0, 0,  0, 0,  0, 0, 0, 0,
-		};
-		input = inputAlt;
 
-		double expectedAlt[] = { 0, 1 };
-		expected = expectedAlt;
+	unsigned char labelData = GetLabel(iterationCount);
+	for (int index = 0; index < expectedCount; index++)
+	{
+		if (labelData == index)
+		{
+			expected[index] = 1;
+		}
+		else
+		{
+			expected[index] = 0;
+		}
 	}
 
 
@@ -68,7 +98,7 @@ void NNTrainer::Iterate(NNetwork* nn)
 
 bool NNTrainer::Trainingcomplete()
 {
-	return iterationCount >= interationMax;
+	return iterationCount >= trainingImageCount;
 }
 
 int NNTrainer::GetTrainingIteration()

@@ -54,5 +54,6 @@ public:
 	virtual int GetDepth();
 	virtual LayerType GetLayerType();
 	virtual void GetLayerData(LayerDataList& layerDataList);
+	double* GetFilterHostMem(bool copyFromDevice);
 	void DebugPrint();
 };

@@ -78,9 +78,10 @@ void NnGpu::GetLayerCount(int* layerCount)
 	*layerCount = (int)nn->GetLayerCount();
 }
 
-void NnGpu::InitializeTraining()
+void NnGpu::InitializeTraining(unsigned char* imageData, int imageDataLength, unsigned char* labelData, int labelDataLength)
 {
 	trainer = new NNTrainer();
+	trainer->Initialize(imageData, imageDataLength, labelData, labelDataLength);
 }
 
 bool NnGpu::TrainNetworkInteration()

@@ -33,8 +33,8 @@ namespace nngpuVisualization.controls
 
             BitmapSource imageSource = laterDataGroup.layerData[0].ToImage();
             Image image = new Image();
-            image.Width = 100;
-            image.Height = 100;
+            image.Width = 25;
+            image.Height = 25;
             image.Stretch = Stretch.Fill;
             image.Source = imageSource;
 
@@ -45,8 +45,8 @@ namespace nngpuVisualization.controls
             for (int filterIndex = 0; filterIndex < filterLayers.Length; filterIndex++)
             {
                 Image filterImage = new Image();
-                filterImage.Width = 100;
-                filterImage.Height = 100;
+                filterImage.Width = 25;
+                filterImage.Height = 25;
                 filterImage.Stretch = Stretch.Fill;
                 filterImage.Source = filterLayers[filterIndex].ToImage();
                 ImageContainer.Children.Add(filterImage);

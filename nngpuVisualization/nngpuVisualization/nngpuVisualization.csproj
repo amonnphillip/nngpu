@@ -65,11 +65,19 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="controls\NnFullyConnected.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="controls\NnInput.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="controls\NnOutput.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="controls\NnPool.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -87,11 +95,17 @@
     <Compile Include="controls\NnDisplay.xaml.cs">
       <DependentUpon>NnDisplay.xaml</DependentUpon>
     </Compile>
+    <Compile Include="controls\NnFullyConnected.xaml.cs">
+      <DependentUpon>NnFullyConnected.xaml</DependentUpon>
+    </Compile>
     <Compile Include="controls\NnInput.xaml.cs">
       <DependentUpon>NnInput.xaml</DependentUpon>
     </Compile>
     <Compile Include="controls\NnOutput.xaml.cs">
       <DependentUpon>NnOutput.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="controls\NnPool.xaml.cs">
+      <DependentUpon>NnPool.xaml</DependentUpon>
     </Compile>
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
@@ -124,6 +138,18 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="data\t10k-images-idx3-ubyte.gz">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="data\t10k-labels-idx1-ubyte.gz">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="data\train-images-idx3-ubyte.gz">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="data\train-labels-idx1-ubyte.gz">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

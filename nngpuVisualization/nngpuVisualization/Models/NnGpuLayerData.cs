@@ -1,18 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media.Imaging;
 
 namespace nngpuVisualization
 {
+
+
     public class NnGpuLayerData
     {
+        [DllImport("gdi32.dll")]
+        public static extern bool DeleteObject(IntPtr hObject);
+
         public NnGpuLayerDataType type;
         public int width;
         public int height;
@@ -24,7 +25,7 @@ namespace nngpuVisualization
             double scale = 1;
             double floor = double.MaxValue;
             double top = double.MinValue;
-            for (int index = 0;index < data.Length;index ++)
+            for (int index = 0; index < data.Length; index++)
             {
                 if (data[index] < floor)
                 {
@@ -57,21 +58,27 @@ namespace nngpuVisualization
                 i++;
             }
 
-            Bitmap bitmap = new Bitmap(width, height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-            BitmapData bmpData = bitmap.LockBits(new Rectangle(0, 0,
-                                                bitmap.Width,
-                                                bitmap.Height),
-                                  ImageLockMode.WriteOnly,
-                                  bitmap.PixelFormat);
+            using (Bitmap bitmap = new Bitmap(width, height, System.Drawing.Imaging.PixelFormat.Format32bppArgb))
+            { 
+                BitmapData bmpData = bitmap.LockBits(new Rectangle(0, 0,
+                                                    bitmap.Width,
+                                                    bitmap.Height),
+                                      ImageLockMode.WriteOnly,
+                                      bitmap.PixelFormat);
 
-            IntPtr pNative = bmpData.Scan0;
-            Marshal.Copy(imageData, 0, pNative, imageData.Length);
+                IntPtr pNative = bmpData.Scan0;
+                Marshal.Copy(imageData, 0, pNative, imageData.Length);
 
-            bitmap.UnlockBits(bmpData);
+                bitmap.UnlockBits(bmpData);
 
-            var handle = bitmap.GetHbitmap();
+                IntPtr handle = bitmap.GetHbitmap();
 
-            return System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(handle, IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+                BitmapSource bitmapSource = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(handle, IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+
+                DeleteObject(handle);
+
+                return bitmapSource;
+            }
         }
 
 

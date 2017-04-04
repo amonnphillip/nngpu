@@ -32,13 +32,19 @@ namespace nngpuVisualization.controls
 
         public NnGpuWin NnNetwork { get; set; }
 
+        public string IterationText { get; set; }
+
         private List<UserControl> _layerControls;
 
         public NnDisplay()
         {
             _layerControls = new List<UserControl>();
 
+            IterationText = "ddd";
+
             InitializeComponent();
+
+            DataContext = this;
 
             NnGpuRunner.StartRunner(
                 delegate (NnGpuWin nnGpuWinInstance)
@@ -62,6 +68,20 @@ namespace nngpuVisualization.controls
                             case (int)LayerType.Convolution:
                                 Dispatcher.Invoke(() => {
                                     NnConv control = new NnConv();
+                                    LayerContainer.Children.Add(control);
+                                    _layerControls.Add(control);
+                                });
+                                break;
+                            case (int)LayerType.FullyConnected:
+                                Dispatcher.Invoke(() => {
+                                    NnFullyConnected control = new NnFullyConnected();
+                                    LayerContainer.Children.Add(control);
+                                    _layerControls.Add(control);
+                                });
+                                break;
+                            case (int)LayerType.Pool:
+                                Dispatcher.Invoke(() => {
+                                    NnPool control = new NnPool();
                                     LayerContainer.Children.Add(control);
                                     _layerControls.Add(control);
                                 });
@@ -90,6 +110,12 @@ namespace nngpuVisualization.controls
                 },
                 delegate (NnGpuWin nnGpuWinInstance)
                 {
+                    Dispatcher.Invoke(() =>
+                    {
+                        this.IterationText = "Training iteraiton: " + nnGpuWinInstance.GetTrainingIteration();
+                        this.UpdateLayout();
+                    });
+
                     // Traning iteration
                     int layerCount = nnGpuWinInstance.GetLayerCount();
 
@@ -108,6 +134,18 @@ namespace nngpuVisualization.controls
                             case (int)LayerType.Convolution:
                                 Dispatcher.Invoke(() => {
                                     NnConv control = _layerControls[layerIndex] as NnConv;
+                                    control.Update(nnGpuWinInstance, layerIndex);
+                                });
+                                break;
+                            case (int)LayerType.FullyConnected:
+                                Dispatcher.Invoke(() => {
+                                    NnFullyConnected control = _layerControls[layerIndex] as NnFullyConnected;
+                                    control.Update(nnGpuWinInstance, layerIndex);
+                                });
+                                break;
+                            case (int)LayerType.Pool:
+                                Dispatcher.Invoke(() => {
+                                    NnPool control = _layerControls[layerIndex] as NnPool;
                                     control.Update(nnGpuWinInstance, layerIndex);
                                 });
                                 break;
