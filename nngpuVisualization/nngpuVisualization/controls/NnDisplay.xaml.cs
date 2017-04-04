@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,8 +19,10 @@ namespace nngpuVisualization.controls
     /// <summary>
     /// Interaction logic for NnDisplay.xaml
     /// </summary>
-    public partial class NnDisplay : UserControl
+    public partial class NnDisplay : UserControl, INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler PropertyChanged;
+
         private enum LayerType
         {
             Convolution = 0,
@@ -32,7 +35,19 @@ namespace nngpuVisualization.controls
 
         public NnGpuWin NnNetwork { get; set; }
 
-        public string IterationText { get; set; }
+        public string IterationText
+        {
+            get
+            {
+                return _iterationText;
+            }
+            set
+            {
+                _iterationText = value;
+                OnPropertyChanged("IterationText");
+            }
+        }
+        private string _iterationText;
 
         private List<UserControl> _layerControls;
 
@@ -163,6 +178,15 @@ namespace nngpuVisualization.controls
                     });
 
                 });
+        }
+
+        protected void OnPropertyChanged(string name)
+        {
+            PropertyChangedEventHandler handler = PropertyChanged;
+            if (handler != null)
+            {
+                handler(this, new PropertyChangedEventArgs(name));
+            }
         }
     }
 }

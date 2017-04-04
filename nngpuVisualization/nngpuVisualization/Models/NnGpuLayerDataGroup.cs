@@ -12,6 +12,22 @@ namespace nngpuVisualization
         public NnGpuLayerType type;
         public NnGpuLayerData[] layerData;
 
+        public NnGpuLayerData GetLayerOfType(NnGpuLayerDataType type)
+        {
+            NnGpuLayerData matchedLayer = null;
+
+            foreach (NnGpuLayerData dataLayer in layerData)
+            {
+                if (dataLayer.type == type)
+                {
+                    matchedLayer = dataLayer;
+                    break;
+                }
+            }
+
+            return matchedLayer;
+        }
+
         public NnGpuLayerData[] GetLayersOfType(NnGpuLayerDataType type)
         {
             List<NnGpuLayerData> matchedLayers = new List<NnGpuLayerData>();

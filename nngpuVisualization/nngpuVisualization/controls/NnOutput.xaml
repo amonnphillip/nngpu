@@ -8,9 +8,12 @@
              d:DesignHeight="100" d:DesignWidth="300"
              x:Name="NnOutputControl" 
              HorizontalAlignment="Stretch">
-    <Grid Height="100" Background="Coral" Width="auto">
-        <Canvas x:Name="BarContainer" VerticalAlignment="Center" Height="100" HorizontalAlignment="Stretch">
-
-        </Canvas>
+    <Grid Height="100" Width="auto" Margin="10 10 10 10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="20"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <TextBlock Grid.Row="0" Text="Output" ></TextBlock>
+        <Canvas x:Name="BarContainer" Background="Coral" Grid.Row="1" VerticalAlignment="Center" Height="100" HorizontalAlignment="Stretch"></Canvas>
     </Grid>
 </UserControl>

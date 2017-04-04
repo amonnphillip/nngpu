@@ -30,15 +30,27 @@ namespace nngpuVisualization.controls
             NnGpuLayerDataGroup laterDataGroup = nnGpuWinInstance.GetLayerData(layerIndex);
 
             ImageContainer.Children.Clear();
+            FilterImageContainer.Children.Clear();
+            BackwardsImageContainer.Children.Clear();
 
-            BitmapSource imageSource = laterDataGroup.layerData[0].ToImage();
+            BitmapSource imageSource = laterDataGroup.GetLayerOfType(NnGpuLayerDataType.Forward).ToDepthImage();
             Image image = new Image();
-            image.Width = 25;
+            image.Width = 25 * laterDataGroup.layerData[0].depth;
             image.Height = 25;
             image.Stretch = Stretch.Fill;
             image.Source = imageSource;
 
             ImageContainer.Children.Add(image);
+
+
+            BitmapSource backwardsImageSource = laterDataGroup.GetLayerOfType(NnGpuLayerDataType.Backward).ToDepthImage();
+            Image backwardsImage = new Image();
+            backwardsImage.Width = 25 * laterDataGroup.layerData[0].depth;
+            backwardsImage.Height = 25;
+            backwardsImage.Stretch = Stretch.Fill;
+            backwardsImage.Source = backwardsImageSource;
+
+            BackwardsImageContainer.Children.Add(backwardsImage);
 
 
             NnGpuLayerData[] filterLayers = laterDataGroup.GetLayersOfType(NnGpuLayerDataType.ConvFilter);
@@ -49,7 +61,7 @@ namespace nngpuVisualization.controls
                 filterImage.Height = 25;
                 filterImage.Stretch = Stretch.Fill;
                 filterImage.Source = filterLayers[filterIndex].ToImage();
-                ImageContainer.Children.Add(filterImage);
+                FilterImageContainer.Children.Add(filterImage);
             }
         }
     }

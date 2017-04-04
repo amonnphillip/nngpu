@@ -11,7 +11,7 @@
             <RowDefinition Height="20"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
         </Grid.RowDefinitions>
-        <TextBlock Grid.Row="0" Text="{Binding IterationText}" Width="100" Height="20" HorizontalAlignment="Left" VerticalAlignment="Top" ></TextBlock>
+        <TextBlock Grid.Row="0" Text="{Binding IterationText}" HorizontalAlignment="Left" VerticalAlignment="Top" ></TextBlock>
         <StackPanel Grid.Row="1" x:Name="LayerContainer" HorizontalAlignment="Left" Orientation="Vertical">
             <ItemsControl>
                 <ItemsControl.ItemTemplate>
