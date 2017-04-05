@@ -96,7 +96,7 @@ void NNTrainer::Iterate(NNetwork* nn)
 	iterationCount++;
 }
 
-bool NNTrainer::Trainingcomplete()
+bool NNTrainer::TrainingComplete()
 {
 	return iterationCount >= trainingImageCount;
 }

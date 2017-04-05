@@ -63,6 +63,7 @@
     <ClCompile Include="nngpu.cpp" />
     <ClCompile Include="nntrainer.cpp" />
     <ClCompile Include="nngpuwin.cpp" />
+    <ClCompile Include="nntester.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="conv\convlayer.cu">
@@ -125,5 +126,7 @@
     <ClInclude Include="nngpu.h" />
     <ClInclude Include="nngpuwin.h" />
     <ClInclude Include="layerdata.h" />
+    <ClInclude Include="nntester.h" />
+    <ClInclude Include="nntestresult.h" />
   </ItemGroup>
 </Project>

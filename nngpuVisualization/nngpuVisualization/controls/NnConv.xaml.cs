@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,24 +19,45 @@ namespace nngpuVisualization.controls
     /// <summary>
     /// Interaction logic for NnConv.xaml
     /// </summary>
-    public partial class NnConv : UserControl
+    public partial class NnConv : UserControl, INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public string BackwardSum
+        {
+            get
+            {
+                return _backwardSum;
+            }
+            set
+            {
+                _backwardSum = value;
+                OnPropertyChanged("BackwardSum");
+            }
+        }
+        private string _backwardSum;
+
         public NnConv()
         {
             InitializeComponent();
+
+            DataContext = this;
         }
 
         public void Update(NnGpuWin nnGpuWinInstance, int layerIndex)
         {
             NnGpuLayerDataGroup laterDataGroup = nnGpuWinInstance.GetLayerData(layerIndex);
 
+            BackwardSum = "Sum: " + laterDataGroup.GetLayerOfType(NnGpuLayerDataType.Backward).Sum();
+
             ImageContainer.Children.Clear();
             FilterImageContainer.Children.Clear();
             BackwardsImageContainer.Children.Clear();
 
-            BitmapSource imageSource = laterDataGroup.GetLayerOfType(NnGpuLayerDataType.Forward).ToDepthImage();
+            NnGpuLayerData forward = laterDataGroup.GetLayerOfType(NnGpuLayerDataType.Forward);
+            BitmapSource imageSource = forward.ToDepthImage();
             Image image = new Image();
-            image.Width = 25 * laterDataGroup.layerData[0].depth;
+            image.Width = 25 * forward.depth;
             image.Height = 25;
             image.Stretch = Stretch.Fill;
             image.Source = imageSource;
@@ -43,9 +65,10 @@ namespace nngpuVisualization.controls
             ImageContainer.Children.Add(image);
 
 
-            BitmapSource backwardsImageSource = laterDataGroup.GetLayerOfType(NnGpuLayerDataType.Backward).ToDepthImage();
+            NnGpuLayerData backward = laterDataGroup.GetLayerOfType(NnGpuLayerDataType.Backward);
+            BitmapSource backwardsImageSource = backward.ToDepthImage();
             Image backwardsImage = new Image();
-            backwardsImage.Width = 25 * laterDataGroup.layerData[0].depth;
+            backwardsImage.Width = backward.width;
             backwardsImage.Height = 25;
             backwardsImage.Stretch = Stretch.Fill;
             backwardsImage.Source = backwardsImageSource;
@@ -62,6 +85,15 @@ namespace nngpuVisualization.controls
                 filterImage.Stretch = Stretch.Fill;
                 filterImage.Source = filterLayers[filterIndex].ToImage();
                 FilterImageContainer.Children.Add(filterImage);
+            }
+        }
+
+        protected void OnPropertyChanged(string name)
+        {
+            PropertyChangedEventHandler handler = PropertyChanged;
+            if (handler != null)
+            {
+                handler(this, new PropertyChangedEventArgs(name));
             }
         }
     }

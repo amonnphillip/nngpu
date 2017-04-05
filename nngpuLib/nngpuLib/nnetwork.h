@@ -35,6 +35,7 @@ public:
 	}
 	void Forward(double* input, int inputSize);
 	void Backward(double* input, int expectedSize, double learnRate);
+	void NNetwork::GetOutput(double** output, int* outputLength);
 	double* GetLayerForward(int layerIndex);
 	double* GetLayerBackward(int layerIndex);
 	void Dispose();

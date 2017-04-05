@@ -52,6 +52,15 @@ void NNetwork::Backward(double* expected, int expectedSize, double learnRate)
 	}
 }
 
+void NNetwork::GetOutput(double** output, int* outputLength)
+{
+	int lastLayer = (int)layers.size() - 1;
+	INNetworkLayer* layer = layers.at(lastLayer);
+
+	*output = layers.at(lastLayer)->GetForwardHostMem(true);
+	*outputLength = layers.at(lastLayer)->GetForwardNodeCount();
+}
+
 double* NNetwork::GetLayerForward(int layerIndex)
 {
 	return layers.at(layerIndex)->GetForwardHostMem(false);

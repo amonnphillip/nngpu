@@ -8,7 +8,7 @@ public:
 	~NNTrainer();
 	void Initialize(unsigned char* imageData, int imageDataLength, unsigned char* labelData, int labelDataLength);
 	void Iterate(NNetwork* nn);
-	bool Trainingcomplete();
+	bool TrainingComplete();
 	int GetTrainingIteration();
 	unsigned char* GetImage(int imageIndex);
 	unsigned char GetLabel(int labelIndex);

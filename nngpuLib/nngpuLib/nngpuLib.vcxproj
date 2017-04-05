@@ -30,6 +30,7 @@
     <ClCompile Include="nnetwork.cpp" />
     <ClCompile Include="nngpu.cpp" />
     <ClCompile Include="nngpuwin.cpp" />
+    <ClCompile Include="nntester.cpp" />
     <ClCompile Include="output\outputlayer.cpp" />
     <ClCompile Include="output\outputlayerconfig.cpp" />
     <ClCompile Include="pool\poollayer.cpp" />
@@ -60,6 +61,7 @@
     <ClInclude Include="nnetwork.h" />
     <ClInclude Include="nngpu.h" />
     <ClInclude Include="nngpuwin.h" />
+    <ClInclude Include="nntester.h" />
     <ClInclude Include="output\outputlayer.h" />
     <ClInclude Include="output\outputlayerconfig.h" />
     <ClInclude Include="pool\poollayer.h" />
@@ -67,6 +69,7 @@
     <ClInclude Include="relu\relulayer.h" />
     <ClInclude Include="relu\relulayerconfig.h" />
     <ClInclude Include="nntrainer.h" />
+    <ClInclude Include="nntestresult.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{199A53C3-3AE6-4992-95DE-DEA6F69CC40E}</ProjectGuid>

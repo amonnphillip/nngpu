@@ -13,6 +13,7 @@
             <RowDefinition Height="20"></RowDefinition>
             <RowDefinition Height="auto"></RowDefinition>
             <RowDefinition Height="20"></RowDefinition>
+            <RowDefinition Height="20"></RowDefinition>
             <RowDefinition Height="auto"></RowDefinition>
         </Grid.RowDefinitions>
         <TextBlock Grid.Row="0" Text="Conv Forward" ></TextBlock>
@@ -20,6 +21,7 @@
         <TextBlock Grid.Row="2" Text="Conv Filters" ></TextBlock>
         <StackPanel x:Name="FilterImageContainer" Grid.Row="3" Orientation="Horizontal"  HorizontalAlignment="Stretch"></StackPanel>
         <TextBlock Grid.Row="4" Text="Conv Backwards" ></TextBlock>
-        <StackPanel x:Name="BackwardsImageContainer" Grid.Row="5" Background="Azure" Orientation="Horizontal" HorizontalAlignment="Stretch"></StackPanel>
+        <TextBlock Grid.Row="5" Text="{Binding BackwardSum}" ></TextBlock>
+        <StackPanel x:Name="BackwardsImageContainer" Grid.Row="6" Background="Azure" Orientation="Horizontal" HorizontalAlignment="Stretch"></StackPanel>
     </Grid>
 </UserControl>

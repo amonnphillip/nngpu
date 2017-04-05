@@ -167,7 +167,7 @@ void ReluLayer::GetLayerData(LayerDataList& layerDataList)
 	LayerData* layerData = new LayerData[2];
 
 	layerDataList.layerDataCount = 2;
-	layerDataList.layerType = LayerType::Input;
+	layerDataList.layerType = LayerType::Pool;
 	layerDataList.layerData = layerData;
 
 	layerData->type = LayerDataType::Forward;
@@ -175,6 +175,7 @@ void ReluLayer::GetLayerData(LayerDataList& layerDataList)
 	layerData->height = GetForwardHeight();
 	layerData->depth = GetForwardDepth();
 	layerData->data = GetForwardHostMem(true);
+	layerData++;
 
 	layerData->type = LayerDataType::Backward;
 	layerData->width = GetForwardWidth();

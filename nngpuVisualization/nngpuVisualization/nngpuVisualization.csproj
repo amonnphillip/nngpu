@@ -81,6 +81,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="controls\NnRelu.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -107,17 +111,22 @@
     <Compile Include="controls\NnPool.xaml.cs">
       <DependentUpon>NnPool.xaml</DependentUpon>
     </Compile>
+    <Compile Include="controls\NnRelu.xaml.cs">
+      <DependentUpon>NnRelu.xaml</DependentUpon>
+    </Compile>
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CustomMarshal\NNGpuMarshalTestResult.cs" />
     <Compile Include="Models\NnGpuLayerData.cs" />
     <Compile Include="Models\NnGpuLayerDataGroup.cs" />
     <Compile Include="Models\NnGpuLayerDataType.cs" />
     <Compile Include="Models\NnGpuLayerType.cs" />
-    <Compile Include="NnGpuMarshal.cs" />
+    <Compile Include="Models\NNGpuTestResult.cs" />
+    <Compile Include="CustomMarshal\NnGpuMarshalLayerData.cs" />
     <Compile Include="NnGpuRunner.cs" />
     <Compile Include="NnGpuWin.cs" />
     <Compile Include="NnGpuWinInterop.cs" />

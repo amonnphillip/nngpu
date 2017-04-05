@@ -11,6 +11,7 @@ using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using System.IO.Compression;
 using System.IO;
+using nngpuVisualization.Models;
 
 namespace nngpuVisualization
 {
@@ -18,18 +19,18 @@ namespace nngpuVisualization
     {
         private IntPtr _nn;
 
-        public bool PauseTraining
+        public bool Pause
         {
             get
             {
-                return _pauseTraining;
+                return _pause;
             }
             set
             {
-                _pauseTraining = value;
+                _pause = value;
             }
         }
-        private bool _pauseTraining = false;
+        private bool _pause = false;
 
         public bool TrainingComplete
         {
@@ -39,6 +40,15 @@ namespace nngpuVisualization
             }
         }
         private bool _trainingComplete = false;
+
+        public bool TestingComplete
+        {
+            get
+            {
+                return _testingComplete;
+            }
+        }
+        private bool _testingComplete = false;
 
         public byte[] LoadAndDecompressFile(string filePathAndName)
         {
@@ -61,14 +71,8 @@ namespace nngpuVisualization
 
         public void InitializeNetwork()
         {
-
-
             byte[] imageData = LoadAndDecompressFile("data\\train-images-idx3-ubyte.gz");
             byte[] labelData = LoadAndDecompressFile("data\\train-labels-idx1-ubyte.gz");
-
-
-
-
 
             _nn = NnGpuWinInterop.Initialize();
             NnGpuWinInterop.InitializeNetwork(_nn);
@@ -82,12 +86,33 @@ namespace nngpuVisualization
             NnGpuWinInterop.InitializeTraining(_nn, imageData, imageData.Length, labelData, labelData.Length);
         }
 
+        public void InitializeTesting()
+        {
+            byte[] imageData = LoadAndDecompressFile("data\\t10k-images-idx3-ubyte.gz");
+            byte[] labelData = LoadAndDecompressFile("data\\t10k-labels-idx1-ubyte.gz");
+
+            NnGpuWinInterop.InitializeTesting(_nn, imageData, imageData.Length, labelData, labelData.Length);
+        }
+
         public void TrainIteration()
         {
-            if (!_pauseTraining)
+            if (!_pause)
             {
                 _trainingComplete = NnGpuWinInterop.TrainNetworkInteration(_nn);
             }
+        }
+
+        public NNGpuTestResult TestIteration()
+        {
+            if (!_pause)
+            {
+                NNGpuTestResult result;
+                _testingComplete = NnGpuWinInterop.TestNetworkInteration(_nn, out result);
+
+                return result;
+            }
+
+            return null;
         }
 
         public void DisposeNetwork()

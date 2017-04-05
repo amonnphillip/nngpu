@@ -85,6 +85,18 @@ bool TrainNetworkInteration(NnGpu* nn)
 	return nn->TrainNetworkInteration();
 }
 
+void InitializeTesting(NnGpu* nn, unsigned char* imageData, int imageDataLength, unsigned char* labelData, int labelDataLength)
+{
+	nn->InitializeTesting(imageData, imageDataLength, labelData, labelDataLength);
+}
+
+bool TestNetworkInteration(NnGpu* nn, NNTestResult** testresult)
+{
+	*testresult = (NNTestResult*)GlobalAlloc(GMEM_FIXED, sizeof(NNTestResult));
+
+	return nn->TestNetworkInteration(*testresult);
+}
+
 void GetTrainingIteration(NnGpu* nn, int* interation)
 {
 	*interation = nn->GetTrainingIteration();

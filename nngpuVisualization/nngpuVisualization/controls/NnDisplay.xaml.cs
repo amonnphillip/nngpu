@@ -94,6 +94,13 @@ namespace nngpuVisualization.controls
                                     _layerControls.Add(control);
                                 });
                                 break;
+                            case (int)LayerType.Relu:
+                                Dispatcher.Invoke(() => {
+                                    NnRelu control = new NnRelu();
+                                    LayerContainer.Children.Add(control);
+                                    _layerControls.Add(control);
+                                });
+                                break;
                             case (int)LayerType.Pool:
                                 Dispatcher.Invoke(() => {
                                     NnPool control = new NnPool();
@@ -158,6 +165,12 @@ namespace nngpuVisualization.controls
                                     control.Update(nnGpuWinInstance, layerIndex);
                                 });
                                 break;
+                            case (int)LayerType.Relu:
+                                Dispatcher.Invoke(() => {
+                                    NnRelu control = _layerControls[layerIndex] as NnRelu;
+                                    control.Update(nnGpuWinInstance, layerIndex);
+                                });
+                                break;
                             case (int)LayerType.Pool:
                                 Dispatcher.Invoke(() => {
                                     NnPool control = _layerControls[layerIndex] as NnPool;
@@ -177,7 +190,21 @@ namespace nngpuVisualization.controls
                         this.InvalidateVisual();
                     });
 
-                });
+                }, 
+                delegate (NnGpuWin nnGpuWinInstance)
+                {
+                    // Training start
+                },
+                delegate (NnGpuWin nnGpuWinInstance)
+                {
+                    // Training stop
+
+                },
+                delegate (NnGpuWin nnGpuWinInstance)
+                {
+                    // Training iterate
+                }
+                );
         }
 
         protected void OnPropertyChanged(string name)

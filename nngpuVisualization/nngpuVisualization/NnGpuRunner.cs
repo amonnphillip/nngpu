@@ -1,4 +1,5 @@
-﻿using System;
+﻿using nngpuVisualization.Models;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -12,9 +13,32 @@ namespace nngpuVisualization
 {
     class NnGpuRunner
     {
-        public delegate void NnGpuRunnerStarted(NnGpuWin nnGpuWinInstance);
-        public delegate void NnGpuRunnerStopped(NnGpuWin nnGpuWinInstance);
+        public delegate void NnGpuRunnerTrainingStarted(NnGpuWin nnGpuWinInstance);
         public delegate void NnGpuRunnerTraningInterationsComplete(NnGpuWin nnGpuWinInstance);
+        public delegate void NnGpuRunnerTrainingStopped(NnGpuWin nnGpuWinInstance);
+        public delegate void NnGpuRunnerTestingStarted(NnGpuWin nnGpuWinInstance);
+        public delegate void NnGpuRunnerTestingInterationsComplete(NnGpuWin nnGpuWinInstance);
+        public delegate void NnGpuRunnerTestingStopped(NnGpuWin nnGpuWinInstance);
+
+        public enum RunnerStatus
+        {
+            None,
+            Training,
+            Testing
+        };
+
+        public static RunnerStatus Status
+        {
+            get
+            {
+                return _status;
+            }
+            set
+            {
+                _status = value;
+            }
+        }
+        private static RunnerStatus _status = RunnerStatus.None;
 
         private static NnGpuWin _nnGpuWin;
         private static bool _workerRunning = false;
@@ -38,7 +62,13 @@ namespace nngpuVisualization
         private static int _threadDelayMs = 0;
 
 
-        public static void StartRunner(NnGpuRunnerStarted startedDelegate, NnGpuRunnerStopped stoppedDelegate, NnGpuRunnerTraningInterationsComplete interationCompleteDelegate)
+        public static void StartRunner(
+            NnGpuRunnerTrainingStarted trainingStartedDelegate, 
+            NnGpuRunnerTrainingStopped trainingStoppedDelegate, 
+            NnGpuRunnerTraningInterationsComplete trainingInterationCompleteDelegate,
+            NnGpuRunnerTestingStarted testingStartedDelegate,
+            NnGpuRunnerTestingStopped testingStoppedDelegate,
+            NnGpuRunnerTestingInterationsComplete testingInterationCompleteDelegate)
         {
             Debug.Assert(_worker == null);
 
@@ -55,9 +85,11 @@ namespace nngpuVisualization
                 _worker.DoWork += new DoWorkEventHandler(
                     delegate (object sender, DoWorkEventArgs args)
                     {
+                        Status = RunnerStatus.Training;
+
                         BackgroundWorker backgroundWorker = sender as BackgroundWorker;
 
-                        startedDelegate(_nnGpuWin);
+                        trainingStartedDelegate(_nnGpuWin);
 
                         while(!_nnGpuWin.TrainingComplete)
                         {
@@ -75,20 +107,53 @@ namespace nngpuVisualization
                                 Thread.Sleep(_threadDelayMs);
                             }
                         }
+
+                        trainingStoppedDelegate(_nnGpuWin);
+
+
+                        Status = RunnerStatus.Testing;
+
+                        _nnGpuWin.InitializeTesting();
+
+                        testingStartedDelegate(_nnGpuWin);
+
+                        while (!_nnGpuWin.TestingComplete)
+                        {
+                            NNGpuTestResult result = _nnGpuWin.TestIteration();
+
+                            _currentInterval++;
+                            if (_currentInterval >= _updateInterval)
+                            {
+                                _currentInterval = 0;
+                                backgroundWorker.ReportProgress(0, result);
+                            }
+
+                            if (_threadDelayMs > 0)
+                            {
+                                Thread.Sleep(_threadDelayMs);
+                            }
+                        }
+
+                        testingStoppedDelegate(_nnGpuWin);
+
                     });
 
                 _worker.ProgressChanged += new ProgressChangedEventHandler(
                     delegate (object sender, ProgressChangedEventArgs args)
                     {
-                        interationCompleteDelegate(_nnGpuWin);
+                        if (_status == RunnerStatus.Training)
+                        {
+                            trainingInterationCompleteDelegate(_nnGpuWin);
+                        } else if (_status == RunnerStatus.Testing)
+                        {
+                            testingInterationCompleteDelegate(_nnGpuWin);
+                        }
                     });
 
                 _worker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(
                     delegate (object sender, RunWorkerCompletedEventArgs args)
                     {
-                        int r = _nnGpuWin.GetTrainingIteration();
 
-                        stoppedDelegate(_nnGpuWin);
                     });
 
                 _worker.RunWorkerAsync();

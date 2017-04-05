@@ -1,7 +1,9 @@
 #pragma once
 #include "nnetwork.h"
 #include "nntrainer.h"
+#include "nntester.h"
 #include "layerdata.h"
+#include "nntestresult.h"
 
 class NnGpu
 {
@@ -17,11 +19,15 @@ public:
 	void GetLayerCount(int* layerCount);
 	void InitializeTraining(unsigned char* imageData, int imageDataLength, unsigned char* labelData, int labelDataLength);
 	bool TrainNetworkInteration();
+	void InitializeTesting(unsigned char* imageData, int imageDataLength, unsigned char* labelData, int labelDataLength);
+	bool TestNetworkInteration(NNTestResult* testresult);
 	int GetTrainingIteration();
+	int GetTestingIteration();
 	void DisposeNetwork();
 	void GetLayerData(int layerIndex, LayerDataType dataType, LayerDataList& layerData);
 
 private:
 	NNetwork* nn;
 	NNTrainer* trainer;
+	NNTester* tester;
 };

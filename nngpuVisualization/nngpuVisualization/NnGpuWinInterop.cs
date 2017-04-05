@@ -1,4 +1,6 @@
-﻿using System;
+﻿using nngpuVisualization.CustomMarshal;
+using nngpuVisualization.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -46,12 +48,18 @@ namespace nngpuVisualization
         public static extern bool TrainNetworkInteration(IntPtr nn);
 
         [DllImport("nngpuLib.dll")]
+        public static extern void InitializeTesting(IntPtr nn, [In, MarshalAs(UnmanagedType.LPArray)] byte[] imageData, int imageDataLength, [In, MarshalAs(UnmanagedType.LPArray)] byte[] labelData, int labelDataLength);
+
+        [DllImport("nngpuLib.dll")]
+        public static extern bool TestNetworkInteration(IntPtr nn, [Out, MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(NNGpuMarshalTestResult))] out NNGpuTestResult result);
+
+        [DllImport("nngpuLib.dll")]
         public static extern void GetTrainingIteration(IntPtr nn, out int interation);
 
         [DllImport("nngpuLib.dll")]
         public static extern void DisposeNetwork(IntPtr nn);
 
         [DllImport("nngpuLib.dll")]
-        public static extern void GetLayerData(IntPtr nn, int layerIndex, [Out, MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(NnGpuMarshal))] out NnGpuLayerDataGroup data);
+        public static extern void GetLayerData(IntPtr nn, int layerIndex, [Out, MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(NnGpuMarshalLayerData))] out NnGpuLayerDataGroup data);
     }
 }

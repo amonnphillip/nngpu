@@ -33,7 +33,7 @@ namespace nngpuVisualization.controls
         {
             NnGpuLayerDataGroup laterDataGroup = nnGpuWinInstance.GetLayerData(layerIndex);
 
-            BitmapSource image = laterDataGroup.layerData[0].ToImage();
+            BitmapSource image = laterDataGroup.GetLayerOfType(NnGpuLayerDataType.Forward).ToImage();
             layerInputImg.Source = image;
         }
     }

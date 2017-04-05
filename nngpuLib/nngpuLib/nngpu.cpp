@@ -88,12 +88,30 @@ bool NnGpu::TrainNetworkInteration()
 {
 	trainer->Iterate(nn);
 
-	return trainer->Trainingcomplete();
+	return trainer->TrainingComplete();
 }
 
 int NnGpu::GetTrainingIteration()
 {
 	return trainer->GetTrainingIteration();
+}
+
+void NnGpu::InitializeTesting(unsigned char* imageData, int imageDataLength, unsigned char* labelData, int labelDataLength)
+{
+	tester = new NNTester();
+	tester->Initialize(imageData, imageDataLength, labelData, labelDataLength);
+}
+
+bool NnGpu::TestNetworkInteration(NNTestResult* testresult)
+{
+	tester->Iterate(nn, testresult);
+
+	return tester->TestingComplete();
+}
+
+int NnGpu::GetTestingIteration()
+{
+	return tester->GetTestingIteration();
 }
 
 void NnGpu::DisposeNetwork()

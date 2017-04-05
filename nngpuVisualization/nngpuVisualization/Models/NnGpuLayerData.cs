@@ -140,5 +140,16 @@ namespace nngpuVisualization
             byte[] imageData = ScaleImageData();
             return ByteArrayBitmapSource(imageData, width, height);
         }
+
+        public double Sum()
+        {
+            double sum = 0;
+            for (int i = 0;i < data.Length;i++)
+            {
+                sum += data[i];
+            }
+
+            return sum;
+        }
     }
 }

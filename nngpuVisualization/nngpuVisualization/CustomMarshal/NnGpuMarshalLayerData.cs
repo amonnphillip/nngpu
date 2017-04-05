@@ -5,9 +5,9 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace nngpuVisualization
+namespace nngpuVisualization.CustomMarshal
 {
-    class NnGpuMarshal : ICustomMarshaler
+    class NnGpuMarshalLayerData : ICustomMarshaler
     {
         public IntPtr MarshalManagedToNative(object managedObj)
         {
@@ -63,7 +63,7 @@ namespace nngpuVisualization
 
         public static ICustomMarshaler GetInstance(string cookie)
         {
-            return new NnGpuMarshal();
+            return new NnGpuMarshalLayerData();
         }
     }
 }

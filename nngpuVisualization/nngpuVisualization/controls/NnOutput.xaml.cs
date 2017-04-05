@@ -40,8 +40,8 @@ namespace nngpuVisualization.controls
         {
             NnGpuLayerDataGroup laterDataGroup = nnGpuWinInstance.GetLayerData(layerIndex);
 
-            double[] layerDataForward = laterDataGroup.layerData[0].data;
-            double[] layerDataBackward = laterDataGroup.layerData[1].data;
+            double[] layerDataForward = laterDataGroup.GetLayerOfType(NnGpuLayerDataType.Forward).data;
+            double[] layerDataBackward = laterDataGroup.GetLayerOfType(NnGpuLayerDataType.Backward).data;
 
             Outputs.Insert(0, layerDataBackward);
             if (Outputs.Count > MaxPoints)
@@ -152,56 +152,6 @@ namespace nngpuVisualization.controls
             });
 
             BarContainer.InvalidateArrange();
-
-
-
-            /*
-            for(int index = 0;index < layerDataForward.Length;index ++)
-            {
-                double value = layerDataForward[index];
-
-                double barValue = value;
-                double marginh = 0;
-                if (barValue >= 0)
-                {
-                    if (barValue > 2)
-                    {
-                        barValue = 2;
-                    }
-                    barValue *= BarUintHeight;
-                    marginh = -barValue;
-                }
-                if (barValue < 0)
-                {
-                    if (barValue < -2)
-                    {
-                        barValue = 2;
-                    }
-                    barValue *= BarUintHeight;
-                    marginh = barValue;
-                }
-
-
-                Grid g = new Grid();
-                //g.Margin = new Thickness(0, marginh, 0, 0);
-
-                Rectangle r = new Rectangle();
-                r.Width = BarWidth;
-                r.Height = barValue;
-                r.VerticalAlignment = VerticalAlignment.Center;
-
-                r.Fill = new SolidColorBrush(Color.FromRgb(255, 0, 0));
-
-                g.Children.Add(r);
-                g.Children.Add(new TextBlock()
-                {
-                    Text = Convert.ToString(Math.Round(value, 4))
-                });
-
-
-                BarContainer.Children.Add(g);
-                BarContainer.InvalidateArrange();
-            }*/
         }
     }
 }

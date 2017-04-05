@@ -14,6 +14,8 @@ extern "C"
 	__declspec(dllexport) void GetLayerCount(NnGpu* nn, int* layerCount);
 	__declspec(dllexport) void InitializeTraining(NnGpu* nn, unsigned char* imageData, int imageDataLength, unsigned char* labelData, int labelDataLength);
 	__declspec(dllexport) bool TrainNetworkInteration(NnGpu* nn);
+	__declspec(dllexport) void InitializeTesting(NnGpu* nn, unsigned char* imageData, int imageDataLength, unsigned char* labelData, int labelDataLength);
+	__declspec(dllexport) bool TestNetworkInteration(NnGpu* nn, NNTestResult** testresult);
 	__declspec(dllexport) void GetTrainingIteration(NnGpu* nn, int* interation);
 	__declspec(dllexport) void DisposeNetwork(NnGpu* nn);
 	__declspec(dllexport) void GetLayerData(NnGpu* nn, int layerIndex, int** data);

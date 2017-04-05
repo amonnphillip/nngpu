@@ -16,11 +16,11 @@ using System.Windows.Shapes;
 namespace nngpuVisualization.controls
 {
     /// <summary>
-    /// Interaction logic for NnPool.xaml
+    /// Interaction logic for NnRelu.xaml
     /// </summary>
-    public partial class NnPool : UserControl
+    public partial class NnRelu : UserControl
     {
-        public NnPool()
+        public NnRelu()
         {
             InitializeComponent();
         }
@@ -43,7 +43,7 @@ namespace nngpuVisualization.controls
             ImageContainer.Children.Add(image);
 
 
-            NnGpuLayerData backward = laterDataGroup.GetLayerOfType(NnGpuLayerDataType.Backward);
+            NnGpuLayerData backward = laterDataGroup.GetLayerOfType(NnGpuLayerDataType.Forward);
             BitmapSource backwardImageSource = backward.ToDepthImage();
             Image backwardImage = new Image();
             backwardImage.Width = 25 * backward.depth;
