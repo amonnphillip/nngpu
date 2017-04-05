@@ -28,7 +28,17 @@ NNTrainer::NNTrainer()
 
 NNTrainer::~NNTrainer()
 {
+	if (trainingImageData)
+	{
+		delete trainingImageData;
+		trainingImageData = nullptr;
+	}
 
+	if (trainingLabelData)
+	{
+		delete trainingLabelData;
+		trainingLabelData = nullptr;
+	}
 }
 
 void NNTrainer::Initialize(unsigned char* imageData, int imageDataLength, unsigned char* labelData, int labelDataLength)
@@ -92,6 +102,9 @@ void NNTrainer::Iterate(NNetwork* nn)
 
 	nn->Forward(input, inputCount);
 	nn->Backward(expected, expectedCount, 0.001);
+
+	delete input;
+	delete expected;
 
 	iterationCount++;
 }

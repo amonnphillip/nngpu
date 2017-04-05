@@ -50,6 +50,25 @@ namespace nngpuVisualization
         }
         private bool _testingComplete = false;
 
+        private List<NNGpuTestResult> _testResults;
+
+        public int CorrectTestPredictions
+        {
+            get
+            {
+                return _correctPredictions;
+            }
+        }
+        private int _correctPredictions;
+
+        public int TestsPerformed
+        {
+            get
+            {
+                return _testResults.Count;
+            }
+        }
+
         public byte[] LoadAndDecompressFile(string filePathAndName)
         {
             byte[] decompressedData;
@@ -88,6 +107,9 @@ namespace nngpuVisualization
 
         public void InitializeTesting()
         {
+            _testResults = new List<NNGpuTestResult>();
+            _correctPredictions = 0;
+
             byte[] imageData = LoadAndDecompressFile("data\\t10k-images-idx3-ubyte.gz");
             byte[] labelData = LoadAndDecompressFile("data\\t10k-labels-idx1-ubyte.gz");
 
@@ -108,6 +130,13 @@ namespace nngpuVisualization
             {
                 NNGpuTestResult result;
                 _testingComplete = NnGpuWinInterop.TestNetworkInteration(_nn, out result);
+
+                _testResults.Add(result);
+
+                if (result.expected == result.predicted)
+                {
+                    _correctPredictions++;
+                }
 
                 return result;
             }

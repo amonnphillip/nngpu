@@ -28,7 +28,17 @@ NNTester::NNTester()
 
 NNTester::~NNTester()
 {
+	if (testingImageData)
+	{
+		delete testingImageData;
+		testingImageData = nullptr;
+	}
 
+	if (testingLabelData)
+	{
+		delete testingLabelData;
+		testingLabelData = nullptr;
+	}
 }
 
 void NNTester::Initialize(unsigned char* imageData, int imageDataLength, unsigned char* labelData, int labelDataLength)
@@ -64,15 +74,10 @@ unsigned char NNTester::GetLabel(int labelIndex)
 
 void NNTester::Iterate(NNetwork* nn, NNTestResult* testresult)
 {
-	testresult->expected = 999;
-	testresult->predicted = 99999;
-	return;
-
 	const int inputCount = testingImageWidth * testingImageHeight;
 	const int expectedCount = 10;
 
 	double* input = new double[inputCount];
-	double* expected = new double[expectedCount];
 
 	unsigned  char* imageData = GetImage(iterationCount);
 	for (int index = 0; index < inputCount; index++)
@@ -81,6 +86,7 @@ void NNTester::Iterate(NNetwork* nn, NNTestResult* testresult)
 	}
 
 	nn->Forward(input, inputCount);
+	delete input;
 
 	double* output = nullptr;
 	int outLength = 0;

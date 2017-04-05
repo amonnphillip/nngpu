@@ -10,6 +10,8 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="20"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="20"></RowDefinition>
+            <RowDefinition Height="20"></RowDefinition>
         </Grid.RowDefinitions>
         <TextBlock Grid.Row="0" Text="{Binding IterationText}" HorizontalAlignment="Left" VerticalAlignment="Top" ></TextBlock>
         <StackPanel Grid.Row="1" x:Name="LayerContainer" HorizontalAlignment="Left" Orientation="Vertical">
@@ -21,5 +23,7 @@
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
         </StackPanel>
+        <TextBlock Grid.Row="2" Text="{Binding TestIterationText}" HorizontalAlignment="Left" VerticalAlignment="Top" ></TextBlock>
+        <TextBlock Grid.Row="3" Text="{Binding TestAccuracyText}" HorizontalAlignment="Left" VerticalAlignment="Top" ></TextBlock>
     </Grid>
 </UserControl>

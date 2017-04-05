@@ -17,8 +17,8 @@ public:
 private:
 	int iterationCount = 0;
 
-	unsigned char* testingImageData;
-	unsigned char* testingLabelData;
+	unsigned char* testingImageData = nullptr;
+	unsigned char* testingLabelData = nullptr;
 	int testingImageCount;
 	int testingImageWidth;
 	int testingImageHeight;

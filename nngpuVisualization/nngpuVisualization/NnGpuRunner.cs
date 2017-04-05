@@ -55,7 +55,7 @@ namespace nngpuVisualization
                 _updateInterval = value;
             }
         }
-        private static int _updateInterval = 10;
+        private static int _updateInterval = 20;
 
         private static int _currentInterval = 0;
 
@@ -119,13 +119,13 @@ namespace nngpuVisualization
 
                         while (!_nnGpuWin.TestingComplete)
                         {
-                            NNGpuTestResult result = _nnGpuWin.TestIteration();
+                            _nnGpuWin.TestIteration();
 
                             _currentInterval++;
                             if (_currentInterval >= _updateInterval)
                             {
                                 _currentInterval = 0;
-                                backgroundWorker.ReportProgress(0, result);
+                                backgroundWorker.ReportProgress(0);
                             }
 
                             if (_threadDelayMs > 0)

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using nngpuVisualization.Models;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -48,6 +49,34 @@ namespace nngpuVisualization.controls
             }
         }
         private string _iterationText;
+
+        public string TestIterationText
+        {
+            get
+            {
+                return _testIterationText;
+            }
+            set
+            {
+                _testIterationText = value;
+                OnPropertyChanged("TestIterationText");
+            }
+        }
+        private string _testIterationText;
+
+        public string TestAccuracyText
+        {
+            get
+            {
+                return _testAccuracyText;
+            }
+            set
+            {
+                _testAccuracyText = value;
+                OnPropertyChanged("TestAccuracyText");
+            }
+        }
+        private string _testAccuracyText;
 
         private List<UserControl> _layerControls;
 
@@ -203,6 +232,8 @@ namespace nngpuVisualization.controls
                 delegate (NnGpuWin nnGpuWinInstance)
                 {
                     // Training iterate
+                    TestIterationText = "Tests: " + nnGpuWinInstance.TestsPerformed;
+                    TestAccuracyText = "Test Accuracy: " + nnGpuWinInstance.CorrectTestPredictions;
                 }
                 );
         }
