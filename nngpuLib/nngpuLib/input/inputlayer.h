@@ -33,6 +33,9 @@ public:
 	virtual int GetForwardHeight();
 	virtual int GetForwardDepth();
 	virtual int GetBackwardNodeCount();
+	virtual int GetBackwardWidth();
+	virtual int GetBackwardHeight();
+	virtual int GetBackwardDepth();
 	virtual int GetWidth();
 	virtual int GetHeight();
 	virtual int GetDepth();

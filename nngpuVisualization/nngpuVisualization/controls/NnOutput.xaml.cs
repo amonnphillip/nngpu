@@ -40,6 +40,9 @@ namespace nngpuVisualization.controls
         {
             NnGpuLayerDataGroup laterDataGroup = nnGpuWinInstance.GetLayerData(layerIndex);
 
+            double largest = laterDataGroup.GetLayerOfType(NnGpuLayerDataType.Forward).GetLargestDataValue();
+            double smallest = laterDataGroup.GetLayerOfType(NnGpuLayerDataType.Forward).GetSmallestDataValue();
+
             double[] layerDataForward = laterDataGroup.GetLayerOfType(NnGpuLayerDataType.Forward).data;
             double[] layerDataBackward = laterDataGroup.GetLayerOfType(NnGpuLayerDataType.Backward).data;
 
@@ -116,7 +119,9 @@ namespace nngpuVisualization.controls
                 double dataPointX = index * xscale;
                 double dataPointY = ((aves[index] * -1) * scale) + (BarContainer.ActualHeight / 2);
 
-                if (index > 0)
+                if (index > 0 
+                    && !double.IsNaN(lastPointY) 
+                    && !double.IsNaN(dataPointY))
                 {
                     Line l = new Line();
                     l.X1 = lastPointX;

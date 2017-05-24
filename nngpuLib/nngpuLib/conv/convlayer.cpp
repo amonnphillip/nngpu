@@ -8,8 +8,8 @@
 #include "cuda_runtime.h"
 #include "layer.h"
 
-extern void ConvLayer_Forward(ConvNode *node, double* filters, LayerSize filterSize, int filterCount, LayerSize layerSize, LayerSize previousLayerSize, LayerSize nextLayerSize, double *previousLayerOutput, double *output, int pad);
-extern void ConvLayer_Backward(ConvNode *node, double* filters, double* backFilters, LayerSize filterSize, int filterCount, LayerSize layerSize, LayerSize previousLayerSize, LayerSize nextLayerSize, double *previousLayerOutput, double *nextLayerOutput, double *output, int pad, double learnRate);
+extern void ConvLayer_Forward(ConvNode *node, double* filters, LayerSize filterSize, int filterCount, LayerSize layerSize, LayerSize previousLayerSize, double *previousLayerOutput, double *output, int pad);
+extern void ConvLayer_Backward(ConvNode *node, double* filters, double* backFilterCollation, double* backFilters, LayerSize filterSize, int filterCount, LayerSize layerSize, LayerSize previousLayerSize, LayerSize nextLayerSize, double *previousLayerOutput, double *nextLayerOutput, double *output, int pad, double learnRate);
 
 ConvLayer::ConvLayer(ConvLayerConfig* config, INNetworkLayer* previousLayer)
 {
@@ -26,14 +26,17 @@ ConvLayer::ConvLayer(ConvLayerConfig* config, INNetworkLayer* previousLayer)
 	filterSize = filterWidth * filterHeight;
 	filterCount = config->GetFilterCount();
 
-	backwardCount = previousLayer->GetForwardNodeCount();
+	backwardWidth = previousLayer->GetForwardWidth();
+	backwardHeight = previousLayer->GetForwardHeight();
+	backwardDepth = previousLayer->GetForwardDepth();
+
 	forwardCount = layerWidth * layerHeight * layerDepth;
 	nodeCount = forwardCount;
 
 	Layer::Initialize(
 		LayerType::Convolution,
 		forwardCount,
-		backwardCount,
+		backwardWidth * backwardHeight * backwardDepth,
 		nodeCount,
 		true);
 
@@ -57,13 +60,25 @@ ConvLayer::ConvLayer(ConvLayerConfig* config, INNetworkLayer* previousLayer)
 	}
 
 	backFilterHostMem = std::unique_ptr<double>(new double[filterSize * filterDepth * filterCount]);
-	std::fill_n(filterHostMem.get(), filterSize * filterDepth * filterCount, (double)0.0);
+	std::fill_n(backFilterHostMem.get(), filterSize * filterDepth * filterCount, (double)0.0);
 	if (cudaMalloc((void**)&backFilterDeviceMem, filterSize * filterDepth * filterCount * sizeof(double)) != cudaError::cudaSuccess)
 	{
 		throw std::bad_alloc();
 	}
 
 	if (cudaMemcpy(backFilterDeviceMem, backFilterHostMem.get(), filterSize * filterDepth * filterCount * sizeof(double), cudaMemcpyHostToDevice) != cudaError::cudaSuccess)
+	{
+		throw std::runtime_error("ConvLayer backward cudaMemcpy returned an error");
+	}
+
+	backFilterCollationhHostMem = std::unique_ptr<double>(new double[filterSize * filterDepth * filterCount * layerWidth * layerHeight]);
+	std::fill_n(backFilterCollationhHostMem.get(), filterSize * filterDepth * filterCount * layerWidth * layerHeight, (double)0.0);
+	if (cudaMalloc((void**)&backFilterCollationDeviceMem, filterSize * filterDepth * filterCount * layerWidth * layerHeight * sizeof(double)) != cudaError::cudaSuccess)
+	{
+		throw std::bad_alloc();
+	}
+
+	if (cudaMemcpy(backFilterCollationDeviceMem, backFilterCollationhHostMem.get(), filterSize * filterDepth * filterCount * layerWidth * layerHeight * sizeof(double), cudaMemcpyHostToDevice) != cudaError::cudaSuccess)
 	{
 		throw std::runtime_error("ConvLayer backward cudaMemcpy returned an error");
 	}
@@ -81,18 +96,48 @@ void ConvLayer::Forward(double* input, int inputSize)
 
 void ConvLayer::Forward(INNetworkLayer* previousLayer, INNetworkLayer* nextLayer)
 {
+
+	int nx = previousLayer->GetForwardWidth();
+	int ny = previousLayer->GetForwardHeight();
+	int nz = previousLayer->GetForwardDepth();
+
+	int nx1 = previousLayer->GetWidth();
+	int ny1 = previousLayer->GetHeight();
+	int nz1 = previousLayer->GetDepth();
+
+	double* ddd = forwardHostMem.get();
+	double sss = 0;
+	for (int i = 0; i < forwardCount; i++)
+	{
+		sss += ddd[i];
+	}
+
+	std::fill_n(forwardHostMem.get(), forwardCount, (double)0.0);
+
+	ddd = forwardHostMem.get();
+	sss = 0;
+	for (int i = 0; i < forwardCount; i++)
+	{
+		sss += ddd[i];
+	}
+
+
+	if (cudaMemcpy(forwardDeviceMem, forwardHostMem.get(), forwardCount * sizeof(double), cudaMemcpyHostToDevice) != cudaError::cudaSuccess)
+	{
+		throw std::runtime_error("ConvLayer forward cudaMemcpy returned an error");
+	}
+
 	ConvLayer_Forward(
 		nodeDeviceMem, 
 		filterDeviceMem, 
 		LayerSize(filterWidth, filterHeight, filterDepth), 
 		filterCount,
 		LayerSize(layerWidth, layerHeight, layerDepth),
-		LayerSize(previousLayer->GetWidth(), previousLayer->GetHeight(), previousLayer->GetDepth()),
-		LayerSize(nextLayer->GetWidth(), nextLayer->GetHeight(), nextLayer->GetDepth()),
+		LayerSize(previousLayer->GetForwardWidth(), previousLayer->GetForwardHeight(), previousLayer->GetForwardDepth()),
 		previousLayer->GetForwardDeviceMem(), 
 		forwardDeviceMem, 
 		pad);
-/*
+
 	if (cudaMemcpy(forwardHostMem.get(), forwardDeviceMem, forwardCount * sizeof(double), cudaMemcpyDeviceToHost) != cudaError::cudaSuccess)
 	{
 		throw std::runtime_error("ConvLayer forward cudaMemcpy returned an error");
@@ -102,7 +147,14 @@ void ConvLayer::Forward(INNetworkLayer* previousLayer, INNetworkLayer* nextLayer
 	{
 		throw std::runtime_error("ConvLayer forward cudaMemcpy returned an error");
 	}
-*/
+
+
+	ddd = forwardHostMem.get();
+	sss = 0;
+	for (int i = 0; i < forwardCount; i++)
+	{
+		sss += ddd[i];
+	}
 }
 
 void ConvLayer::Backward(double* input, int inputSize, double learnRate)
@@ -112,9 +164,21 @@ void ConvLayer::Backward(double* input, int inputSize, double learnRate)
 
 void ConvLayer::Backward(INNetworkLayer* previousLayer, INNetworkLayer* nextLayer, double learnRate)
 {
-	std::fill_n(backFilterHostMem.get(), filterSize * filterDepth * filterCount, (double)0.0);
 
+	std::fill_n(backwardHostMem.get(), GetBackwardNodeCount(), (double)0.0);
+	if (cudaMemcpy(backwardDeviceMem, backwardHostMem.get(), GetBackwardNodeCount() * sizeof(double), cudaMemcpyHostToDevice) != cudaError::cudaSuccess)
+	{
+		throw std::runtime_error("ConvLayer cudaMemcpy returned an error");
+	}
+
+	std::fill_n(backFilterHostMem.get(), filterSize * filterDepth * filterCount, (double)0.0);
 	if (cudaMemcpy(backFilterDeviceMem, backFilterHostMem.get(), filterSize * filterDepth * filterCount * sizeof(double), cudaMemcpyHostToDevice) != cudaError::cudaSuccess)
+	{
+		throw std::runtime_error("ConvLayer cudaMemcpy returned an error");
+	}
+
+	std::fill_n(backFilterCollationhHostMem.get(), filterSize * filterDepth * filterCount * layerWidth * layerHeight, (double)0.0);
+	if (cudaMemcpy(backFilterCollationDeviceMem, backFilterCollationhHostMem.get(), filterSize * filterDepth * filterCount * layerWidth * layerHeight * sizeof(double), cudaMemcpyHostToDevice) != cudaError::cudaSuccess)
 	{
 		throw std::runtime_error("ConvLayer cudaMemcpy returned an error");
 	}
@@ -122,12 +186,13 @@ void ConvLayer::Backward(INNetworkLayer* previousLayer, INNetworkLayer* nextLaye
 	ConvLayer_Backward(
 		nodeDeviceMem,
 		filterDeviceMem,
+		backFilterCollationDeviceMem,
 		backFilterDeviceMem,
 		LayerSize(filterWidth, filterHeight, filterDepth),
 		filterCount,
 		LayerSize(layerWidth, layerHeight, layerDepth),
-		LayerSize(previousLayer->GetWidth(), previousLayer->GetHeight(), previousLayer->GetDepth()),
-		LayerSize(nextLayer->GetWidth(), nextLayer->GetHeight(), nextLayer->GetDepth()),
+		LayerSize(previousLayer->GetForwardWidth(), previousLayer->GetForwardHeight(), previousLayer->GetForwardDepth()),
+		LayerSize(nextLayer->GetBackwardWidth(), nextLayer->GetBackwardHeight(), nextLayer->GetBackwardDepth()),
 		previousLayer->GetForwardDeviceMem(),
 		nextLayer->GetBackwardDeviceMem(),
 		backwardDeviceMem,
@@ -168,7 +233,7 @@ double* ConvLayer::GetBackwardHostMem(bool copyFromDevice)
 {
 	if (copyFromDevice)
 	{
-		if (cudaMemcpy(backwardHostMem.get(), backwardDeviceMem, backwardCount * sizeof(double), cudaMemcpyDeviceToHost) != cudaError::cudaSuccess)
+		if (cudaMemcpy(backwardHostMem.get(), backwardDeviceMem, GetBackwardNodeCount() * sizeof(double), cudaMemcpyDeviceToHost) != cudaError::cudaSuccess)
 		{
 			throw std::runtime_error("ConvLayer backward cudaMemcpy returned an error");
 		}
@@ -209,7 +274,22 @@ int ConvLayer::GetForwardDepth()
 
 int ConvLayer::GetBackwardNodeCount()
 {
-	return backwardCount;
+	return backwardWidth * backwardHeight * backwardDepth;
+}
+
+int ConvLayer::GetBackwardWidth()
+{
+	return backwardWidth;
+}
+
+int ConvLayer::GetBackwardHeight()
+{
+	return backwardHeight;
+}
+
+int ConvLayer::GetBackwardDepth()
+{
+	return backwardDepth;
 }
 
 int ConvLayer::GetWidth()
@@ -248,7 +328,7 @@ void ConvLayer::GetLayerData(LayerDataList& layerDataList)
 	layerData++;
 
 	layerData->type = LayerDataType::Backward;
-	layerData->width = backwardCount;
+	layerData->width = GetBackwardNodeCount();
 	layerData->height = 1;
 	layerData->depth = 1;
 	layerData->data = GetBackwardHostMem(true);
@@ -277,11 +357,34 @@ double* ConvLayer::GetFilterHostMem(bool copyFromDevice)
 	{
 		if (cudaMemcpy(filterHostMem.get(), filterDeviceMem, filterSize * filterDepth * filterCount * sizeof(double), cudaMemcpyDeviceToHost) != cudaError::cudaSuccess)
 		{
-			throw std::runtime_error("ConvLayer forward cudaMemcpy returned an error");
+			throw std::runtime_error("ConvLayer cudaMemcpy returned an error");
 		}
 	}
 
 	return filterHostMem.get();
+}
+
+int ConvLayer::GetFilterMemNodeCount()
+{
+	return filterSize * filterDepth * filterCount;
+}
+
+double* ConvLayer::GetBackFilterHostMem(bool copyFromDevice)
+{
+	if (copyFromDevice)
+	{
+		if (cudaMemcpy(backFilterHostMem.get(), backFilterDeviceMem, filterSize * filterDepth * filterCount * sizeof(double), cudaMemcpyDeviceToHost) != cudaError::cudaSuccess)
+		{
+			throw std::runtime_error("ConvLayer cudaMemcpy returned an error");
+		}
+	}
+
+	return backFilterHostMem.get();
+}
+
+int ConvLayer::GetBackFilterMemNodeCount()
+{
+	return filterSize * filterDepth * filterCount;
 }
 
 void ConvLayer::DebugPrint()

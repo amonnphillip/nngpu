@@ -19,6 +19,12 @@
     <Filter Include="output">
       <UniqueIdentifier>{ac95034b-e797-4377-a516-2110b28f5a07}</UniqueIdentifier>
     </Filter>
+    <Filter Include="test">
+      <UniqueIdentifier>{d28175e1-5491-4adb-913f-625dab08d7b3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="peformance">
+      <UniqueIdentifier>{04792587-7f10-4cf5-bdaf-738e77c37ede}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="conv\convlayer.cpp">
@@ -64,6 +70,15 @@
     <ClCompile Include="nntrainer.cpp" />
     <ClCompile Include="nngpuwin.cpp" />
     <ClCompile Include="nntester.cpp" />
+    <ClCompile Include="testlayer.cpp">
+      <Filter>test</Filter>
+    </ClCompile>
+    <ClCompile Include="convutest.cpp">
+      <Filter>conv</Filter>
+    </ClCompile>
+    <ClCompile Include="convutestreference.cpp">
+      <Filter>conv</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="conv\convlayer.cu">
@@ -77,6 +92,9 @@
     </CudaCompile>
     <CudaCompile Include="relu\relulayer.cu">
       <Filter>relu</Filter>
+    </CudaCompile>
+    <CudaCompile Include="convutestreference.cu">
+      <Filter>conv</Filter>
     </CudaCompile>
   </ItemGroup>
   <ItemGroup>
@@ -128,5 +146,15 @@
     <ClInclude Include="layerdata.h" />
     <ClInclude Include="nntester.h" />
     <ClInclude Include="nntestresult.h" />
+    <ClInclude Include="testlayer.h">
+      <Filter>test</Filter>
+    </ClInclude>
+    <ClInclude Include="convutest.h">
+      <Filter>conv</Filter>
+    </ClInclude>
+    <ClInclude Include="convutestreference.h">
+      <Filter>conv</Filter>
+    </ClInclude>
+    <ClInclude Include="testutils.h" />
   </ItemGroup>
 </Project>

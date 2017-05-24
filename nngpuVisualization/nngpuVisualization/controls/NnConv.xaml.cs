@@ -37,6 +37,20 @@ namespace nngpuVisualization.controls
         }
         private string _backwardSum;
 
+        public string ForwardSum
+        {
+            get
+            {
+                return _forwardSum;
+            }
+            set
+            {
+                _forwardSum = value;
+                OnPropertyChanged("ForwardSum");
+            }
+        }
+        private string _forwardSum;
+
         public NnConv()
         {
             InitializeComponent();
@@ -48,7 +62,11 @@ namespace nngpuVisualization.controls
         {
             NnGpuLayerDataGroup laterDataGroup = nnGpuWinInstance.GetLayerData(layerIndex);
 
+            double largest = laterDataGroup.GetLayerOfType(NnGpuLayerDataType.Forward).GetLargestDataValue();
+            double smallest = laterDataGroup.GetLayerOfType(NnGpuLayerDataType.Forward).GetSmallestDataValue();
+
             BackwardSum = "Sum: " + laterDataGroup.GetLayerOfType(NnGpuLayerDataType.Backward).Sum();
+            ForwardSum = "Sum: " + laterDataGroup.GetLayerOfType(NnGpuLayerDataType.Forward).Sum();
 
             ImageContainer.Children.Clear();
             FilterImageContainer.Children.Clear();

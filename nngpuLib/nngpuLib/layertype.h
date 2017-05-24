@@ -7,5 +7,6 @@ enum LayerType
 	FullyConnected = 2,
 	Input = 3,
 	Output = 4,
-	Relu = 5
+	Relu = 5,
+	Test = 6
 };

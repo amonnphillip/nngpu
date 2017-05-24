@@ -19,4 +19,5 @@ extern "C"
 	__declspec(dllexport) void GetTrainingIteration(NnGpu* nn, int* interation);
 	__declspec(dllexport) void DisposeNetwork(NnGpu* nn);
 	__declspec(dllexport) void GetLayerData(NnGpu* nn, int layerIndex, int** data);
+	__declspec(dllexport) bool RunUnitTests(NnGpu* nn);
 }

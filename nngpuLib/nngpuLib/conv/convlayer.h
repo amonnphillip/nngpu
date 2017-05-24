@@ -14,10 +14,12 @@ public:
 
 class ConvLayer : public Layer<ConvNode, double, double, double>, public INNetworkLayer
 {
-private:
+protected:
 	int nodeCount = 0;
 	int forwardCount = 0;
-	int backwardCount = 0;
+	int backwardWidth = 0;
+	int backwardHeight = 0;
+	int backwardDepth = 0;
 	int layerWidth = 0;
 	int layerHeight = 0;
 	int layerDepth = 0;
@@ -32,6 +34,8 @@ private:
 	double* filterDeviceMem;
 	std::unique_ptr<double> backFilterHostMem;
 	double* backFilterDeviceMem;
+	std::unique_ptr<double> backFilterCollationhHostMem;
+	double* backFilterCollationDeviceMem;
 
 public:
 	ConvLayer(ConvLayerConfig* config, INNetworkLayer* previousLayer);
@@ -49,11 +53,17 @@ public:
 	virtual int GetForwardHeight();
 	virtual int GetForwardDepth();
 	virtual int GetBackwardNodeCount();
+	virtual int GetBackwardWidth();
+	virtual int GetBackwardHeight();
+	virtual int GetBackwardDepth();
 	virtual int GetWidth();
 	virtual int GetHeight();
 	virtual int GetDepth();
 	virtual LayerType GetLayerType();
 	virtual void GetLayerData(LayerDataList& layerDataList);
 	double* GetFilterHostMem(bool copyFromDevice);
+	int GetFilterMemNodeCount();
+	double* GetBackFilterHostMem(bool copyFromDevice);
+	int GetBackFilterMemNodeCount();
 	void DebugPrint();
 };

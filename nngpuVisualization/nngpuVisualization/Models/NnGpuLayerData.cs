@@ -7,8 +7,6 @@ using System.Windows.Media.Imaging;
 
 namespace nngpuVisualization
 {
-
-
     public class NnGpuLayerData
     {
         [DllImport("gdi32.dll")]
@@ -19,6 +17,34 @@ namespace nngpuVisualization
         public int height;
         public int depth;
         public double[] data;
+
+        public double GetLargestDataValue()
+        {
+            double value = double.MinValue;
+            for (int index = 0; index < data.Length; index++)
+            {
+                if (data[index] > value)
+                {
+                    value = data[index];
+                }
+            }
+
+            return value;
+        }
+
+        public double GetSmallestDataValue()
+        {
+            double value = double.MaxValue;
+            for (int index = 0; index < data.Length; index++)
+            {
+                if (data[index] < value)
+                {
+                    value = data[index];
+                }
+            }
+
+            return value;
+        }
 
         private double GetImageScale(out double floor)
         {

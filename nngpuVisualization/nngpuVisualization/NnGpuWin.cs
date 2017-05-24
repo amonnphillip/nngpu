@@ -97,8 +97,8 @@ namespace nngpuVisualization
             NnGpuWinInterop.InitializeNetwork(_nn);
             NnGpuWinInterop.AddInputLayer(_nn, 28, 28, 1);
             NnGpuWinInterop.AddConvLayer(_nn, 3, 3, 1, 32, 1, 1);
-            NnGpuWinInterop.AddReluLayer(_nn);
-            NnGpuWinInterop.AddPoolLayer(_nn, 2, 2);
+            //NnGpuWinInterop.AddReluLayer(_nn);
+            //NnGpuWinInterop.AddPoolLayer(_nn, 2, 2);
             NnGpuWinInterop.AddFullyConnected(_nn, 10);
             NnGpuWinInterop.AddOutput(_nn, 10);
 
@@ -180,6 +180,11 @@ namespace nngpuVisualization
             NnGpuWinInterop.GetTrainingIteration(_nn, out interation);
 
             return interation;
+        }
+
+        public bool RunUnitTests()
+        {
+            return NnGpuWinInterop.RunUnitTests(_nn);
         }
     }
 }

@@ -19,6 +19,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="convutest.cpp" />
+    <ClCompile Include="convutestreference.cpp" />
     <ClCompile Include="conv\convlayer.cpp" />
     <ClCompile Include="conv\convlayerconfig.cpp" />
     <ClCompile Include="fullyconnected\fullyconnectedlayer.cpp" />
@@ -38,14 +40,18 @@
     <ClCompile Include="relu\relulayer.cpp" />
     <ClCompile Include="relu\relulayerconfig.cpp" />
     <ClCompile Include="nntrainer.cpp" />
+    <ClCompile Include="testlayer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <CudaCompile Include="convutestreference.cu" />
     <CudaCompile Include="conv\convlayer.cu" />
     <CudaCompile Include="fullyconnected\fullyconnectedlayer.cu" />
     <CudaCompile Include="pool\poollayer.cu" />
     <CudaCompile Include="relu\relulayer.cu" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="convutest.h" />
+    <ClInclude Include="convutestreference.h" />
     <ClInclude Include="conv\convlayer.h" />
     <ClInclude Include="conv\convlayerconfig.h" />
     <ClInclude Include="fullyconnected\fullyconnectedlayer.h" />
@@ -70,6 +76,8 @@
     <ClInclude Include="relu\relulayerconfig.h" />
     <ClInclude Include="nntrainer.h" />
     <ClInclude Include="nntestresult.h" />
+    <ClInclude Include="testlayer.h" />
+    <ClInclude Include="testutils.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{199A53C3-3AE6-4992-95DE-DEA6F69CC40E}</ProjectGuid>
@@ -148,12 +156,13 @@ copy "$(CudaToolkitBinDir)\cudart*.dll" "$(OutDir)"</Command>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;WIN64;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(MSBuildProjectDirectory)\fullyconnected;$(MSBuildProjectDirectory)\input;$(MSBuildProjectDirectory)\output;$(MSBuildProjectDirectory)\conv;$(MSBuildProjectDirectory)\;$(MSBuildProjectDirectory)\relu;$(MSBuildProjectDirectory)\pool;%(AdditionalIncludeDirectories);$(CudaToolkitIncludeDir)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(MSBuildProjectDirectory)\fullyconnected;$(MSBuildProjectDirectory)\input;$(MSBuildProjectDirectory)\output;$(MSBuildProjectDirectory)\conv;$(MSBuildProjectDirectory)\;$(MSBuildProjectDirectory)\relu;$(MSBuildProjectDirectory)\pool;%(AdditionalIncludeDirectories);$(CudaToolkitIncludeDir);$(MSBuildProjectDirectory)\test</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <AdditionalDependencies>cudart.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <PostBuildEvent>
       <Command>echo copy "$(CudaToolkitBinDir)\cudart*.dll" "$(OutDir)"
@@ -162,7 +171,20 @@ copy "$(CudaToolkitBinDir)\cudart*.dll" "$(OutDir)"</Command>
     <CudaCompile>
       <TargetMachinePlatform>64</TargetMachinePlatform>
       <CodeGeneration>compute_30,sm_30</CodeGeneration>
+      <InterleaveSourceInPTX>true</InterleaveSourceInPTX>
+      <GenerateLineInfo>true</GenerateLineInfo>
+      <Optimization>Od</Optimization>
+      <RuntimeChecks>RTC1</RuntimeChecks>
+      <PtxAsOptionV>true</PtxAsOptionV>
+      <TypeInfo>true</TypeInfo>
+      <Warning>InheritFromHost</Warning>
     </CudaCompile>
+    <CudaLink>
+      <GPUDebugInfo>true</GPUDebugInfo>
+    </CudaLink>
+    <CudaLink>
+      <Optimization>Od</Optimization>
+    </CudaLink>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>

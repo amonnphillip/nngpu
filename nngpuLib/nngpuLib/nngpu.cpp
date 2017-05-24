@@ -11,6 +11,7 @@
 #include "outputlayer.h"
 #include "nntrainer.h"
 #include "layerdata.h"
+#include "convutest.h"
 
 void NnGpu::InitializeNetwork()
 {
@@ -133,4 +134,12 @@ void NnGpu::GetLayerData(int layerIndex, LayerDataType dataType, LayerDataList& 
 	{
 		layer->GetLayerData(layerDataList);
 	}
+}
+
+bool NnGpu::RunUnitTests()
+{
+	ConvUTest* convTest = new ConvUTest();
+	convTest->Test();
+
+	return true;
 }

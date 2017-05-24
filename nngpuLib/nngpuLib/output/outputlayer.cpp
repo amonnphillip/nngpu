@@ -9,6 +9,12 @@
 OutputLayer::OutputLayer(OutputLayerConfig* config, INNetworkLayer* previousLayer)
 {
 	nodeCount = config->GetWidth() * config->GetHeight() * config->GetDepth();
+
+	// TODO: LOOK AT THE BACK VALUES
+	backwardWidth = previousLayer->GetForwardWidth();
+	backwardHeight = previousLayer->GetForwardHeight();
+	backwardDepth = previousLayer->GetForwardDepth();
+
 	Layer::Initialize(
 		LayerType::Output,
 		nodeCount,
@@ -32,6 +38,17 @@ void OutputLayer::Forward(INNetworkLayer* previousLayer, INNetworkLayer* nextLay
 	assert(previousLayer->GetForwardNodeCount() == nodeCount);
 
 	memcpy(forwardHostMem.get(), previousLayer->GetForwardHostMem(true), nodeCount * sizeof(double));
+
+	double* forward = forwardHostMem.get();
+	for (int index = 0; index < nodeCount; index++)
+	{
+		if (isnan(*forward) ||
+			isinf(*forward))
+		{
+			*forward = 0;
+		}
+		forward++;
+	}
 }
 
 void OutputLayer::Backward(double* input, int inputSize, double learnRate)
@@ -43,6 +60,11 @@ void OutputLayer::Backward(double* input, int inputSize, double learnRate)
 	for (int index = 0; index < nodeCount; index++)
 	{
 		*backward = *input - *forward;
+		if (isnan(*backward) ||
+			isinf(*backward))
+		{
+			*backward = 0;
+		}
 		forward++;
 		input++;
 		backward++;
@@ -101,7 +123,22 @@ int OutputLayer::GetForwardDepth()
 
 int OutputLayer::GetBackwardNodeCount()
 {
-	return nodeCount;
+	return backwardWidth * backwardHeight * backwardDepth;
+}
+
+int OutputLayer::GetBackwardWidth()
+{
+	return backwardWidth;
+}
+
+int OutputLayer::GetBackwardHeight()
+{
+	return backwardHeight;
+}
+
+int OutputLayer::GetBackwardDepth()
+{
+	return backwardDepth;
 }
 
 int OutputLayer::GetWidth()

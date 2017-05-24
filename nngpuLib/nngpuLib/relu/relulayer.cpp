@@ -7,7 +7,9 @@ extern void ReluLayer_Backward(ReluNode *node, double *forward, double* nextlaye
 
 ReluLayer::ReluLayer(INNetworkLayer* previousLayer)
 {
-	backwardCount = previousLayer->GetForwardNodeCount();
+	backwardWidth = previousLayer->GetForwardWidth();
+	backwardHeight = previousLayer->GetForwardHeight();
+	backwardDepth = previousLayer->GetForwardDepth();
 
 	layerWidth = previousLayer->GetWidth();
 	layerHeight = previousLayer->GetHeight();
@@ -19,7 +21,7 @@ ReluLayer::ReluLayer(INNetworkLayer* previousLayer)
 	Layer::Initialize(
 		LayerType::Relu,
 		forwardCount,
-		backwardCount,
+		backwardWidth * backwardHeight * backwardDepth,
 		nodeCount,
 		true);
 }
@@ -66,6 +68,7 @@ void ReluLayer::Backward(double* input, int inputSize, double learnRate)
 void ReluLayer::Backward(INNetworkLayer* previousLayer, INNetworkLayer* nextLayer, double learnRate)
 {
 	double* backward = backwardHostMem.get();
+	int backwardCount = GetBackwardNodeCount();
 	for (int index = 0; index < backwardCount; index++)
 	{
 		*backward = 0;
@@ -103,7 +106,7 @@ double* ReluLayer::GetBackwardHostMem(bool copyFromDevice)
 {
 	if (copyFromDevice)
 	{
-		if (cudaMemcpy(backwardHostMem.get(), backwardDeviceMem, backwardCount * sizeof(double), cudaMemcpyDeviceToHost) != cudaError::cudaSuccess)
+		if (cudaMemcpy(backwardHostMem.get(), backwardDeviceMem, GetBackwardNodeCount() * sizeof(double), cudaMemcpyDeviceToHost) != cudaError::cudaSuccess)
 		{
 			throw std::runtime_error("ReluLayer backward cudaMemcpy returned an error");
 		}
@@ -144,7 +147,22 @@ int ReluLayer::GetForwardDepth()
 
 int ReluLayer::GetBackwardNodeCount()
 {
-	return backwardCount;
+	return backwardWidth * backwardHeight * backwardDepth;
+}
+
+int ReluLayer::GetBackwardWidth()
+{
+	return backwardWidth;
+}
+
+int ReluLayer::GetBackwardHeight()
+{
+	return backwardHeight;
+}
+
+int ReluLayer::GetBackwardDepth()
+{
+	return backwardDepth;
 }
 
 int ReluLayer::GetWidth()

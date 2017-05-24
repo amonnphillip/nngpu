@@ -136,6 +136,11 @@ void GetLayerData(NnGpu* nn, int layerIndex, int** data)
 	layerDataList.CleanUp();
 }
 
+bool RunUnitTests(NnGpu* nn)
+{
+	return nn->RunUnitTests();
+}
+
 
 
 

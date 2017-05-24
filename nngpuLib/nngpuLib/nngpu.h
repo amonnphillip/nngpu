@@ -25,6 +25,7 @@ public:
 	int GetTestingIteration();
 	void DisposeNetwork();
 	void GetLayerData(int layerIndex, LayerDataType dataType, LayerDataList& layerData);
+	bool RunUnitTests();
 
 private:
 	NNetwork* nn;

@@ -11,7 +11,7 @@ InputLayer::InputLayer(InputLayerConfig* config, INNetworkLayer* previousLayer)
 	width = config->GetWidth();
 	height = config->GetHeight();
 	depth = config->GetDepth();
-	nodeCount = config->GetWidth() * config->GetHeight() * config->GetDepth();
+	nodeCount = width * height * depth;
 	Layer::Initialize(
 		LayerType::Input,
 		nodeCount,
@@ -94,6 +94,21 @@ int InputLayer::GetForwardNodeCount()
 }
 
 int InputLayer::GetBackwardNodeCount()
+{
+	return 0;
+}
+
+int InputLayer::GetBackwardWidth()
+{
+	return 0;
+}
+
+int InputLayer::GetBackwardHeight()
+{
+	return 0;
+}
+
+int InputLayer::GetBackwardDepth()
 {
 	return 0;
 }

@@ -13,7 +13,10 @@ PoolLayer::PoolLayer(PoolLayerConfig* config, INNetworkLayer* previousLayer)
 	spatiallExtent = config->GetSpatialExtent();
 	stride = config->GetStride();
 
-	backwardCount = previousLayer->GetForwardNodeCount();
+	backwardWidth = previousLayer->GetForwardWidth();
+	backwardHeight = previousLayer->GetForwardHeight();
+	backwardDepth = previousLayer->GetForwardDepth();
+
 	backwardWidth = previousLayer->GetForwardWidth();
 	backwardHeight = previousLayer->GetForwardHeight();
 	backwardDepth = previousLayer->GetForwardDepth();
@@ -23,7 +26,7 @@ PoolLayer::PoolLayer(PoolLayerConfig* config, INNetworkLayer* previousLayer)
 	Layer::Initialize(
 		LayerType::Pool,
 		forwardCount,
-		backwardCount,
+		backwardWidth * backwardHeight * backwardDepth,
 		nodeCount,
 		true);
 
@@ -105,6 +108,7 @@ void PoolLayer::Backward(double* input, int inputSize, double learnRate)
 void PoolLayer::Backward(INNetworkLayer* previousLayer, INNetworkLayer* nextLayer, double learnRate)
 {
 	double* backward = backwardHostMem.get();
+	int backwardCount = GetBackwardNodeCount();
 	for (int index = 0; index < backwardCount; index++)
 	{
 		*backward = 0;
@@ -147,7 +151,7 @@ double* PoolLayer::GetBackwardHostMem(bool copyFromDevice)
 {
 	if (copyFromDevice)
 	{
-		if (cudaMemcpy(backwardHostMem.get(), backwardDeviceMem, backwardCount * sizeof(double), cudaMemcpyDeviceToHost) != cudaError::cudaSuccess)
+		if (cudaMemcpy(backwardHostMem.get(), backwardDeviceMem, GetBackwardNodeCount() * sizeof(double), cudaMemcpyDeviceToHost) != cudaError::cudaSuccess)
 		{
 			throw std::runtime_error("PoolLayer backward cudaMemcpy returned an error");
 		}
@@ -188,7 +192,22 @@ int PoolLayer::GetForwardDepth()
 
 int PoolLayer::GetBackwardNodeCount()
 {
-	return backwardCount;
+	return backwardWidth * backwardHeight * backwardDepth;
+}
+
+int PoolLayer::GetBackwardWidth()
+{
+	return backwardWidth;
+}
+
+int PoolLayer::GetBackwardHeight()
+{
+	return backwardHeight;
+}
+
+int PoolLayer::GetBackwardDepth()
+{
+	return backwardDepth;
 }
 
 int PoolLayer::GetWidth()

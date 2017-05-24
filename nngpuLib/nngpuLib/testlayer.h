@@ -1,25 +1,28 @@
 #pragma once
 
-#include "outputlayerconfig.h"
+#include "vector"
 #include "innetworklayer.h"
 #include "layer.h"
 #include "layerdata.h"
 
-struct OutputNode
+class TestLayeruNode
 {
-	double output;
 };
 
-class OutputLayer : public Layer<OutputNode, double, double, double>, public INNetworkLayer
+class TestLayer : public Layer<TestLayeruNode, double, double, double>, public INNetworkLayer
 {
 private:
+	int nodeCount = 0;
+	int forwardCount = 0;
 	int backwardWidth = 0;
 	int backwardHeight = 0;
 	int backwardDepth = 0;
-	int nodeCount = 0;
+	int layerWidth = 0;
+	int layerHeight = 0;
+	int layerDepth = 0;
 
 public:
-	OutputLayer(OutputLayerConfig* config, INNetworkLayer* previousLayer);
+	TestLayer(int width, int height, int depth);
 	virtual void Forward(double* input, int inputSize);
 	virtual void Forward(INNetworkLayer* previousLayer, INNetworkLayer* nextLayer);
 	virtual void Backward(double* input, int inputSize, double learnRate);
@@ -42,5 +45,5 @@ public:
 	virtual int GetDepth();
 	virtual LayerType GetLayerType();
 	virtual void GetLayerData(LayerDataList& layerDataList);
-	void DebugPrint(double* expected, int expectedCount);
+	void ResetForwardAndBackward();
 };

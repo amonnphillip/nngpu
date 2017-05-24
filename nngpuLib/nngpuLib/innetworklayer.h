@@ -22,6 +22,9 @@ public:
 	virtual int GetForwardHeight() = 0;
 	virtual int GetForwardDepth() = 0;
 	virtual int GetBackwardNodeCount() = 0;
+	virtual int GetBackwardWidth() = 0;
+	virtual int GetBackwardHeight() = 0;
+	virtual int GetBackwardDepth() = 0;
 	virtual int GetWidth() = 0;
 	virtual int GetHeight() = 0;
 	virtual int GetDepth() = 0;

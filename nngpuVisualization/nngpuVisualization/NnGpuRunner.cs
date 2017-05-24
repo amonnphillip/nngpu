@@ -55,11 +55,11 @@ namespace nngpuVisualization
                 _updateInterval = value;
             }
         }
-        private static int _updateInterval = 20;
+        private static int _updateInterval = 10;
 
         private static int _currentInterval = 0;
 
-        private static int _threadDelayMs = 0;
+        private static int _threadDelayMs = 10;
 
 
         public static void StartRunner(
@@ -77,6 +77,7 @@ namespace nngpuVisualization
                 _workerRunning = true;
 
                 _nnGpuWin = new NnGpuWin();
+                _nnGpuWin.RunUnitTests();
                 _nnGpuWin.InitializeNetwork();
 
                 _worker = new BackgroundWorker();
