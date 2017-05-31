@@ -1,4 +1,6 @@
 #pragma once
+#include <stdio.h>
+#include <stdexcept>
 
 #include "convlayer.h"
 #include "layersize.h"
@@ -9,8 +11,6 @@
 #include <cuda.h>
 #include <cuda_runtime_api.h>
 
-#include <stdio.h>
-#include <stdexcept>
 
 __global__ void ConvLayer_Forward_cu(ConvNode *node, double* filters, LayerSize filterSize, LayerSize layerSize, LayerSize previousLayerSize, double *previousLayerOutput, double *output, int pad)
 {
@@ -65,20 +65,20 @@ __global__ void ConvLayer_Backward_cu(ConvNode *node, double* filters, double* b
 	{
 		for (int filterPosx = 0; filterPosx < filterSize.width; filterPosx++)
 		{
-			if (filterPosy + posy >= 0 &&
-				filterPosy + posy < layerSize.height &&
-				filterPosx + posx >= 0 &&
-				filterPosx + posx < layerSize.width)
-			{
-				for (int d = 0; d < filterSize.depth; d++)
-				{
-					int index1 = ((layerSize.width * (filterPosy + posy)) + filterPosx + posx) * previousLayerSize.depth + d;
-					int index2 = ((filterSize.width * filterPosy) + filterPosx) * filterSize.depth + d;
+if (filterPosy + posy >= 0 &&
+	filterPosy + posy < layerSize.height &&
+	filterPosx + posx >= 0 &&
+	filterPosx + posx < layerSize.width)
+{
+	for (int d = 0; d < filterSize.depth; d++)
+	{
+		int index1 = ((layerSize.width * (filterPosy + posy)) + filterPosx + posx) * previousLayerSize.depth + d;
+		int index2 = ((filterSize.width * filterPosy) + filterPosx) * filterSize.depth + d;
 
-					backFilter[index2] += previousLayerOutput[index1] * gradient;
-					output[index1] += filter[index2] * gradient;
-				}
-			}
+		backFilter[index2] += previousLayerOutput[index1] * gradient;
+		output[index1] += filter[index2] * gradient;
+	}
+}
 		}
 	}
 
@@ -87,36 +87,6 @@ __global__ void ConvLayer_Backward_cu(ConvNode *node, double* filters, double* b
 
 __global__ void ConvLayer_Backward_update_back_filters_cu(ConvNode *node, double* filters, double* backFilterCollation, double* backFilters, LayerSize filterSize, int filterCount, LayerSize layerSize, LayerSize previousLayerSize, LayerSize nextLayerSize, double *previousLayerOutput, double *nextLayerOutput, double *output, int pad, double learnRate)
 {
-	/*
-	blockIdx.xxx is layer size
-
-	int posx = blockIdx.x - pad;
-	int posy = blockIdx.y - pad;
-	double* filter = filters + (filterSize.width * filterSize.height * filterSize.depth * blockIdx.z);
-	double* backFilter = backFilters + (filterSize.width * filterSize.height * filterSize.depth * blockIdx.z);
-	double gradient = nextLayerOutput[((layerSize.width * blockIdx.y) + blockIdx.x) * nextLayerSize.depth + blockIdx.z];
-
-	for (int filterPosy = 0; filterPosy < filterSize.height; filterPosy++)
-	{
-		for (int filterPosx = 0; filterPosx < filterSize.width; filterPosx++)
-		{
-			if (filterPosy + posy >= 0 &&
-				filterPosy + posy < layerSize.height &&
-				filterPosx + posx >= 0 &&
-				filterPosx + posx < layerSize.width)
-			{
-				for (int d = 0; d < filterSize.depth; d++)
-				{
-					int index1 = ((layerSize.width * (filterPosy + posy)) + filterPosx + posx) * previousLayerSize.depth + d;
-					int index2 = ((filterSize.width * filterPosy) + filterPosx) * filterSize.depth + d;
-
-					backFilter[index2] += previousLayerOutput[index1] * gradient;
-					output[index1] += filter[index2] * gradient;
-				}
-			}
-		}
-	}*/
-
 	int posx = blockIdx.x - pad;
 	int posy = blockIdx.y - pad;
 	//double* filter = filters + (filterSize.width * filterSize.height * filterSize.depth * blockIdx.z);
@@ -147,132 +117,7 @@ __global__ void ConvLayer_Backward_update_back_filters_cu(ConvNode *node, double
 		}
 
 	}
-	/*
 
-
-
-	for (int d2 = 0; d2<filterCount; d2++)
-	{
-		//double* filter = filters + (filterSize.width * filterSize.height * filterSize.depth * d2);
-		double* backFilter = backFilters + (filterSize.width * filterSize.height * filterSize.depth * d2);
-
-		for (int y = 0; y<layerSize.height; y++)
-		{
-			for (int x = 0; x<layerSize.width; x++)
-			{
-				int posx = x - pad;
-				int posy = y - pad;
-				double gradient = nextLayerOutput[((layerSize.width * y) + x) * nextLayerSize.depth + d2];
-
-				for (int filterPosy = 0; filterPosy < filterSize.height; filterPosy++)
-				{
-					for (int filterPosx = 0; filterPosx < filterSize.width; filterPosx++)
-					{
-						if (filterPosy + posy >= 0 &&
-							filterPosy + posy < layerSize.height &&
-							filterPosx + posx >= 0 &&
-							filterPosx + posx < layerSize.width)
-						{
-							for (int d = 0; d < filterSize.depth; d++)
-							{
-								int index1 = ((layerSize.width * (filterPosy + posy)) + filterPosx + posx) * previousLayerSize.depth + d;
-								int index2 = ((filterSize.width * filterPosy) + filterPosx) * filterSize.depth + d;
-
-								backFilter[index2] += previousLayerOutput[index1] * gradient;
-								//output[index1] += filter[index2] * gradient;
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-
-	blockIdx.x = filterPosx
-	blockIdx.y = filterPosy
-	blockIdx.z = d
-
-	call for each filter = d2
-
-	SHARED MEMORY?
-	threadIdx.x = d2 = shared memory?
-
-
-	if (blockIdx.y + posy >= 0 &&
-		blockIdx.y + posy < layerSize.height &&
-		blockIdx.x + posx >= 0 &&
-		blockIdx.x + posx < layerSize.width)
-	{
-		int index1 = ((layerSize.width * (blockIdx.y + posy)) + blockIdx.x + posx) * previousLayerSize.depth + blockIdx.z;
-		int index2 = ((filterSize.width * blockIdx.y) + blockIdx.x) * filterSize.depth + blockIdx.z;
-
-		backFilter[index2] += previousLayerOutput[index1] * gradient;
-	}
-
-
-	*/
-
-
-
-	//blockIdx.z = filter count
-	//	blockIdx.x, y = filter x and y
-	//	threadIdx.z = depth... not needed?
-	//	threadIdx.x = layer x
-	//	threadIdx.y = layer y
-/*
-	double* backFilter = backFilters + (filterSize.width * filterSize.height * filterSize.depth * blockIdx.z);
-	backFilter += ((filterSize.width * blockIdx.y) + blockIdx.x) * filterSize.depth + threadIdx.z;
-
-	double gradient = nextLayerOutput[((layerSize.width * threadIdx.y) + threadIdx.x) * nextLayerSize.depth + blockIdx.z];
-	int posx = threadIdx.x - pad;
-	int posy = threadIdx.y - pad;
-	if (blockIdx.y + posy >= 0 &&
-		blockIdx.y + posy < layerSize.height &&
-		blockIdx.x + posx >= 0 &&
-		blockIdx.x + posx < layerSize.width)
-	{
-		for (int d = 0; d < filterSize.depth; d++)
-		{
-			int index1 = ((layerSize.width * (blockIdx.y + posy)) + blockIdx.x + posx) * previousLayerSize.depth + d;
-			*backFilter += previousLayerOutput[index1] * gradient;
-		}
-	}*/
-	/*
-	double* backFilter = backFilters + (filterSize.width * filterSize.height * filterSize.depth * blockIdx.z);
-
-	for (int y = 0; y < layerSize.height; y++)
-	{
-		for (int x = 0; x < layerSize.width; x++)
-		{
-			int posx = x - pad;
-			int posy = y - pad;
-			double* filter = filters + (filterSize.width * filterSize.height * filterSize.depth * blockIdx.z);
-			//double* backFilter = backFilters + (filterSize.width * filterSize.height * filterSize.depth * blockIdx.z);
-			double gradient = nextLayerOutput[((layerSize.width * y) + x) * nextLayerSize.depth + blockIdx.z];
-
-			//for (int filterPosy = 0; filterPosy < filterSize.height; filterPosy++)
-			//{
-				//for (int filterPosx = 0; filterPosx < filterSize.width; filterPosx++)
-				//{
-					if (blockIdx.y + posy >= 0 &&
-						blockIdx.y + posy < layerSize.height &&
-						blockIdx.x + posx >= 0 &&
-						blockIdx.x + posx < layerSize.width)
-					{
-						for (int d = 0; d < filterSize.depth; d++)
-						{
-							int index1 = ((layerSize.width * (blockIdx.y + posy)) + blockIdx.x + posx) * previousLayerSize.depth + d;
-							int index2 = ((filterSize.width * blockIdx.y) + blockIdx.x) * filterSize.depth + d;
-
-							backFilter[index2] += previousLayerOutput[index1] * gradient;
-							//output[index1] += filter[index2] * gradient;
-						}
-					}
-				//}
-			//}
-		}
-	}
-	*/
 	//node->bias += gradient * learnRate;
 }
 
@@ -280,7 +125,7 @@ __global__ void ConvLayer_Backward_update_back_filters_collate(double* backFilte
 {
 	// do each pixel in each filter!
 	// 
-    // blockIdx.x = filter x
+	// blockIdx.x = filter x
 	// blockIdx.y = filter y
 	// blockIdx.z = filter index (count)
 
@@ -302,62 +147,6 @@ __global__ void ConvLayer_Backward_update_back_filters_collate(double* backFilte
 
 __global__ void ConvLayer_Backward_update_output_cu(ConvNode *node, double* filters, double* backFilters, LayerSize filterSize, int filterCount, LayerSize layerSize, LayerSize previousLayerSize, LayerSize nextLayerSize, double *previousLayerOutput, double *nextLayerOutput, double *output, int pad, double learnRate)
 {
-	/*
-	int posx = blockIdx.x - pad;
-	int posy = blockIdx.y - pad;
-	double* filter = filters + (filterSize.width * filterSize.height * filterSize.depth * blockIdx.z);
-	double* backFilter = backFilters + (filterSize.width * filterSize.height * filterSize.depth * blockIdx.z);
-	double gradient = nextLayerOutput[((layerSize.width * blockIdx.y) + blockIdx.x) * nextLayerSize.depth + blockIdx.z];
-
-	for (int filterPosy = 0; filterPosy < filterSize.height; filterPosy++)
-	{
-		for (int filterPosx = 0; filterPosx < filterSize.width; filterPosx++)
-		{
-			if (filterPosy + posy >= 0 &&
-				filterPosy + posy < layerSize.height &&
-				filterPosx + posx >= 0 &&
-				filterPosx + posx < layerSize.width)
-			{
-				for (int d = 0; d < filterSize.depth; d++)
-				{
-					int index1 = ((layerSize.width * (filterPosy + posy)) + filterPosx + posx) * previousLayerSize.depth + d;
-					int index2 = ((filterSize.width * filterPosy) + filterPosx) * filterSize.depth + d;
-
-					backFilter[index2] += previousLayerOutput[index1] * gradient;
-					output[index1] += filter[index2] * gradient;
-				}
-			}
-		}
-	}*/
-
-	/*
-	int posx = blockIdx.x - pad;
-	int posy = blockIdx.y - pad;
-	double* filter = filters + (filterSize.width * filterSize.height * filterSize.depth * blockIdx.z);
-	double* backFilter = backFilters + (filterSize.width * filterSize.height * filterSize.depth * blockIdx.z);
-	double gradient = nextLayerOutput[((layerSize.width * blockIdx.y) + blockIdx.x) * nextLayerSize.depth + blockIdx.z];
-
-	for (int filterPosy = 0; filterPosy < filterSize.height; filterPosy++)
-	{
-		for (int filterPosx = 0; filterPosx < filterSize.width; filterPosx++)
-		{
-			if (filterPosy + posy >= 0 &&
-				filterPosy + posy < layerSize.height &&
-				filterPosx + posx >= 0 &&
-				filterPosx + posx < layerSize.width)
-			{
-				for (int d = 0; d < filterSize.depth; d++)
-				{
-					int index1 = ((layerSize.width * (filterPosy + posy)) + filterPosx + posx) * previousLayerSize.depth + d;
-					int index2 = ((filterSize.width * filterPosy) + filterPosx) * filterSize.depth + d;
-
-					//backFilter[index2] += previousLayerOutput[index1] * gradient;
-					output[index1] += filter[index2] * gradient;
-				}
-			}
-		}
-	}*/
-
 	// TODO: ASSUMING PAD OF 1!!
 
 	//int posx = blockIdx.x - pad;
@@ -366,58 +155,90 @@ __global__ void ConvLayer_Backward_update_output_cu(ConvNode *node, double* filt
 
 	//unsigned int index1 = ((layerSize.width * (filterPosy + posy)) + filterPosx + posx) * previousLayerSize.depth + d;
 	unsigned int index1 = ((layerSize.width * blockIdx.y) + blockIdx.x) * previousLayerSize.depth + d;
+	//unsigned int filterStartX = filterSize.width - pad - 1 + blockIdx.x;
+	//unsigned int filterStartY = filterSize.height - pad - 1 + blockIdx.y;
+
+	int fpxStart = -pad;
+	int filterStartPosx = filterSize.width - 1;
+	if ((int)blockIdx.x - pad < 0)
+	{
+		fpxStart = 0;
+		filterStartPosx = filterSize.width - pad - 1;
+	}
+
+	int fpyStart = -pad;
+	int filterStartPosy = filterSize.height - 1;
+	if ((int)blockIdx.y - pad < 0)
+	{
+		fpyStart = 0;
+		filterStartPosy = filterSize.height - pad - 1;
+	}
+
+	int filterEndPosx = 0;
+	if ((int)blockIdx.x + filterSize.width - pad > layerSize.width)
+	{
+		filterEndPosx = (int)blockIdx.x + filterSize.width - pad - layerSize.width;
+	}
+
+	int filterEndPosy = 0;
+	if ((int)blockIdx.y + filterSize.height - pad > layerSize.height)
+	{
+		filterEndPosy = (int)blockIdx.y + filterSize.height - pad - layerSize.height;
+	}
+
+	if (blockIdx.x == 11 && blockIdx.y == 0) 
+	{
+		printf("filterStartPosx: %i\n", filterStartPosx);
+		printf("filterStartPosy: %i\n", filterStartPosy);
+
+		printf("filterEndPosx: %i\n", filterEndPosx);
+		printf("filterEndPosy: %i\n", filterEndPosy);
+
+		printf("?? (int)blockIdx.x + filterSize.width: %i\n", (int)blockIdx.x + filterSize.width);
+		printf("?? (int)blockIdx.y + filterSize.height: %i\n", (int)blockIdx.y + filterSize.height);
+		printf("?? layerSize.height: %i\n", layerSize.height);
+	}
+
 
 	for (int filterIndex = 0; filterIndex < filterCount; filterIndex++)
 	{
-		double gradient = nextLayerOutput[((layerSize.width * blockIdx.y) + blockIdx.x) * nextLayerSize.depth + filterIndex];
+		double* filter = filters + (filterSize.width * filterSize.height * filterSize.depth * filterIndex);
 
-		for (int filterPosy = 0; filterPosy < filterSize.height; filterPosy++)
+
+		for (int fpy = fpyStart, int filterPosy = filterStartPosy; filterPosy >= filterEndPosy; fpy++, filterPosy--)
 		{
-			for (int filterPosx = 0; filterPosx < filterSize.width; filterPosx++)
+			for (int fpx = fpxStart, int filterPosx = filterStartPosx; filterPosx >= filterEndPosx; fpx++, filterPosx--)
 			{
-				if (blockIdx.x - pad + filterPosx >= 0 &&
-					blockIdx.x - pad + filterPosx < layerSize.width &&
-					blockIdx.y - pad + filterPosy >= 0 &&
-					blockIdx.y - pad + filterPosy < layerSize.height) {
-					double* filter = filters + (filterSize.width * filterSize.height * filterSize.depth * filterIndex);
+
+				//int fpx = filterStartX + filterPosx - blockIdx.x + filterSize.width - 1;
+				//int fpy = filterStartY + filterPosy - blockIdx.y + filterSize.height - 1;
+				double gradient = nextLayerOutput[((layerSize.width * (blockIdx.y + fpy)) + (blockIdx.x + fpx)) * nextLayerSize.depth + filterIndex];
+
+				if (blockIdx.x == 11 && blockIdx.y == 0)
+				{
+					printf("fpx: %i, fpy: %i\n", fpx, fpy);
+					printf("gradient x: %i, y: %i nextLayerSize.depth: %i, d2: %i, layerSize.width: %i \n", blockIdx.x + fpx, blockIdx.y + fpy, nextLayerSize.depth, filterIndex, layerSize.width);
+				}
+
 					int index2 = ((filterSize.width * filterPosy) + filterPosx) * filterSize.depth + d;
 
 					output[index1] += filter[index2] * gradient;
-				}
+					if (blockIdx.x == 11 && blockIdx.y == 0)
+					{
+						printf("gradient: %f\n", gradient);
+						printf("filter: %i\n", filterIndex);
+						printf("index1: %i\n index2: %i\n", index1, index2);
+					}
+				
 			}
 		}
 	}
 
-	/*
-
-	int posx = ((int)blockIdx.x) - pad;
-	int posy = ((int)blockIdx.y) - pad;
-	double* filter = filters + (filterSize.width * filterSize.height * filterSize.depth * blockIdx.z);
-	//double* backFilter = backFilters + (filterSize.width * filterSize.height * filterSize.depth * blockIdx.z);
-	double gradient = nextLayerOutput[((layerSize.width * blockIdx.y) + blockIdx.x) * nextLayerSize.depth + blockIdx.z];
-
-	//for (int filterPosy = 0; filterPosy < filterSize.height; filterPosy++)
-	//{
-		//for (int filterPosx = 0; filterPosx < filterSize.width; filterPosx++)
-		//{
-			if (threadIdx.y + posy >= 0 &&
-				threadIdx.y + posy < layerSize.height &&
-				threadIdx.x + posx >= 0 &&
-				threadIdx.x + posx < layerSize.width)
-			{
-				for (int d = 0; d < filterSize.depth; d++)
-				{
-					int index1 = ((layerSize.width * (threadIdx.y + posy)) + threadIdx.x + posx) * previousLayerSize.depth + d;
-					int index2 = ((filterSize.width * threadIdx.y) + threadIdx.x) * filterSize.depth + d;
-
-					//backFilter[index2] += previousLayerOutput[index1] * gradient;
-					output[index1] += filter[index2] * gradient;
-
-					//__syncthreads();
-				}
-			}
-		//}
-	//}*/
+	if (blockIdx.x == 11 && blockIdx.y == 0)
+	{
+		printf("index1 %i\n", index1);
+		printf("output[index1] %f\n", output[index1]);
+	}
 
 	//node->bias += gradient * learnRate;
 }
@@ -433,7 +254,7 @@ __global__ void ConvLayer_Backward_cu_2(ConvNode *node, double* filters, double*
 				int posx = x - pad;
 				int posy = y - pad;
 				double* filter = filters + (filterSize.width * filterSize.height * filterSize.depth * d2);
-				double* backFilter = backFilters + (filterSize.width * filterSize.height * filterSize.depth * d2);
+				//double* backFilter = backFilters + (filterSize.width * filterSize.height * filterSize.depth * d2);
 				double gradient = nextLayerOutput[((layerSize.width * y) + x) * nextLayerSize.depth + d2];
 
 				for (int filterPosy = 0; filterPosy < filterSize.height; filterPosy++)
@@ -479,7 +300,7 @@ __global__ void ConvLayer_Update_Backward_filter_cu(double* filters, double* bac
 
 void ConvLayer_Forward(ConvNode *node, double* filters, LayerSize filterSize, int filterCount, LayerSize layerSize, LayerSize previousLayerSize, double *previousLayerOutput, double *output, int pad)
 {
-	dim3 blocks(layerSize.width, layerSize.height, filterCount);
+	dim3 blocks(layerSize.width, layerSize.height, filterSize.depth);
 	ConvLayer_Forward_cu <<<blocks, 1>>>(node, filters, filterSize, layerSize, previousLayerSize, previousLayerOutput, output, pad);
 //	ConvLayer_Forward_cu_2 << <1, 1 >> >(node, filters, filterSize, layerSize, previousLayerSize, previousLayerOutput, output, pad);
 
@@ -502,9 +323,28 @@ void ConvLayer_Backward(ConvNode *node, double* filters, double* backFilterColla
 	ConvLayer_Backward_update_back_filters_cu <<<blocks, 1>>>(node, filters, backFilterCollation, backFilters, filterSize, filterCount, layerSize, previousLayerSize, nextLayerSize, previousLayerOutput, nextLayerOutput, output, pad, learnRate);
 	//ConvLayer_Backward_cu_2 << <1, 1 >> >(node, filters, backFilters, filterSize, filterCount, layerSize, previousLayerSize, nextLayerSize, previousLayerOutput, nextLayerOutput, output, pad, learnRate);
 
+	if (cudaGetLastError() != cudaError::cudaSuccess)
+	{
+		throw std::runtime_error("FullyconnectedLayer Backward CUDA method returned an error");
+	}
+
+	if (cudaDeviceSynchronize() != cudaError::cudaSuccess)
+	{
+		throw std::runtime_error("FullyconnectedLayer Backward CUDA syncronize returned an error");
+	}
+
 	dim3 bfblocks(filterSize.width, filterSize.height, filterCount);
 	ConvLayer_Backward_update_back_filters_collate<<<bfblocks , 1>>>(backFilterCollation, backFilters, filterSize, layerSize);
 
+	if (cudaGetLastError() != cudaError::cudaSuccess)
+	{
+		throw std::runtime_error("FullyconnectedLayer Backward CUDA method returned an error");
+	}
+
+	if (cudaDeviceSynchronize() != cudaError::cudaSuccess)
+	{
+		throw std::runtime_error("FullyconnectedLayer Backward CUDA syncronize returned an error");
+	}
 
 	//dim3 bfblocks(filterSize.width, filterSize.height, filterCount);
 	//dim3 bthreads(layerSize.width, layerSize.height, 1);
@@ -513,6 +353,7 @@ void ConvLayer_Backward(ConvNode *node, double* filters, double* backFilterColla
 	dim3 bblocks(layerSize.width, layerSize.height, filterSize.depth);
 	//dim3 bthreads2(filterSize.width, filterSize.height, 1);
 	ConvLayer_Backward_update_output_cu <<<bblocks, 1 >>>(node, filters, backFilters, filterSize, filterCount, layerSize, previousLayerSize, nextLayerSize, previousLayerOutput, nextLayerOutput, output, pad, learnRate);
+	//ConvLayer_Backward_cu_2 << <1, 1 >> >(node, filters, backFilters, filterSize, filterCount, layerSize, previousLayerSize, nextLayerSize, previousLayerOutput, nextLayerOutput, output, pad, learnRate);
 
 
 	//ConvLayer_Backward_cu_2 << <1, 1 >> >(node, filters, backFilters, filterSize, filterCount, layerSize, previousLayerSize, nextLayerSize, previousLayerOutput, nextLayerOutput, output, pad, learnRate);
@@ -520,11 +361,11 @@ void ConvLayer_Backward(ConvNode *node, double* filters, double* backFilterColla
 
 	if (cudaGetLastError() != cudaError::cudaSuccess)
 	{
-		throw std::runtime_error("FullyconnectedLayer Forward CUDA method returned an error");
+		throw std::runtime_error("FullyconnectedLayer Backward CUDA method returned an error");
 	}
 
 	if (cudaDeviceSynchronize() != cudaError::cudaSuccess)
 	{
-		throw std::runtime_error("FullyconnectedLayer Forward CUDA syncronize returned an error");
+		throw std::runtime_error("FullyconnectedLayer Backward CUDA syncronize returned an error");
 	}
 }

@@ -1,4 +1,6 @@
 #pragma once
+#include <stdio.h>
+#include <stdexcept>
 
 #include "convlayer.h"
 #include "layersize.h"
@@ -8,9 +10,6 @@
 #include <device_functions.h>
 #include <cuda.h>
 #include <cuda_runtime_api.h>
-
-#include <stdio.h>
-#include <stdexcept>
 
 __global__ void ConvLayer_Forward_cu_test(ConvNode *node, double* filters, LayerSize filterSize, LayerSize layerSize, LayerSize previousLayerSize, double *previousLayerOutput, double *output, int pad)
 {
@@ -91,6 +90,16 @@ __global__ void ConvLayer_Backward_cu_test(ConvNode *node, double* filters, doub
 
 								backFilter[index2] += previousLayerOutput[index1] * gradient;
 								output[index1] += filter[index2] * gradient;
+
+								if (index1 == 11)
+								{
+									printf("gradient x: %i, y: %i nextLayerSize.depth: %i, d2: %i, layerSize.width: %i \n", x, y, nextLayerSize.depth, d2, layerSize.width);
+									printf("filterPosx: %i, filterPosy: %i, posx: %i, posy: %i\n", filterPosx, filterPosy, posx, posy);
+									printf("gradient %f\n", gradient);
+									printf("filter: %i\n", d2);
+									printf("d: %i\n", d);
+									printf("index1: %i\n index2: %i\n", index1, index2);
+								}
 							}
 						}
 					}
@@ -100,13 +109,14 @@ __global__ void ConvLayer_Backward_cu_test(ConvNode *node, double* filters, doub
 	}
 
 
+	//printf("output[10, 10] %f\n", output[(10 * layerSize.width) + 10]);
+	printf("output[1] %f\n", output[11]);
 
 	//node->bias += gradient * learnRate;
 }
 
 void ConvLayer_ForwardReference(ConvNode *node, double* filters, LayerSize filterSize, int filterCount, LayerSize layerSize, LayerSize previousLayerSize, double *previousLayerOutput, double *output, int pad)
 {
-	dim3 blocks(layerSize.width, layerSize.height, filterCount);
 	ConvLayer_Forward_cu_test << <1, 1 >> >(node, filters, filterSize, layerSize, previousLayerSize, previousLayerOutput, output, pad);
 
 	if (cudaGetLastError() != cudaError::cudaSuccess)
@@ -122,7 +132,6 @@ void ConvLayer_ForwardReference(ConvNode *node, double* filters, LayerSize filte
 
 void ConvLayer_BackwardReference(ConvNode *node, double* filters, double* backFilters, LayerSize filterSize, int filterCount, LayerSize layerSize, LayerSize previousLayerSize, LayerSize nextLayerSize, double *previousLayerOutput, double *nextLayerOutput, double *output, int pad, double learnRate)
 {
-	dim3 blocks(layerSize.width, layerSize.height, filterCount);
 	ConvLayer_Backward_cu_test << <1, 1 >> >(node, filters, backFilters, filterSize, filterCount, layerSize, previousLayerSize, nextLayerSize, previousLayerOutput, nextLayerOutput, output, pad, learnRate);
 
 	if (cudaGetLastError() != cudaError::cudaSuccess)

@@ -139,7 +139,9 @@ void NnGpu::GetLayerData(int layerIndex, LayerDataType dataType, LayerDataList& 
 bool NnGpu::RunUnitTests()
 {
 	ConvUTest* convTest = new ConvUTest();
-	convTest->Test();
+	bool convTestResult = convTest->Test();
 
-	return true;
+	delete convTest;
+
+	return convTestResult;
 }

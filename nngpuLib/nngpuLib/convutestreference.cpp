@@ -19,7 +19,7 @@ void ConvUTestReference::ReferenceForward(INNetworkLayer* previousLayer, INNetwo
 	{
 		throw std::runtime_error("ConvLayer forward cudaMemcpy returned an error");
 	}
-
+	
 	ConvLayer_ForwardReference(
 		nodeDeviceMem,
 		filterDeviceMem,
@@ -30,7 +30,7 @@ void ConvUTestReference::ReferenceForward(INNetworkLayer* previousLayer, INNetwo
 		previousLayer->GetForwardDeviceMem(),
 		forwardDeviceMem,
 		pad);
-
+		
 	if (cudaMemcpy(forwardHostMem.get(), forwardDeviceMem, forwardCount * sizeof(double), cudaMemcpyDeviceToHost) != cudaError::cudaSuccess)
 	{
 		throw std::runtime_error("ConvLayer forward cudaMemcpy returned an error");

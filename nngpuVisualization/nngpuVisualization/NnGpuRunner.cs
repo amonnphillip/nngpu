@@ -77,7 +77,12 @@ namespace nngpuVisualization
                 _workerRunning = true;
 
                 _nnGpuWin = new NnGpuWin();
-                _nnGpuWin.RunUnitTests();
+                bool testResults = _nnGpuWin.RunUnitTests();
+                if (!testResults)
+                {
+                    throw new Exception("NN Unit test results failed!");
+                }
+
                 _nnGpuWin.InitializeNetwork();
 
                 _worker = new BackgroundWorker();

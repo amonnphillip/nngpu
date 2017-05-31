@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "nngpuVisualization", "nngpu
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nngpuLib", "..\nngpuLib\nngpuLib\nngpuLib.vcxproj", "{199A53C3-3AE6-4992-95DE-DEA6F69CC40E}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nngpuTest", "..\nngpuTest\nngpuTest.vcxproj", "{F90CE20A-CC4F-469A-B078-2CD5D6A91ECF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,16 @@ Global
 		{199A53C3-3AE6-4992-95DE-DEA6F69CC40E}.Release|x64.Build.0 = Release|x64
 		{199A53C3-3AE6-4992-95DE-DEA6F69CC40E}.Release|x86.ActiveCfg = Release|Win32
 		{199A53C3-3AE6-4992-95DE-DEA6F69CC40E}.Release|x86.Build.0 = Release|Win32
+		{F90CE20A-CC4F-469A-B078-2CD5D6A91ECF}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{F90CE20A-CC4F-469A-B078-2CD5D6A91ECF}.Debug|x64.ActiveCfg = Debug|x64
+		{F90CE20A-CC4F-469A-B078-2CD5D6A91ECF}.Debug|x64.Build.0 = Debug|x64
+		{F90CE20A-CC4F-469A-B078-2CD5D6A91ECF}.Debug|x86.ActiveCfg = Debug|Win32
+		{F90CE20A-CC4F-469A-B078-2CD5D6A91ECF}.Debug|x86.Build.0 = Debug|Win32
+		{F90CE20A-CC4F-469A-B078-2CD5D6A91ECF}.Release|Any CPU.ActiveCfg = Release|Win32
+		{F90CE20A-CC4F-469A-B078-2CD5D6A91ECF}.Release|x64.ActiveCfg = Release|x64
+		{F90CE20A-CC4F-469A-B078-2CD5D6A91ECF}.Release|x64.Build.0 = Release|x64
+		{F90CE20A-CC4F-469A-B078-2CD5D6A91ECF}.Release|x86.ActiveCfg = Release|Win32
+		{F90CE20A-CC4F-469A-B078-2CD5D6A91ECF}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

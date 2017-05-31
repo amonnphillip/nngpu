@@ -6,6 +6,7 @@
 #include <cassert>
 #include "cuda_runtime.h"
 #include "layer.h"
+#include "testutils.h"
 
 TestLayer::TestLayer(int width, int height, int depth)
 {
@@ -156,13 +157,15 @@ void TestLayer::GetLayerData(LayerDataList& layerDataList)
 
 void TestLayer::ResetForwardAndBackward()
 {
-	std::fill_n(forwardHostMem.get(), GetForwardNodeCount(), (double)1.0);
+	//std::fill_n(forwardHostMem.get(), GetForwardNodeCount(), (double)1.0);
+	TestUtils::GradualFill(forwardHostMem.get(), GetForwardNodeCount());
 	if (cudaMemcpy(forwardDeviceMem, forwardHostMem.get(), GetForwardNodeCount() * sizeof(double), cudaMemcpyHostToDevice) != cudaError::cudaSuccess)
 	{
 		throw std::runtime_error("TestLayer forward cudaMemcpy returned an error");
 	}
 
-	std::fill_n(backwardHostMem.get(), GetBackwardNodeCount(), (double)1.0);
+	//std::fill_n(backwardHostMem.get(), GetBackwardNodeCount(), (double)1.0);
+	TestUtils::GradualFill(backwardHostMem.get(), GetBackwardNodeCount());
 	if (cudaMemcpy(backwardDeviceMem, backwardHostMem.get(), GetBackwardNodeCount() * sizeof(double), cudaMemcpyHostToDevice) != cudaError::cudaSuccess)
 	{
 		throw std::runtime_error("TestLayer backward cudaMemcpy returned an error");
