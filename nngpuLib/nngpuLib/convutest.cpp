@@ -22,18 +22,19 @@ bool ConvUTest::Test()
 	convLayer->Forward(previousLayer, nextLayer);
 	convLayerReference->ReferenceForward(previousLayer, nextLayer);
 
+	int errorx;
+	int errory;
+	int errord;
+
 	const int NUM_OF_TESTS = 4;
 	bool* isSame = new bool[NUM_OF_TESTS];
-	isSame[0] = TestUtils::CompareMemory(convLayer->GetForwardHostMem(true), convLayerReference->GetForwardHostMem(true), convLayer->GetForwardNodeCount());
+	isSame[0] = TestUtils::CompareRectangularMemory(convLayer->GetForwardHostMem(true), convLayerReference->GetForwardHostMem(true), convLayer->GetForwardWidth(), convLayer->GetForwardHeight(), convLayer->GetForwardDepth(), &errorx, &errory, &errord);
 	isSame[1] = TestUtils::CompareMemory(convLayer->GetFilterHostMem(true), convLayerReference->GetFilterHostMem(true), convLayer->GetFilterMemNodeCount());
 
 	// Test backward
 	convLayer->Backward(previousLayer, nextLayer, 0.01);
 	convLayerReference->ReferenceBackward(previousLayer, nextLayer, 0.01);
 
-	int errorx;
-	int errory;
-	int errord;
 	isSame[2] = TestUtils::CompareRectangularMemory(convLayer->GetBackwardHostMem(true), convLayerReference->GetBackwardHostMem(true), convLayer->GetBackwardWidth(), convLayer->GetBackwardHeight(), convLayer->GetBackwardDepth(), &errorx, &errory, &errord);
 	isSame[3] = TestUtils::CompareMemory(convLayer->GetBackFilterHostMem(true), convLayerReference->GetBackFilterHostMem(true), convLayer->GetBackFilterMemNodeCount());
 

@@ -43,6 +43,16 @@ __global__ void ConvLayer_Forward_cu(ConvNode *node, double* filters, LayerSize 
 						val = 0;
 					}
 					val += filter[index1] * previousLayerOutput[index2];
+					/*
+					if (blockIdx.x == 1 && blockIdx.y == 0)
+					{
+						printf("gradient x: %i, y: %i, d2: %i, layerSize.width: %i !\n", blockIdx.x, blockIdx.y, blockIdx.z, layerSize.width);
+						printf("filterPosx: %i, filterPosy: %i, posx: %i, posy: %i\n", filterPosx, filterPosy, posx, posy);
+						printf("filter[index1]: %f, previousLayerOutput[index2]: %f\n", filter[index1], previousLayerOutput[index2]);
+						printf("d: %i\n", d);
+						printf("index1: %i\n index2: %i\n", index1, index2);
+					}*/
+
 				}
 			}
 		}
@@ -50,6 +60,9 @@ __global__ void ConvLayer_Forward_cu(ConvNode *node, double* filters, LayerSize 
 
 	//val += node->bias;
 	output[((blockIdx.y * layerSize.width) + blockIdx.x) * layerSize.depth + blockIdx.z] = val;
+	/*if (blockIdx.x == 1 && blockIdx.y == 0) {
+		printf("output[1]: %f\n", output[1]);
+	}*/
 }
 
 
@@ -185,7 +198,7 @@ __global__ void ConvLayer_Backward_update_output_cu(ConvNode *node, double* filt
 	{
 		filterEndPosy = (int)blockIdx.y + filterSize.height - pad - layerSize.height;
 	}
-
+	/*
 	if (blockIdx.x == 11 && blockIdx.y == 0) 
 	{
 		printf("filterStartPosx: %i\n", filterStartPosx);
@@ -197,7 +210,7 @@ __global__ void ConvLayer_Backward_update_output_cu(ConvNode *node, double* filt
 		printf("?? (int)blockIdx.x + filterSize.width: %i\n", (int)blockIdx.x + filterSize.width);
 		printf("?? (int)blockIdx.y + filterSize.height: %i\n", (int)blockIdx.y + filterSize.height);
 		printf("?? layerSize.height: %i\n", layerSize.height);
-	}
+	}*/
 
 
 	for (int filterIndex = 0; filterIndex < filterCount; filterIndex++)
@@ -213,32 +226,33 @@ __global__ void ConvLayer_Backward_update_output_cu(ConvNode *node, double* filt
 				//int fpx = filterStartX + filterPosx - blockIdx.x + filterSize.width - 1;
 				//int fpy = filterStartY + filterPosy - blockIdx.y + filterSize.height - 1;
 				double gradient = nextLayerOutput[((layerSize.width * (blockIdx.y + fpy)) + (blockIdx.x + fpx)) * nextLayerSize.depth + filterIndex];
-
+				/*
 				if (blockIdx.x == 11 && blockIdx.y == 0)
 				{
 					printf("fpx: %i, fpy: %i\n", fpx, fpy);
 					printf("gradient x: %i, y: %i nextLayerSize.depth: %i, d2: %i, layerSize.width: %i \n", blockIdx.x + fpx, blockIdx.y + fpy, nextLayerSize.depth, filterIndex, layerSize.width);
-				}
+				}*/
 
 					int index2 = ((filterSize.width * filterPosy) + filterPosx) * filterSize.depth + d;
 
 					output[index1] += filter[index2] * gradient;
+					/*
 					if (blockIdx.x == 11 && blockIdx.y == 0)
 					{
 						printf("gradient: %f\n", gradient);
 						printf("filter: %i\n", filterIndex);
 						printf("index1: %i\n index2: %i\n", index1, index2);
-					}
+					}*/
 				
 			}
 		}
 	}
-
+	/*
 	if (blockIdx.x == 11 && blockIdx.y == 0)
 	{
 		printf("index1 %i\n", index1);
 		printf("output[index1] %f\n", output[index1]);
-	}
+	}*/
 
 	//node->bias += gradient * learnRate;
 }
@@ -300,7 +314,7 @@ __global__ void ConvLayer_Update_Backward_filter_cu(double* filters, double* bac
 
 void ConvLayer_Forward(ConvNode *node, double* filters, LayerSize filterSize, int filterCount, LayerSize layerSize, LayerSize previousLayerSize, double *previousLayerOutput, double *output, int pad)
 {
-	dim3 blocks(layerSize.width, layerSize.height, filterSize.depth);
+	dim3 blocks(layerSize.width, layerSize.height, filterCount);
 	ConvLayer_Forward_cu <<<blocks, 1>>>(node, filters, filterSize, layerSize, previousLayerSize, previousLayerOutput, output, pad);
 //	ConvLayer_Forward_cu_2 << <1, 1 >> >(node, filters, filterSize, layerSize, previousLayerSize, previousLayerOutput, output, pad);
 

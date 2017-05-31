@@ -11,9 +11,9 @@
 #include <cuda.h>
 #include <cuda_runtime_api.h>
 
-__global__ void ConvLayer_Forward_cu_test(ConvNode *node, double* filters, LayerSize filterSize, LayerSize layerSize, LayerSize previousLayerSize, double *previousLayerOutput, double *output, int pad)
+__global__ void ConvLayer_Forward_cu_test(ConvNode *node, double* filters, LayerSize filterSize, LayerSize layerSize, LayerSize previousLayerSize, double *previousLayerOutput, double *output, int pad, int filterCount)
 {
-	for (int d2 = 0; d2 < 32; d2++)
+	for (int d2 = 0; d2 < filterCount; d2++)
 	{
 		for (int y = 0; y < layerSize.height; y++)
 		{
@@ -48,6 +48,15 @@ __global__ void ConvLayer_Forward_cu_test(ConvNode *node, double* filters, Layer
 									val = 0;
 								}
 								val += filter[index1] * previousLayerOutput[index2];
+
+								/*if (x == 1 && y == 0)
+								{
+									printf("gradient x: %i, y: %i, d2: %i, layerSize.width: %i \n", x, y, d2, layerSize.width);
+									printf("filterPosx: %i, filterPosy: %i, posx: %i, posy: %i\n", filterPosx, filterPosy, posx, posy);
+									printf("filter[index1]: %f, previousLayerOutput[index2]: %f\n", filter[index1], previousLayerOutput[index2]);
+									printf("d: %i\n", d);
+									printf("index1: %i\n index2: %i\n", index1, index2);
+								}*/
 							}
 						}
 					}
@@ -58,6 +67,8 @@ __global__ void ConvLayer_Forward_cu_test(ConvNode *node, double* filters, Layer
 			}
 		}
 	}
+
+	//printf("output[1]: %f\n", output[1]);
 }
 
 __global__ void ConvLayer_Backward_cu_test(ConvNode *node, double* filters, double* backFilters, LayerSize filterSize, int filterCount, LayerSize layerSize, LayerSize previousLayerSize, LayerSize nextLayerSize, double *previousLayerOutput, double *nextLayerOutput, double *output, int pad, double learnRate)
@@ -90,7 +101,7 @@ __global__ void ConvLayer_Backward_cu_test(ConvNode *node, double* filters, doub
 
 								backFilter[index2] += previousLayerOutput[index1] * gradient;
 								output[index1] += filter[index2] * gradient;
-
+								/*
 								if (index1 == 11)
 								{
 									printf("gradient x: %i, y: %i nextLayerSize.depth: %i, d2: %i, layerSize.width: %i \n", x, y, nextLayerSize.depth, d2, layerSize.width);
@@ -99,7 +110,7 @@ __global__ void ConvLayer_Backward_cu_test(ConvNode *node, double* filters, doub
 									printf("filter: %i\n", d2);
 									printf("d: %i\n", d);
 									printf("index1: %i\n index2: %i\n", index1, index2);
-								}
+								}*/
 							}
 						}
 					}
@@ -110,14 +121,14 @@ __global__ void ConvLayer_Backward_cu_test(ConvNode *node, double* filters, doub
 
 
 	//printf("output[10, 10] %f\n", output[(10 * layerSize.width) + 10]);
-	printf("output[1] %f\n", output[11]);
+	//printf("output[1] %f\n", output[11]);
 
 	//node->bias += gradient * learnRate;
 }
 
 void ConvLayer_ForwardReference(ConvNode *node, double* filters, LayerSize filterSize, int filterCount, LayerSize layerSize, LayerSize previousLayerSize, double *previousLayerOutput, double *output, int pad)
 {
-	ConvLayer_Forward_cu_test << <1, 1 >> >(node, filters, filterSize, layerSize, previousLayerSize, previousLayerOutput, output, pad);
+	ConvLayer_Forward_cu_test << <1, 1 >> >(node, filters, filterSize, layerSize, previousLayerSize, previousLayerOutput, output, pad, filterCount);
 
 	if (cudaGetLastError() != cudaError::cudaSuccess)
 	{
