@@ -1,3 +1,4 @@
+#include <iostream>
 #include "nntrainer.h"
 #include "inputlayer.h"
 #include "inputlayerconfig.h"
@@ -99,8 +100,14 @@ void NNTrainer::Iterate(NNetwork* nn)
 		}
 	}
 
-
+#ifdef _UNITTEST
+	std::cout << "FORWARD PASS --------------------------------:\r\n";
+#endif
 	nn->Forward(input, inputCount);
+
+#ifdef _UNITTEST
+	std::cout << "BACKWARD PASS --------------------------------:\r\n";
+#endif
 	nn->Backward(expected, expectedCount, 0.001);
 
 	delete input;

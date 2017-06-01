@@ -2,6 +2,9 @@
 #include <iostream>
 #include "fullyconnectedlayer.h"
 #include "layerexception.h"
+#ifdef _DEBUG
+#include "testutils.h"
+#endif
 
 extern void FullyConnectedLayer_Forward(FullyConnectedNode *node, double* weights, int weightCount, double *input, double *output, int nodeCount);
 extern void FullyConnectedLayer_Backward(FullyConnectedNode *node, double* weights, int weightCount, double *forward, double *previousLayerForward, double* nextlayerBackward, double *output, int nodeCount, double learnRate);
@@ -87,8 +90,20 @@ void FullyConnectedLayer::Forward(INNetworkLayer* previousLayer, INNetworkLayer*
 
 	if (cudaMemcpy(forwardHostMem.get(), forwardDeviceMem, forwardCount * sizeof(double), cudaMemcpyDeviceToHost) != cudaError::cudaSuccess)
 	{
-		throw std::runtime_error("Sigmoid forward cudaMemcpy returned an error");
+		throw std::runtime_error("Forward cudaMemcpy returned an error");
 	}	
+
+#ifdef _UNITTEST
+	if (TestUtils::HasElementOutOfRange(GetForwardHostMem(true), GetForwardNodeCount(), -1000, 1000))
+	{
+		DebugPrint();
+		throw "Fullyconnected: Forward memory out of range";
+	}
+#endif
+
+#ifdef _UNITTEST
+	DebugPrint();
+#endif
 }
 
 void FullyConnectedLayer::Backward(double* input, int inputSize, double learnRate)
@@ -101,18 +116,14 @@ void FullyConnectedLayer::Backward(INNetworkLayer* previousLayer, INNetworkLayer
 	assert(previousLayer->GetForwardNodeCount() == weightCount);
 	assert(nextLayer->GetBackwardNodeCount() == nodeCount);
 
-	int ff = previousLayer->GetForwardNodeCount();
 
-
-	double* dd = previousLayer->GetForwardHostMem(true);
-	double sum = 0;
-	for (int i = 0; i < previousLayer->GetForwardNodeCount(); i++)
+#ifdef _UNITTEST
+	if (TestUtils::HasElementOutOfRange(previousLayer->GetForwardHostMem(true), previousLayer->GetForwardNodeCount(), -1000, 1000))
 	{
-		sum += dd[i];
+		DebugPrint();
+		throw "Conv: Backward memory out of range";
 	}
-	//std::cout << "FullyConnectedLayer::Backward\n";
-	//std::cout << sum;
-	//std::cout << "\n";
+#endif
 
 	std::fill_n(backwardHostMem.get(), GetBackwardNodeCount(), (double)0.0);
 	if (cudaMemcpy(backwardDeviceMem, backwardHostMem.get(), GetBackwardNodeCount() * sizeof(double), cudaMemcpyHostToDevice) != cudaError::cudaSuccess)
@@ -137,16 +148,23 @@ void FullyConnectedLayer::Backward(INNetworkLayer* previousLayer, INNetworkLayer
 		throw std::runtime_error("FullyConnectedLayer backward cudaMemcpy returned an error");
 	}
 
-
-	//double sum = 0;
-	double* d = backwardHostMem.get();
-	sum = 0;
-	for (int i = 0; i < GetBackwardNodeCount(); i++)
+#ifdef _UNITTEST
+	if (TestUtils::HasElementOutOfRange(GetBackwardHostMem(true), GetBackwardNodeCount(), -10, 10))
 	{
-		//std::cout << d[i];
-		sum += d[i];
+		DebugPrint();
+		throw "FullyConnected: Backward memory out of range";
 	}
-	//std::cout << "\n";
+
+	if (TestUtils::HasElementOutOfRange(weightsHostMem.get(), weightCount * nodeCount * sizeof(double), -10, 10))
+	{
+		DebugPrint();
+		throw "FullyConnected: Backward memory out of range";
+	}
+#endif
+
+#ifdef _UNITTEST
+	DebugPrint();
+#endif
 }
 
 double* FullyConnectedLayer::GetForwardHostMem(bool copyFromDevice)
@@ -293,6 +311,7 @@ void FullyConnectedLayer::DebugPrint()
 	std::cout << "fully connected layer:\r\n";
 
 	std::cout << "weights:\r\n";
+	/*
 	for (int index = 0; index < nodeCount; index++)
 	{
 		double* weight = GetWeightsForNode(index);
@@ -309,7 +328,7 @@ void FullyConnectedLayer::DebugPrint()
 			}
 			weight++;
 		}
-	}
+	}*/
 
 	std::cout << "\r\n";
 	std::cout << "bias:\r\n";

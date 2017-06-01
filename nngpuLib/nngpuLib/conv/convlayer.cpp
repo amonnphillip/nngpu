@@ -97,30 +97,6 @@ void ConvLayer::Forward(double* input, int inputSize)
 void ConvLayer::Forward(INNetworkLayer* previousLayer, INNetworkLayer* nextLayer)
 {
 
-	int nx = previousLayer->GetForwardWidth();
-	int ny = previousLayer->GetForwardHeight();
-	int nz = previousLayer->GetForwardDepth();
-
-	int nx1 = previousLayer->GetWidth();
-	int ny1 = previousLayer->GetHeight();
-	int nz1 = previousLayer->GetDepth();
-
-	double* ddd = forwardHostMem.get();
-	double sss = 0;
-	for (int i = 0; i < forwardCount; i++)
-	{
-		sss += ddd[i];
-	}
-
-	std::fill_n(forwardHostMem.get(), forwardCount, (double)0.0);
-
-	ddd = forwardHostMem.get();
-	sss = 0;
-	for (int i = 0; i < forwardCount; i++)
-	{
-		sss += ddd[i];
-	}
-
 
 	if (cudaMemcpy(forwardDeviceMem, forwardHostMem.get(), forwardCount * sizeof(double), cudaMemcpyHostToDevice) != cudaError::cudaSuccess)
 	{
@@ -149,12 +125,10 @@ void ConvLayer::Forward(INNetworkLayer* previousLayer, INNetworkLayer* nextLayer
 	}
 
 
-	ddd = forwardHostMem.get();
-	sss = 0;
-	for (int i = 0; i < forwardCount; i++)
-	{
-		sss += ddd[i];
-	}
+
+#ifdef _UNITTEST
+	DebugPrint();
+#endif
 }
 
 void ConvLayer::Backward(double* input, int inputSize, double learnRate)
@@ -220,6 +194,10 @@ void ConvLayer::Backward(INNetworkLayer* previousLayer, INNetworkLayer* nextLaye
 	{
 		sss += ddd[i];
 	}*/
+
+#ifdef _UNITTEST
+	DebugPrint();
+#endif
 }
 
 double* ConvLayer::GetForwardHostMem(bool copyFromDevice)
@@ -398,7 +376,7 @@ void ConvLayer::DebugPrint()
 	std::cout << "conv layer:\r\n";
 
 	std::cout << "back filters:\r\n";
-	double* backFilters = backFilterHostMem.get();
+	double* backFilters = GetBackFilterHostMem(true);
 	for (int c = 0; c < filterCount; c++)
 	{
 		for (int d = 0; d < filterDepth; d++)

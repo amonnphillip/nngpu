@@ -74,6 +74,10 @@ void OutputLayer::Backward(double* input, int inputSize, double learnRate)
 	{
 		throw std::runtime_error("OutputLayer backward cudaMemcpy returned an error");
 	}
+
+#ifdef _UNITTEST
+	DebugPrint(nullptr, 0);
+#endif
 }
 
 void OutputLayer::Backward(INNetworkLayer* previousLayer, INNetworkLayer* nextLayer, double learnRate)
@@ -184,7 +188,7 @@ void OutputLayer::GetLayerData(LayerDataList& layerDataList)
 
 void OutputLayer::DebugPrint(double* expected, int expectedCount)
 {
-	assert(expectedCount == GetForwardNodeCount());
+	assert(expectedCount == GetForwardNodeCount() || (expected == nullptr && expectedCount == 0));
 
 	double* forward = GetForwardHostMem(false);
 	int forwardCount = GetForwardNodeCount();
@@ -193,10 +197,22 @@ void OutputLayer::DebugPrint(double* expected, int expectedCount)
 	{
 		std::cout << forward[index] << " ";
 	}
-	std::cout << "\r\n";
-	std::cout << "expected:\r\n";
-	for (int index = 0; index < forwardCount; index++)
+
+	double* backward = GetBackwardHostMem(false);
+	int backwardCount = GetBackwardNodeCount();
+	std::cout << "backward:\r\n";
+	for (int index = 0; index < backwardCount; index++)
 	{
-		std::cout << expected[index] << " ";
+		std::cout << backward[index] << " ";
+	}
+
+	if (expected != nullptr)
+	{
+		std::cout << "\r\n";
+		std::cout << "expected:\r\n";
+		for (int index = 0; index < forwardCount; index++)
+		{
+			std::cout << expected[index] << " ";
+		}
 	}
 }

@@ -246,7 +246,7 @@ copy "$(CudaToolkitBinDir)\cudart*.dll" "$(OutDir)"</Command>
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;WIN64;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;WIN64;_DEBUG;_CONSOLE;_UNITTEST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(MSBuildProjectDirectory)\fullyconnected;$(MSBuildProjectDirectory)\input;$(MSBuildProjectDirectory)\output;$(MSBuildProjectDirectory)\conv;$(MSBuildProjectDirectory)\;$(MSBuildProjectDirectory)\relu;$(MSBuildProjectDirectory)\pool;%(AdditionalIncludeDirectories);$(CudaToolkitIncludeDir);$(MSBuildProjectDirectory)\test</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>

@@ -371,7 +371,7 @@ void ConvLayer_Backward(ConvNode *node, double* filters, double* backFilterColla
 
 
 	//ConvLayer_Backward_cu_2 << <1, 1 >> >(node, filters, backFilters, filterSize, filterCount, layerSize, previousLayerSize, nextLayerSize, previousLayerOutput, nextLayerOutput, output, pad, learnRate);
-	//ConvLayer_Update_Backward_filter_cu <<<filterCount, 1 >>>(filters, backFilters, filterSize, learnRate);
+	ConvLayer_Update_Backward_filter_cu <<<filterCount, 1 >>>(filters, backFilters, filterSize, learnRate);
 
 	if (cudaGetLastError() != cudaError::cudaSuccess)
 	{

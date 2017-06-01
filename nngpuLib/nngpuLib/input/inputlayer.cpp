@@ -36,6 +36,10 @@ void InputLayer::Forward(double* input, int inputSize)
 	{
 		throw std::runtime_error("InputLayer forward cudaMemcpy returned an error");
 	}
+
+#ifdef _UNITTEST
+	DebugPrint();
+#endif
 }
 
 void InputLayer::Forward(INNetworkLayer* previousLayer, INNetworkLayer* nextLayer)

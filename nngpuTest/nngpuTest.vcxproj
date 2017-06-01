@@ -220,6 +220,10 @@
       <Project>{199a53c3-3ae6-4992-95de-dea6f69cc40e}</Project>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="t10k-images.idx3-ubyte" />
+    <None Include="t10k-labels.idx1-ubyte" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

@@ -1,13 +1,14 @@
 #pragma once
-
-#include "fullyconnectedlayer.h"
-#include "cuda_runtime.h"
-#include "math.h"
-#include "device_launch_parameters.h"
-#include "device_functions.h"
-
 #include <stdio.h>
 #include <stdexcept>
+
+#include "fullyconnectedlayer.h"
+#include <cuda_runtime.h>
+#include <math.h>
+#include <device_launch_parameters.h>
+#include <device_functions.h>
+#include <cuda.h>
+#include <cuda_runtime_api.h>
 
 __global__ void FullyConnectedLayer_Forward_cu(FullyConnectedNode *node, double* weights, int weightCount, double *in, double *out)
 {
@@ -16,10 +17,18 @@ __global__ void FullyConnectedLayer_Forward_cu(FullyConnectedNode *node, double*
 	for (int i = 0; i < weightCount; i++)
 	{
 		val += *weightBlock * in[i];
+		if (blockIdx.x == 0)
+		{
+			//printf("val: %f, i: %i, in[i]: %f, *weightBlock: %f\n", val, i, in[i], *weightBlock);
+		}
 		weightBlock++;
 	}
 
 	out[blockIdx.x] = val + node->bias;
+	if (blockIdx.x == 0)
+	{
+		//printf("\n");
+	}
 }
 
 __global__ void FullyConnectedLayer_Backward_cu_p1(FullyConnectedNode *node, double* weights, int weightCount, double *forward, double *previousLayerForward, double* nextlayerBackward, double *out, double learnRate, int nodeCount)
@@ -107,16 +116,13 @@ __global__ void FullyConnectedLayer_Backward_cu_2(FullyConnectedNode *node, doub
 		double* weightBlock = weights + (x * weightCount);
 		for (int i = 0; i < weightCount; i++)
 		{
-			out[i] += 1;//*weightBlock * error;
-				* weightBlock += 1;// previousLayerForward[i] * error * learnRate;
+			out[i] += *weightBlock * error;
+			*weightBlock += previousLayerForward[i] * error * learnRate;
 			weightBlock++;
 		}
 
 		node[x].bias += error * learnRate;
 	}
-
-
-
 }
 
 void FullyConnectedLayer_Forward(FullyConnectedNode *node, double* weights, int weightCount, double *input, double *output, int nodeCount)

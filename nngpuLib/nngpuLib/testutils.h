@@ -82,4 +82,16 @@ public:
 			v += inc;
 		}
 	}
+
+	static bool HasElementOutOfRange(double* src, int count, double lowValue, double highValue)
+	{
+		for (int i = 0; i < count; i++) {
+			if (*src < lowValue || *src > highValue)
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
 };
