@@ -79,6 +79,12 @@
     <ClCompile Include="convutestreference.cpp">
       <Filter>conv</Filter>
     </ClCompile>
+    <ClCompile Include="pool\poolutest.cpp">
+      <Filter>pool</Filter>
+    </ClCompile>
+    <ClCompile Include="pool\poolutestreference.cpp">
+      <Filter>pool</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="conv\convlayer.cu">
@@ -95,6 +101,10 @@
     </CudaCompile>
     <CudaCompile Include="convutestreference.cu">
       <Filter>conv</Filter>
+    </CudaCompile>
+    <CudaCompile Include="layer.cu" />
+    <CudaCompile Include="pool\poolutestreference.cu">
+      <Filter>pool</Filter>
     </CudaCompile>
   </ItemGroup>
   <ItemGroup>
@@ -156,5 +166,11 @@
       <Filter>conv</Filter>
     </ClInclude>
     <ClInclude Include="testutils.h" />
+    <ClInclude Include="pool\poolutest.h">
+      <Filter>pool</Filter>
+    </ClInclude>
+    <ClInclude Include="pool\poolutestreference.h">
+      <Filter>pool</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

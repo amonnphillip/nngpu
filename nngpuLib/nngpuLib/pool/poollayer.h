@@ -11,7 +11,7 @@ class PoolNode
 
 class PoolLayer : public Layer<PoolNode, double, double, double>, public INNetworkLayer
 {
-private:
+protected:
 	int nodeCount = 0;
 	int forwardCount = 0;
 	int backwardWidth = 0;
@@ -47,7 +47,10 @@ public:
 	virtual int GetWidth();
 	virtual int GetHeight();
 	virtual int GetDepth();
+	virtual int* GetBackDataHostMem(bool copyFromDevice);
+	virtual int GetBackDataNodeCount();
 	virtual void GetLayerData(LayerDataList& layerDataList);
 	virtual LayerType GetLayerType();
+	void DebugPrint();
 };
 

@@ -11,7 +11,7 @@ class ReluNode
 
 class ReluLayer : public Layer<ReluNode, double, double, double>, public INNetworkLayer
 {
-private:
+protected:
 	int nodeCount = 0;
 	int forwardCount = 0;
 	int backwardWidth = 0;

@@ -1,21 +1,26 @@
-// nngpuTest.cpp : Defines the entry point for the console application.
-//
-
 #include "stdafx.h"
 #include "nngpu.h"
 #include "nngpuwin.h"
 
 int main()
 {
+	// Run unit tests on individual layers
 	NnGpu* nn = Initialize();
 	InitializeNetwork(nn);
 	bool testResults = RunUnitTests(nn);
 
+	if (!testResults)
+	{
+		DisposeNetwork(nn);
+		delete nn;
+		return -1;
+	}
 
+	// Run tests on the network as a whole
 	AddInputLayer(nn, 28, 28, 1);
 	AddConvLayer(nn, 3, 3, 1, 32, 1, 1);
-	//nn->AddReluLayer(_nn);
-	//nn->AddPoolLayer(_nn, 2, 2);
+	AddReluLayer(nn);
+	AddPoolLayer(nn, 2, 2);
 	AddFullyConnected(nn, 10);
 	AddOutput(nn, 10);
 	
@@ -47,20 +52,33 @@ int main()
 
 	InitializeTraining(nn, imageData, imageDataSize, labelData, labelDataSize);
 
+	bool trainError = false;
 	int numIterations = 100;
-	while (numIterations > 0)
+	while (numIterations > 0 && 
+		trainError == false)
 	{
-		TrainNetworkInteration(nn);
+		try {
+			TrainNetworkInteration(nn);
+		} 
+		catch (...)
+		{
+			trainError = true;
+		}
+
 		numIterations--;
 	}
 
-
+	// Release network resources
 	DisposeNetwork(nn);
 	delete nn;
 
 	delete imageData;
 	delete labelData;
 
+	if (trainError)
+	{
+		return -1;
+	}
 
     return 0;
 }

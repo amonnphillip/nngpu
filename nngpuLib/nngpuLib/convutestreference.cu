@@ -126,32 +126,36 @@ __global__ void ConvLayer_Backward_cu_test(ConvNode *node, double* filters, doub
 	//node->bias += gradient * learnRate;
 }
 
+__global__ void ConvLayer_Update_Backward_filter_cu_test(double* filters, double* backFilters, LayerSize filterSize, double learnRate, int filterCount)
+{
+	int size = filterSize.width * filterSize.height * filterSize.depth;
+
+	for (int i = 0; i < filterCount; i++)
+	{
+		double* filter = filters + (size * i);
+		double* backFilter = backFilters + (size * i);
+
+		for (int index = 0; index < size; index++)
+		{
+			filter[index] += backFilter[index] * learnRate;
+		}
+	}
+}
+
 void ConvLayer_ForwardReference(ConvNode *node, double* filters, LayerSize filterSize, int filterCount, LayerSize layerSize, LayerSize previousLayerSize, double *previousLayerOutput, double *output, int pad)
 {
 	ConvLayer_Forward_cu_test << <1, 1 >> >(node, filters, filterSize, layerSize, previousLayerSize, previousLayerOutput, output, pad, filterCount);
 
-	if (cudaGetLastError() != cudaError::cudaSuccess)
-	{
-		throw std::runtime_error("Conv Reference Forward CUDA method returned an error");
-	}
-
-	if (cudaDeviceSynchronize() != cudaError::cudaSuccess)
-	{
-		throw std::runtime_error("Conv Reference Forward CUDA syncronize returned an error");
-	}
+	LayerSynchronize();
 }
 
 void ConvLayer_BackwardReference(ConvNode *node, double* filters, double* backFilters, LayerSize filterSize, int filterCount, LayerSize layerSize, LayerSize previousLayerSize, LayerSize nextLayerSize, double *previousLayerOutput, double *nextLayerOutput, double *output, int pad, double learnRate)
 {
 	ConvLayer_Backward_cu_test << <1, 1 >> >(node, filters, backFilters, filterSize, filterCount, layerSize, previousLayerSize, nextLayerSize, previousLayerOutput, nextLayerOutput, output, pad, learnRate);
 
-	if (cudaGetLastError() != cudaError::cudaSuccess)
-	{
-		throw std::runtime_error("Conv Reference Forward CUDA method returned an error");
-	}
+	LayerSynchronize();
 
-	if (cudaDeviceSynchronize() != cudaError::cudaSuccess)
-	{
-		throw std::runtime_error("Conv Reference Forward CUDA syncronize returned an error");
-	}
+	ConvLayer_Update_Backward_filter_cu_test << <1, 1 >> >(filters, backFilters, filterSize, learnRate, filterCount);
+
+	LayerSynchronize();
 }

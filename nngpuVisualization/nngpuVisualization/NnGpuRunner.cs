@@ -59,7 +59,7 @@ namespace nngpuVisualization
 
         private static int _currentInterval = 0;
 
-        private static int _threadDelayMs = 10;
+        private static int _threadDelayMs = 1;
 
 
         public static void StartRunner(

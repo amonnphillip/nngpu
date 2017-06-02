@@ -85,4 +85,8 @@ void ConvUTestReference::ReferenceBackward(INNetworkLayer* previousLayer, INNetw
 	{
 	throw std::runtime_error("ConvLayer backward cudaMemcpy returned an error");
 	}
+
+#ifdef _UNITTEST
+	DebugPrint();
+#endif
 }

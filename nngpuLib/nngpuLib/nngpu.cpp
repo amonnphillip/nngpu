@@ -12,6 +12,7 @@
 #include "nntrainer.h"
 #include "layerdata.h"
 #include "convutest.h"
+#include "poolutest.h"
 
 void NnGpu::InitializeNetwork()
 {
@@ -140,8 +141,11 @@ bool NnGpu::RunUnitTests()
 {
 	ConvUTest* convTest = new ConvUTest();
 	bool convTestResult = convTest->Test();
-
 	delete convTest;
 
-	return convTestResult;
+	PoolUTest* poolTest = new PoolUTest();
+	bool poolTestResult = poolTest->Test();
+	delete poolTest;
+
+	return convTestResult && poolTestResult;
 }

@@ -45,6 +45,8 @@
     <ClCompile Include="output\outputlayerconfig.cpp" />
     <ClCompile Include="pool\poollayer.cpp" />
     <ClCompile Include="pool\poollayerconfig.cpp" />
+    <ClCompile Include="pool\poolutest.cpp" />
+    <ClCompile Include="pool\poolutestreference.cpp" />
     <ClCompile Include="relu\relulayer.cpp" />
     <ClCompile Include="relu\relulayerconfig.cpp" />
     <ClCompile Include="nntrainer.cpp" />
@@ -54,7 +56,9 @@
     <CudaCompile Include="convutestreference.cu" />
     <CudaCompile Include="conv\convlayer.cu" />
     <CudaCompile Include="fullyconnected\fullyconnectedlayer.cu" />
+    <CudaCompile Include="layer.cu" />
     <CudaCompile Include="pool\poollayer.cu" />
+    <CudaCompile Include="pool\poolutestreference.cu" />
     <CudaCompile Include="relu\relulayer.cu" />
   </ItemGroup>
   <ItemGroup>
@@ -80,6 +84,8 @@
     <ClInclude Include="output\outputlayerconfig.h" />
     <ClInclude Include="pool\poollayer.h" />
     <ClInclude Include="pool\poollayerconfig.h" />
+    <ClInclude Include="pool\poolutest.h" />
+    <ClInclude Include="pool\poolutestreference.h" />
     <ClInclude Include="relu\relulayer.h" />
     <ClInclude Include="relu\relulayerconfig.h" />
     <ClInclude Include="nntrainer.h" />

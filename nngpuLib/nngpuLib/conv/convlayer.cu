@@ -318,15 +318,7 @@ void ConvLayer_Forward(ConvNode *node, double* filters, LayerSize filterSize, in
 	ConvLayer_Forward_cu <<<blocks, 1>>>(node, filters, filterSize, layerSize, previousLayerSize, previousLayerOutput, output, pad);
 //	ConvLayer_Forward_cu_2 << <1, 1 >> >(node, filters, filterSize, layerSize, previousLayerSize, previousLayerOutput, output, pad);
 
-	if (cudaGetLastError() != cudaError::cudaSuccess)
-	{
-		throw std::runtime_error("FullyconnectedLayer Forward CUDA method returned an error");
-	}
-
-	if (cudaDeviceSynchronize() != cudaError::cudaSuccess)
-	{
-		throw std::runtime_error("FullyconnectedLayer Forward CUDA syncronize returned an error");
-	}
+	LayerSynchronize();
 }
 
 void ConvLayer_Backward(ConvNode *node, double* filters, double* backFilterCollation, double* backFilters, LayerSize filterSize, int filterCount, LayerSize layerSize, LayerSize previousLayerSize, LayerSize nextLayerSize, double *previousLayerOutput, double *nextLayerOutput, double *output, int pad, double learnRate)
@@ -337,28 +329,12 @@ void ConvLayer_Backward(ConvNode *node, double* filters, double* backFilterColla
 	ConvLayer_Backward_update_back_filters_cu <<<blocks, 1>>>(node, filters, backFilterCollation, backFilters, filterSize, filterCount, layerSize, previousLayerSize, nextLayerSize, previousLayerOutput, nextLayerOutput, output, pad, learnRate);
 	//ConvLayer_Backward_cu_2 << <1, 1 >> >(node, filters, backFilters, filterSize, filterCount, layerSize, previousLayerSize, nextLayerSize, previousLayerOutput, nextLayerOutput, output, pad, learnRate);
 
-	if (cudaGetLastError() != cudaError::cudaSuccess)
-	{
-		throw std::runtime_error("FullyconnectedLayer Backward CUDA method returned an error");
-	}
-
-	if (cudaDeviceSynchronize() != cudaError::cudaSuccess)
-	{
-		throw std::runtime_error("FullyconnectedLayer Backward CUDA syncronize returned an error");
-	}
+	LayerSynchronize();
 
 	dim3 bfblocks(filterSize.width, filterSize.height, filterCount);
 	ConvLayer_Backward_update_back_filters_collate<<<bfblocks , 1>>>(backFilterCollation, backFilters, filterSize, layerSize);
 
-	if (cudaGetLastError() != cudaError::cudaSuccess)
-	{
-		throw std::runtime_error("FullyconnectedLayer Backward CUDA method returned an error");
-	}
-
-	if (cudaDeviceSynchronize() != cudaError::cudaSuccess)
-	{
-		throw std::runtime_error("FullyconnectedLayer Backward CUDA syncronize returned an error");
-	}
+	LayerSynchronize();
 
 	//dim3 bfblocks(filterSize.width, filterSize.height, filterCount);
 	//dim3 bthreads(layerSize.width, layerSize.height, 1);
@@ -369,17 +345,10 @@ void ConvLayer_Backward(ConvNode *node, double* filters, double* backFilterColla
 	ConvLayer_Backward_update_output_cu <<<bblocks, 1 >>>(node, filters, backFilters, filterSize, filterCount, layerSize, previousLayerSize, nextLayerSize, previousLayerOutput, nextLayerOutput, output, pad, learnRate);
 	//ConvLayer_Backward_cu_2 << <1, 1 >> >(node, filters, backFilters, filterSize, filterCount, layerSize, previousLayerSize, nextLayerSize, previousLayerOutput, nextLayerOutput, output, pad, learnRate);
 
+	LayerSynchronize();
 
 	//ConvLayer_Backward_cu_2 << <1, 1 >> >(node, filters, backFilters, filterSize, filterCount, layerSize, previousLayerSize, nextLayerSize, previousLayerOutput, nextLayerOutput, output, pad, learnRate);
 	ConvLayer_Update_Backward_filter_cu <<<filterCount, 1 >>>(filters, backFilters, filterSize, learnRate);
 
-	if (cudaGetLastError() != cudaError::cudaSuccess)
-	{
-		throw std::runtime_error("FullyconnectedLayer Backward CUDA method returned an error");
-	}
-
-	if (cudaDeviceSynchronize() != cudaError::cudaSuccess)
-	{
-		throw std::runtime_error("FullyconnectedLayer Backward CUDA syncronize returned an error");
-	}
+	LayerSynchronize();
 }

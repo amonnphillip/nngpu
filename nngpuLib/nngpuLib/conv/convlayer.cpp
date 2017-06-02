@@ -1,10 +1,10 @@
 #include <algorithm>
 #include <iostream>
+#include <cassert>
 #include "convlayerconfig.h"
 #include "convlayer.h"
 #include "layersize.h"
 #include "layerexception.h"
-#include <cassert>
 #include "cuda_runtime.h"
 #include "layer.h"
 
@@ -187,13 +187,7 @@ void ConvLayer::Backward(INNetworkLayer* previousLayer, INNetworkLayer* nextLaye
 	{
 		throw std::runtime_error("ConvLayer backward cudaMemcpy returned an error");
 	}
-
-	double* ddd = backFilterHostMem.get();
-	double sss = 0;
-	for (int i = 0; i < filterSize * filterDepth * filterCount; i++)
-	{
-		sss += ddd[i];
-	}*/
+*/
 
 #ifdef _UNITTEST
 	DebugPrint();
@@ -393,7 +387,7 @@ void ConvLayer::DebugPrint()
 			std::cout << "\r\n";
 		}
 	}
-
+#if 0
 	std::cout << "forward filters:\r\n";
 	double* forwardFilters = filterHostMem.get();
 	for (int c = 0; c < filterCount; c++)
@@ -428,5 +422,5 @@ void ConvLayer::DebugPrint()
 		}
 		std::cout << "\r\n";
 	}
-
+#endif
 }

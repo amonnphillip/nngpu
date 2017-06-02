@@ -43,6 +43,7 @@ bool ConvUTest::Test()
 
 	delete previousLayer;
 	delete convLayer;
+	delete convLayerReference;
 	delete nextLayer;
 
 	return testResult;

@@ -8,6 +8,8 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="800" Width="800">
     <Grid Background="#1a228e">
-        <nncontrols:NnDisplay></nncontrols:NnDisplay>
+        <ScrollViewer>
+            <nncontrols:NnDisplay></nncontrols:NnDisplay>
+        </ScrollViewer>
     </Grid>
 </Window>

@@ -129,15 +129,7 @@ void FullyConnectedLayer_Forward(FullyConnectedNode *node, double* weights, int 
 {
 	FullyConnectedLayer_Forward_cu <<<nodeCount, 1 >>>(node, weights, weightCount, input, output);
 
-	if (cudaGetLastError() != cudaError::cudaSuccess)
-	{
-		throw std::runtime_error("FullyconnectedLayer Forward CUDA method returned an error");
-	}
-
-	if (cudaDeviceSynchronize() != cudaError::cudaSuccess)
-	{
-		throw std::runtime_error("FullyconnectedLayer Forward CUDA syncronize returned an error");
-	}
+	LayerSynchronize();
 }
 
 void FullyConnectedLayer_Backward(FullyConnectedNode *node, double* weights, int weightCount, double *forward, double *previousLayerForward, double* nextlayerBackward, double *output, int nodeCount, double learnRate)
@@ -145,16 +137,14 @@ void FullyConnectedLayer_Backward(FullyConnectedNode *node, double* weights, int
 	//FullyConnectedLayer_Backward_cu <<<nodeCount, 1 >>>(node, weights, weightCount, forward, previousLayerForward, nextlayerBackward, output, learnRate);
 	//FullyConnectedLayer_Backward_cu_2 << <1, 1 >> >(node, weights, weightCount, forward, previousLayerForward, nextlayerBackward, output, learnRate, nodeCount);
 	FullyConnectedLayer_Backward_cu_p1 << <weightCount, nodeCount >> >(node, weights, weightCount, forward, previousLayerForward, nextlayerBackward, output, learnRate, nodeCount);
+
+	LayerSynchronize();
+
 	FullyConnectedLayer_Backward_cu_p2 << <weightCount, nodeCount >> >(node, weights, weightCount, forward, previousLayerForward, nextlayerBackward, output, learnRate, nodeCount);
+
+	LayerSynchronize();
+
 	FullyConnectedLayer_Backward_cu_p3 << <nodeCount, 1 >> >(node, nextlayerBackward, learnRate);
 
-	if (cudaGetLastError() != cudaError::cudaSuccess)
-	{
-		throw std::runtime_error("FullyconnectedLayer Forward CUDA method returned an error");
-	}
-
-	if (cudaDeviceSynchronize() != cudaError::cudaSuccess)
-	{
-		throw std::runtime_error("FullyconnectedLayer Forward CUDA syncronize returned an error");
-	}
+	LayerSynchronize();
 }

@@ -1,6 +1,6 @@
 #pragma once
 
-class ConvUTest
+class PoolUTest
 {
 public:
 	bool Test();

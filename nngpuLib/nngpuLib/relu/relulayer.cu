@@ -36,28 +36,12 @@ void ReluLayer_Forward(ReluNode *node, double *previousLayerForward, double *out
 {
 	ReluLayer_Forward_cu <<<nodeCount, 1 >>>(node, previousLayerForward, output);
 
-	if (cudaGetLastError() != cudaError::cudaSuccess)
-	{
-		throw std::runtime_error("ReluLayer Forward CUDA method returned an error");
-	}
-
-	if (cudaDeviceSynchronize() != cudaError::cudaSuccess)
-	{
-		throw std::runtime_error("ReluLayer Forward CUDA syncronize returned an error");
-	}
+	LayerSynchronize();
 }
 
 void ReluLayer_Backward(ReluNode *node, double *forward, double* nextlayerBackward, double *output, int nodeCount, double learnRate)
 {
 	ReluLayer_Backward_cu <<<nodeCount, 1 >>>(node, forward, nextlayerBackward, output, learnRate);
 
-	if (cudaGetLastError() != cudaError::cudaSuccess)
-	{
-		throw std::runtime_error("ReluLayer Forward CUDA method returned an error");
-	}
-
-	if (cudaDeviceSynchronize() != cudaError::cudaSuccess)
-	{
-		throw std::runtime_error("ReluLayer Forward CUDA syncronize returned an error");
-	}
+	LayerSynchronize();
 }

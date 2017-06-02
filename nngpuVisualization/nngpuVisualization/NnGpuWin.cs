@@ -99,6 +99,9 @@ namespace nngpuVisualization
             NnGpuWinInterop.AddConvLayer(_nn, 3, 3, 1, 32, 1, 1);
             NnGpuWinInterop.AddReluLayer(_nn);
             NnGpuWinInterop.AddPoolLayer(_nn, 2, 2);
+            NnGpuWinInterop.AddConvLayer(_nn, 3, 3, 1, 32, 1, 1);
+            NnGpuWinInterop.AddReluLayer(_nn);
+            NnGpuWinInterop.AddPoolLayer(_nn, 2, 2);
             NnGpuWinInterop.AddFullyConnected(_nn, 10);
             NnGpuWinInterop.AddOutput(_nn, 10);
 

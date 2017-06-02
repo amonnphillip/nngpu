@@ -5,6 +5,8 @@
 #include "layertype.h"
 #include "cuda_runtime.h"
 
+extern void LayerSynchronize();
+
 template<typename nodetype, typename inputtype, typename forwardtype, typename backwardtype>
 class Layer
 {
@@ -90,5 +92,10 @@ protected:
 	virtual LayerType GetLayerType()
 	{
 		return layerType;
+	}
+
+	inline void Synchronize()
+	{
+		LayerSynchronize();
 	}
 };
