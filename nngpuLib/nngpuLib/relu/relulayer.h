@@ -5,7 +5,7 @@
 #include "layer.h"
 #include "layerdata.h"
 
-class ReluNode
+class ReluNode // TODO: REMOVE THIS?
 {
 };
 

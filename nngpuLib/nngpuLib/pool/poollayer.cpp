@@ -68,10 +68,10 @@ void PoolLayer::Forward(double* input, int inputSize)
 void PoolLayer::Forward(INNetworkLayer* previousLayer, INNetworkLayer* nextLayer)
 {
 	double negativeInfinity = -std::numeric_limits<double>::infinity();
-	std::fill_n(forwardHostMem.get(), GetForwardNodeCount(), negativeInfinity);
+	std::fill_n(GetForwardHostMem(false), GetForwardNodeCount(), negativeInfinity);
 	std::fill_n(GetBackDataHostMem(false), GetBackDataNodeCount(), (int)0);
 
-	if (cudaMemcpy(forwardDeviceMem, forwardHostMem.get(), forwardCount * sizeof(double), cudaMemcpyHostToDevice) != cudaError::cudaSuccess)
+	if (cudaMemcpy(forwardDeviceMem, GetForwardHostMem(false), GetForwardNodeCount() * sizeof(double), cudaMemcpyHostToDevice) != cudaError::cudaSuccess)
 	{
 		throw std::runtime_error("PoolLayer forward cudaMemcpy returned an error");
 	}
@@ -129,7 +129,7 @@ double* PoolLayer::GetForwardHostMem(bool copyFromDevice)
 {
 	if (copyFromDevice)
 	{
-		if (cudaMemcpy(forwardHostMem.get(), forwardDeviceMem, forwardCount * sizeof(double), cudaMemcpyDeviceToHost) != cudaError::cudaSuccess)
+		if (cudaMemcpy(forwardHostMem.get(), forwardDeviceMem, GetForwardNodeCount() * sizeof(double), cudaMemcpyDeviceToHost) != cudaError::cudaSuccess)
 		{
 			throw std::runtime_error("PoolLayer forward cudaMemcpy returned an error");
 		}

@@ -30,7 +30,7 @@ protected:
 
 		this->layerType = layerType;
 
-		nodeHostMem = std::unique_ptr<nodetype>(new nodetype[nodeSize]);
+		nodeHostMem = std::unique_ptr<nodetype>(new nodetype[nodeSize]); // TODO: MAKE THIS OPTIONAL?
 		forwardHostMem = std::unique_ptr<forwardtype>(new forwardtype[forwardSize]);
 		backwardHostMem = std::unique_ptr<backwardtype>(new backwardtype[backwardSize]);
 

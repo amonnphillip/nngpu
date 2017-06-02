@@ -1,14 +1,17 @@
 #pragma once
-
-#include "relulayer.h"
-#include "cuda_runtime.h"
-#include "math.h"
-#include "device_launch_parameters.h"
-
 #include <stdio.h>
 #include <stdexcept>
 
-__global__ void ReluLayer_Forward_cu(ReluNode *node, double *previousLayerForward, double *out)
+#include <cuda_runtime.h>
+#include <math.h>
+#include <device_launch_parameters.h>
+
+#include "relulayer.h"
+
+
+
+
+__global__ void ReluLayer_Forward_cu(double *previousLayerForward, double *out)
 {
 	if (previousLayerForward[blockIdx.x] < 0)
 	{
@@ -20,7 +23,7 @@ __global__ void ReluLayer_Forward_cu(ReluNode *node, double *previousLayerForwar
 	}
 }
 
-__global__ void ReluLayer_Backward_cu(ReluNode *node, double *forward, double* nextlayerBackward, double *out, double learnRate)
+__global__ void ReluLayer_Backward_cu(double *forward, double* nextlayerBackward, double *out, double learnRate)
 {
 	if (forward[blockIdx.x] <= 0)
 	{
@@ -32,16 +35,16 @@ __global__ void ReluLayer_Backward_cu(ReluNode *node, double *forward, double* n
 	}
 }
 
-void ReluLayer_Forward(ReluNode *node, double *previousLayerForward, double *output, int nodeCount)
+void ReluLayer_Forward(double *previousLayerForward, double *output, int nodeCount)
 {
-	ReluLayer_Forward_cu <<<nodeCount, 1 >>>(node, previousLayerForward, output);
+	ReluLayer_Forward_cu <<<nodeCount, 1 >>>(previousLayerForward, output);
 
 	LayerSynchronize();
 }
 
-void ReluLayer_Backward(ReluNode *node, double *forward, double* nextlayerBackward, double *output, int nodeCount, double learnRate)
+void ReluLayer_Backward(double *forward, double* nextlayerBackward, double *output, int nodeCount, double learnRate)
 {
-	ReluLayer_Backward_cu <<<nodeCount, 1 >>>(node, forward, nextlayerBackward, output, learnRate);
+	ReluLayer_Backward_cu <<<nodeCount, 1 >>>(forward, nextlayerBackward, output, learnRate);
 
 	LayerSynchronize();
 }

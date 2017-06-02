@@ -16,8 +16,8 @@ ConvLayer::ConvLayer(ConvLayerConfig* config, INNetworkLayer* previousLayer)
 	pad = config->GetPad();
 	stride = config->GetStride();
 
-	layerWidth = (int)std::floor((double)(previousLayer->GetWidth() + pad * 2 - config->GetFilterWidth()) / (double)(stride + 1));
-	layerHeight = (int)std::floor((double)(previousLayer->GetHeight() + pad * 2 - config->GetFilterHeight()) / (double)(stride + 1));
+	layerWidth = (int)std::floor(((double)(previousLayer->GetWidth() + pad * 2 - config->GetFilterWidth()) / (double)stride) + 1);
+	layerHeight = (int)std::floor(((double)(previousLayer->GetHeight() + pad * 2 - config->GetFilterHeight()) / (double)stride) + 1);
 	layerDepth = config->GetFilterCount();
 
 	filterWidth = config->GetFilterWidth();
@@ -96,13 +96,13 @@ void ConvLayer::Forward(double* input, int inputSize)
 
 void ConvLayer::Forward(INNetworkLayer* previousLayer, INNetworkLayer* nextLayer)
 {
-
-
 	if (cudaMemcpy(forwardDeviceMem, forwardHostMem.get(), forwardCount * sizeof(double), cudaMemcpyHostToDevice) != cudaError::cudaSuccess)
 	{
 		throw std::runtime_error("ConvLayer forward cudaMemcpy returned an error");
 	}
-	
+
+	//LayerSynchronize();
+
 	ConvLayer_Forward(
 		nodeDeviceMem, 
 		filterDeviceMem, 
@@ -156,6 +156,8 @@ void ConvLayer::Backward(INNetworkLayer* previousLayer, INNetworkLayer* nextLaye
 	{
 		throw std::runtime_error("ConvLayer cudaMemcpy returned an error");
 	}
+
+	//LayerSynchronize();
 
 	ConvLayer_Backward(
 		nodeDeviceMem,

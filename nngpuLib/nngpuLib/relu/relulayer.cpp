@@ -1,9 +1,10 @@
-#include "relulayer.h"
-#include "layerexception.h"
 #include <cassert>
 
-extern void ReluLayer_Forward(ReluNode *node, double *previousLayerForward, double *output, int nodeCount);
-extern void ReluLayer_Backward(ReluNode *node, double *forward, double* nextlayerBackward, double *output, int nodeCount, double learnRate);
+#include "relulayer.h"
+#include "layerexception.h"
+
+extern void ReluLayer_Forward(double *previousLayerForward, double *output, int nodeCount);
+extern void ReluLayer_Backward(double *forward, double* nextlayerBackward, double *output, int nodeCount, double learnRate);
 
 ReluLayer::ReluLayer(INNetworkLayer* previousLayer)
 {
@@ -26,7 +27,6 @@ ReluLayer::ReluLayer(INNetworkLayer* previousLayer)
 		true);
 }
 
-
 void ReluLayer::Dispose()
 {
 	Layer::Dispose();
@@ -39,19 +39,16 @@ void ReluLayer::Forward(double* input, int inputSize)
 
 void ReluLayer::Forward(INNetworkLayer* previousLayer, INNetworkLayer* nextLayer)
 {
-	double* forward = forwardHostMem.get();
-	for (int index = 0; index < forwardCount; index++)
-	{
-		*forward = 0;
-		forward++;
-	}
+	assert(GetForwardNodeCount() == previousLayer->GetForwardNodeCount());
 
-	if (cudaMemcpy(forwardDeviceMem, forwardHostMem.get(), forwardCount * sizeof(double), cudaMemcpyHostToDevice) != cudaError::cudaSuccess)
+	std::fill_n(GetForwardHostMem(false), GetForwardNodeCount(), (double)0.0);
+
+	if (cudaMemcpy(forwardDeviceMem, GetForwardHostMem(false), GetForwardNodeCount() * sizeof(double), cudaMemcpyHostToDevice) != cudaError::cudaSuccess)
 	{
 		throw std::runtime_error("ReluLayer forward cudaMemcpy returned an error");
 	}
 
-	ReluLayer_Forward(nodeDeviceMem, previousLayer->GetForwardDeviceMem(), forwardDeviceMem, nodeCount);
+	ReluLayer_Forward(previousLayer->GetForwardDeviceMem(), forwardDeviceMem, nodeCount);
 /*
 	if (cudaMemcpy(forwardHostMem.get(), forwardDeviceMem, forwardCount * sizeof(double), cudaMemcpyDeviceToHost) != cudaError::cudaSuccess)
 	{
@@ -67,20 +64,16 @@ void ReluLayer::Backward(double* input, int inputSize, double learnRate)
 
 void ReluLayer::Backward(INNetworkLayer* previousLayer, INNetworkLayer* nextLayer, double learnRate)
 {
-	double* backward = backwardHostMem.get();
-	int backwardCount = GetBackwardNodeCount();
-	for (int index = 0; index < backwardCount; index++)
-	{
-		*backward = 0;
-		backward++;
-	}
+	assert(GetBackwardNodeCount() == nextLayer->GetBackwardNodeCount());
 
-	if (cudaMemcpy(backwardDeviceMem, backwardHostMem.get(), backwardCount * sizeof(double), cudaMemcpyHostToDevice) != cudaError::cudaSuccess)
+	std::fill_n(GetBackwardHostMem(false), GetBackwardNodeCount(), (double)0.0);
+
+	if (cudaMemcpy(backwardDeviceMem, backwardHostMem.get(), GetBackwardNodeCount() * sizeof(double), cudaMemcpyHostToDevice) != cudaError::cudaSuccess)
 	{
 		throw std::runtime_error("ReluLayer backward cudaMemcpy returned an error");
 	}
 
-	ReluLayer_Backward(nodeDeviceMem, forwardDeviceMem, nextLayer->GetBackwardDeviceMem(), backwardDeviceMem, nodeCount, learnRate);
+	ReluLayer_Backward(forwardDeviceMem, nextLayer->GetBackwardDeviceMem(), backwardDeviceMem, nodeCount, learnRate);
 /*
 	if (cudaMemcpy(backwardHostMem.get(), backwardDeviceMem, backwardCount * sizeof(double), cudaMemcpyDeviceToHost) != cudaError::cudaSuccess)
 	{
@@ -93,7 +86,7 @@ double* ReluLayer::GetForwardHostMem(bool copyFromDevice)
 {
 	if (copyFromDevice)
 	{
-		if (cudaMemcpy(forwardHostMem.get(), forwardDeviceMem, forwardCount * sizeof(double), cudaMemcpyDeviceToHost) != cudaError::cudaSuccess)
+		if (cudaMemcpy(forwardHostMem.get(), forwardDeviceMem, GetForwardNodeCount() * sizeof(double), cudaMemcpyDeviceToHost) != cudaError::cudaSuccess)
 		{
 			throw std::runtime_error("ReluLayer forward cudaMemcpy returned an error");
 		}

@@ -131,6 +131,8 @@ void FullyConnectedLayer::Backward(INNetworkLayer* previousLayer, INNetworkLayer
 		throw std::runtime_error("FullyConnectedLayer backward cudaMemcpy returned an error");
 	}
 
+	//LayerSynchronize();
+
 	FullyConnectedLayer_Backward(nodeDeviceMem, weightsDeviceMem, weightCount, forwardDeviceMem, previousLayer->GetForwardDeviceMem(), nextLayer->GetBackwardDeviceMem(), backwardDeviceMem, nodeCount, learnRate);
 
 	if (cudaMemcpy(weightsHostMem.get(), weightsDeviceMem, weightCount * nodeCount * sizeof(double), cudaMemcpyDeviceToHost) != cudaError::cudaSuccess)
