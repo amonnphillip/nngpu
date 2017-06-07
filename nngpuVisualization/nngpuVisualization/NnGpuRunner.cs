@@ -77,6 +77,7 @@ namespace nngpuVisualization
                 _workerRunning = true;
 
                 _nnGpuWin = new NnGpuWin();
+                
                 bool testResults = _nnGpuWin.RunUnitTests();
                 if (!testResults)
                 {

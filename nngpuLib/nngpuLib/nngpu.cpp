@@ -19,6 +19,13 @@ void NnGpu::InitializeNetwork()
 	cudaError_t cudaStatus;
 	cudaStatus = cudaSetDevice(0);
 
+#ifdef _UNITTEST
+	size_t size = 0;
+	cudaDeviceGetLimit(&size, cudaLimitPrintfFifoSize);
+	size *= 5;
+	cudaDeviceSetLimit(cudaLimitPrintfFifoSize, size);
+#endif
+
 	nn = new NNetwork();
 }
 
@@ -29,11 +36,11 @@ void NnGpu::AddInputLayer(int width, int height, int depth)
 	nn->Add<InputLayer, InputLayerConfig>(new InputLayerConfig(width, height, depth));
 }
 
-void NnGpu::AddConvLayer(int filterWidth, int filterHeight, int filterDepth, int filterCount, int pad, int stride)
+void NnGpu::AddConvLayer(int filterWidth, int filterHeight, int filterCount, int pad, int stride)
 {
 	assert(nn);
 
-	nn->Add<ConvLayer, ConvLayerConfig>(new ConvLayerConfig(filterWidth, filterHeight, filterDepth, filterCount, pad, stride));
+	nn->Add<ConvLayer, ConvLayerConfig>(new ConvLayerConfig(filterWidth, filterHeight, filterCount, pad, stride));
 }
 
 void NnGpu::AddReluLayer()

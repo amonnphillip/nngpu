@@ -34,8 +34,9 @@ protected:
 	double* filterDeviceMem;
 	std::unique_ptr<double> backFilterHostMem;
 	double* backFilterDeviceMem;
-	std::unique_ptr<double> backFilterCollationhHostMem;
-	double* backFilterCollationDeviceMem;
+	std::unique_ptr<int> backFilterLookUpHostMem;
+	int* backFilterLookUpDeviceMem;
+	int backFilterLookupSize;
 
 public:
 	ConvLayer(ConvLayerConfig* config, INNetworkLayer* previousLayer);
@@ -65,5 +66,6 @@ public:
 	int GetFilterMemNodeCount();
 	double* GetBackFilterHostMem(bool copyFromDevice);
 	int GetBackFilterMemNodeCount();
+	void ComputeBackFilterLookUp(INNetworkLayer* previousLayer, INNetworkLayer* nextLayer);
 	void DebugPrint();
 };

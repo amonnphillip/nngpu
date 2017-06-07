@@ -65,99 +65,6 @@ __global__ void ConvLayer_Forward_cu(ConvNode *node, double* filters, LayerSize 
 	}*/
 }
 
-
-__global__ void ConvLayer_Backward_cu(ConvNode *node, double* filters, double* backFilters, LayerSize filterSize, int filterCount, LayerSize layerSize, LayerSize previousLayerSize, LayerSize nextLayerSize, double *previousLayerOutput, double *nextLayerOutput, double *output, int pad, double learnRate)
-{
-	int posx = blockIdx.x - pad;
-	int posy = blockIdx.y - pad;
-	double* filter = filters + (filterSize.width * filterSize.height * filterSize.depth * blockIdx.z);
-	double* backFilter = backFilters + (filterSize.width * filterSize.height * filterSize.depth * blockIdx.z);
-	double gradient = nextLayerOutput[((layerSize.width * blockIdx.y) + blockIdx.x) * nextLayerSize.depth + blockIdx.z];
-
-	for (int filterPosy = 0; filterPosy < filterSize.height; filterPosy++)
-	{
-		for (int filterPosx = 0; filterPosx < filterSize.width; filterPosx++)
-		{
-if (filterPosy + posy >= 0 &&
-	filterPosy + posy < layerSize.height &&
-	filterPosx + posx >= 0 &&
-	filterPosx + posx < layerSize.width)
-{
-	for (int d = 0; d < filterSize.depth; d++)
-	{
-		int index1 = ((layerSize.width * (filterPosy + posy)) + filterPosx + posx) * previousLayerSize.depth + d;
-		int index2 = ((filterSize.width * filterPosy) + filterPosx) * filterSize.depth + d;
-
-		backFilter[index2] += previousLayerOutput[index1] * gradient;
-		output[index1] += filter[index2] * gradient;
-	}
-}
-		}
-	}
-
-	//node->bias += gradient * learnRate;
-}
-
-__global__ void ConvLayer_Backward_update_back_filters_cu(ConvNode *node, double* filters, double* backFilterCollation, double* backFilters, LayerSize filterSize, int filterCount, LayerSize layerSize, LayerSize previousLayerSize, LayerSize nextLayerSize, double *previousLayerOutput, double *nextLayerOutput, double *output, int pad, double learnRate)
-{
-	int posx = blockIdx.x - pad;
-	int posy = blockIdx.y - pad;
-	//double* filter = filters + (filterSize.width * filterSize.height * filterSize.depth * blockIdx.z);
-	unsigned int collationFilterGroupSize = filterSize.width * filterSize.height * filterSize.depth * layerSize.width * layerSize.height;
-	double* backFilter = backFilterCollation + (collationFilterGroupSize * blockIdx.z);// *blockIdx.x * blockIdx.y);
-	backFilter += (filterSize.width * filterSize.height * filterSize.depth * layerSize.width * blockIdx.y);
-	backFilter += (filterSize.width * filterSize.height * filterSize.depth * blockIdx.x);
-	double gradient = nextLayerOutput[((layerSize.width * blockIdx.y) + blockIdx.x) * nextLayerSize.depth + blockIdx.z];
-
-	for (int filterPosy = 0; filterPosy < filterSize.height; filterPosy++)
-	{
-		for (int filterPosx = 0; filterPosx < filterSize.width; filterPosx++)
-		{
-			if (filterPosy + posy >= 0 &&
-				filterPosy + posy < layerSize.height &&
-				filterPosx + posx >= 0 &&
-				filterPosx + posx < layerSize.width)
-			{
-				for (int d = 0; d < filterSize.depth; d++)
-				{
-					int index1 = ((layerSize.width * (filterPosy + posy)) + filterPosx + posx) * previousLayerSize.depth + d;
-					int index2 = ((filterSize.width * filterPosy) + filterPosx) * filterSize.depth + d;
-
-					backFilter[index2] += previousLayerOutput[index1] * gradient;
-					//output[index1] += filter[index2] * gradient;
-				}
-			}
-		}
-
-	}
-
-	//node->bias += gradient * learnRate;
-}
-
-__global__ void ConvLayer_Backward_update_back_filters_collate(double* backFilterCollation, double* backFilters, LayerSize filterSize, LayerSize layerSize)
-{
-	// do each pixel in each filter!
-	// 
-	// blockIdx.x = filter x
-	// blockIdx.y = filter y
-	// blockIdx.z = filter index (count)
-
-	// TODO: I ASSUME THE PAD IS 1!!
-
-	unsigned int collationFilterGroupSize = filterSize.width * filterSize.height * filterSize.depth * layerSize.width * layerSize.height;
-
-	double* backFilter = backFilters + (filterSize.width * filterSize.height * filterSize.depth * blockIdx.z) + (blockIdx.y * filterSize.width) + blockIdx.x;
-	double* collation = backFilterCollation + (collationFilterGroupSize * blockIdx.z) + (blockIdx.y * filterSize.width) + blockIdx.x;
-	for (int y = 0; y < layerSize.height; y++)
-	{
-		for (int x = 0; x < layerSize.width; x++)
-		{
-			*backFilter += *collation;
-			collation += filterSize.width * filterSize.height * filterSize.depth;
-		}
-	}
-}
-
 __global__ void ConvLayer_Backward_update_output_cu(ConvNode *node, double* filters, double* backFilters, LayerSize filterSize, int filterCount, LayerSize layerSize, LayerSize previousLayerSize, LayerSize nextLayerSize, double *previousLayerOutput, double *nextLayerOutput, double *output, int pad, double learnRate)
 {
 	// TODO: ASSUMING PAD OF 1!!
@@ -199,17 +106,17 @@ __global__ void ConvLayer_Backward_update_output_cu(ConvNode *node, double* filt
 		filterEndPosy = (int)blockIdx.y + filterSize.height - pad - layerSize.height;
 	}
 	/*
-	if (blockIdx.x == 11 && blockIdx.y == 0) 
+	if (blockIdx.x == 11 && blockIdx.y == 0)
 	{
-		printf("filterStartPosx: %i\n", filterStartPosx);
-		printf("filterStartPosy: %i\n", filterStartPosy);
+	printf("filterStartPosx: %i\n", filterStartPosx);
+	printf("filterStartPosy: %i\n", filterStartPosy);
 
-		printf("filterEndPosx: %i\n", filterEndPosx);
-		printf("filterEndPosy: %i\n", filterEndPosy);
+	printf("filterEndPosx: %i\n", filterEndPosx);
+	printf("filterEndPosy: %i\n", filterEndPosy);
 
-		printf("?? (int)blockIdx.x + filterSize.width: %i\n", (int)blockIdx.x + filterSize.width);
-		printf("?? (int)blockIdx.y + filterSize.height: %i\n", (int)blockIdx.y + filterSize.height);
-		printf("?? layerSize.height: %i\n", layerSize.height);
+	printf("?? (int)blockIdx.x + filterSize.width: %i\n", (int)blockIdx.x + filterSize.width);
+	printf("?? (int)blockIdx.y + filterSize.height: %i\n", (int)blockIdx.y + filterSize.height);
+	printf("?? layerSize.height: %i\n", layerSize.height);
 	}*/
 
 
@@ -229,75 +136,96 @@ __global__ void ConvLayer_Backward_update_output_cu(ConvNode *node, double* filt
 				/*
 				if (blockIdx.x == 11 && blockIdx.y == 0)
 				{
-					printf("fpx: %i, fpy: %i\n", fpx, fpy);
-					printf("gradient x: %i, y: %i nextLayerSize.depth: %i, d2: %i, layerSize.width: %i \n", blockIdx.x + fpx, blockIdx.y + fpy, nextLayerSize.depth, filterIndex, layerSize.width);
+				printf("fpx: %i, fpy: %i\n", fpx, fpy);
+				printf("gradient x: %i, y: %i nextLayerSize.depth: %i, d2: %i, layerSize.width: %i \n", blockIdx.x + fpx, blockIdx.y + fpy, nextLayerSize.depth, filterIndex, layerSize.width);
 				}*/
 
-					int index2 = ((filterSize.width * filterPosy) + filterPosx) * filterSize.depth + d;
+				int index2 = ((filterSize.width * filterPosy) + filterPosx) * filterSize.depth + d;
 
-					output[index1] += filter[index2] * gradient;
-					/*
-					if (blockIdx.x == 11 && blockIdx.y == 0)
-					{
-						printf("gradient: %f\n", gradient);
-						printf("filter: %i\n", filterIndex);
-						printf("index1: %i\n index2: %i\n", index1, index2);
-					}*/
-				
+				output[index1] += filter[index2] * gradient;
+				/*
+				if (blockIdx.x == 11 && blockIdx.y == 0)
+				{
+				printf("gradient: %f\n", gradient);
+				printf("filter: %i\n", filterIndex);
+				printf("index1: %i\n index2: %i\n", index1, index2);
+				}*/
+
 			}
 		}
 	}
 	/*
 	if (blockIdx.x == 11 && blockIdx.y == 0)
 	{
-		printf("index1 %i\n", index1);
-		printf("output[index1] %f\n", output[index1]);
+	printf("index1 %i\n", index1);
+	printf("output[index1] %f\n", output[index1]);
 	}*/
 
 	//node->bias += gradient * learnRate;
 }
 
-__global__ void ConvLayer_Backward_cu_2(ConvNode *node, double* filters, double* backFilters, LayerSize filterSize, int filterCount, LayerSize layerSize, LayerSize previousLayerSize, LayerSize nextLayerSize, double *previousLayerOutput, double *nextLayerOutput, double *output, int pad, double learnRate)
+__global__ void ConvLayer_Backward_back_filters_cu2(double* backFilters, LayerSize filterSize, LayerSize layerSize, LayerSize previousLayerSize, double *previousLayerOutput, LayerSize nextLayerSize, double *nextLayerOutput, int pad, int* backFilterLookUp)
 {
-	for (int d2 = 0;d2<filterCount;d2++)
+	// do each pixel in each filter!
+	// 
+	// blockIdx.x = filter x
+	// blockIdx.y = filter y
+	// blockIdx.z = filter index (count)
+	// threadIdx.x = filterSize.depth
+
+//	int ii = 0;
+
+	//	int index2 = ((filterSize.width * blockIdx.x) + blockIdx.y) * filterSize.depth + blockIdx.z;
+	//int d = 0;
+	//for (int d = 0; d < filterSize.depth; d++)
 	{
-		for (int y = 0; y<layerSize.height; y++)
+		double* backFilter = backFilters + (filterSize.width * filterSize.height * filterSize.depth * blockIdx.z);
+
+		int index2 = ((filterSize.width * blockIdx.y) + blockIdx.x) * filterSize.depth;
+		int* lookUp = backFilterLookUp + (((filterSize.width * blockIdx.y) + blockIdx.x) * layerSize.width * layerSize.height * 2);
+		index2 += threadIdx.x;
+
+		for (int y = 0; y < layerSize.height; y++)
 		{
-			for (int x = 0; x<layerSize.width; x++)
+			for (int x = 0; x < layerSize.width; x++)
 			{
-				int posx = x - pad;
-				int posy = y - pad;
-				double* filter = filters + (filterSize.width * filterSize.height * filterSize.depth * d2);
-				//double* backFilter = backFilters + (filterSize.width * filterSize.height * filterSize.depth * d2);
-				double gradient = nextLayerOutput[((layerSize.width * y) + x) * nextLayerSize.depth + d2];
+				int index1 = *lookUp;
+				lookUp++;
+				int gradIndex = *lookUp;
+				lookUp++;
 
-				for (int filterPosy = 0; filterPosy < filterSize.height; filterPosy++)
+				if (index1 >= 0)
 				{
-					for (int filterPosx = 0; filterPosx < filterSize.width; filterPosx++)
-					{
-						if (filterPosy + posy >= 0 &&
-							filterPosy + posy < layerSize.height &&
-							filterPosx + posx >= 0 &&
-							filterPosx + posx < layerSize.width)
-						{
-							for (int d = 0; d < filterSize.depth; d++)
-							{
-								int index1 = ((layerSize.width * (filterPosy + posy)) + filterPosx + posx) * previousLayerSize.depth + d;
-								int index2 = ((filterSize.width * filterPosy) + filterPosx) * filterSize.depth + d;
+					gradIndex += blockIdx.z;
 
-								//backFilter[index2] += previousLayerOutput[index1] * gradient;
-								output[index1] += filter[index2] * gradient;
-							}
+					//double gradient = nextLayerOutput[((layerSize.width * (y - pad)) + (x - pad)) * nextLayerSize.depth + blockIdx.z];
+					double gradient = nextLayerOutput[gradIndex];
+
+					//int index1 = ((layerSize.width * (y - pad)) + (x - pad)) * previousLayerSize.depth + threadIdx.x;
+
+					//double gradient = nextLayerOutput[((layerSize.width * y) + x) * nextLayerSize.depth + d2];
+					//int index1 = ((layerSize.width * (filterPosy + posy)) + filterPosx + posx) * previousLayerSize.depth + d;
+
+					index1 += threadIdx.x;
+					/*
+					if (index2 == 32 && blockIdx.z == 0)
+					{
+						if (ii < 4000) {
+							printf("iiiii: %i, index1: %i, index2: %i, filterPosx: %i, filterPosy: %i, posx: %i, posy: %i, gradient: %f, d: %i, d2: %i, x: %i, y: %i \n", ii, index1, index2, blockIdx.x, blockIdx.y, x, y, gradient, threadIdx.x, blockIdx.z, x - pad, y - pad);
+							ii++;
 						}
-					}
+					}*/
+
+					backFilter[index2] += previousLayerOutput[index1] * gradient;
 				}
 			}
 		}
+		/*
+		if (index2 == 32 && blockIdx.z == 0)
+		{
+			printf("backFilters[32] %f\n", backFilters[32]);
+		}*/
 	}
-
-
-
-	//node->bias += gradient * learnRate;
 }
 
 __global__ void ConvLayer_Update_Backward_filter_cu(double* filters, double* backFilters, LayerSize filterSize, double learnRate)
@@ -316,38 +244,24 @@ void ConvLayer_Forward(ConvNode *node, double* filters, LayerSize filterSize, in
 {
 	dim3 blocks(layerSize.width, layerSize.height, filterCount);
 	ConvLayer_Forward_cu <<<blocks, 1>>>(node, filters, filterSize, layerSize, previousLayerSize, previousLayerOutput, output, pad);
-//	ConvLayer_Forward_cu_2 << <1, 1 >> >(node, filters, filterSize, layerSize, previousLayerSize, previousLayerOutput, output, pad);
 
 	LayerSynchronize();
 }
 
-void ConvLayer_Backward(ConvNode *node, double* filters, double* backFilterCollation, double* backFilters, LayerSize filterSize, int filterCount, LayerSize layerSize, LayerSize previousLayerSize, LayerSize nextLayerSize, double *previousLayerOutput, double *nextLayerOutput, double *output, int pad, double learnRate)
+void ConvLayer_Backward(ConvNode *node, double* filters, double* backFilters, LayerSize filterSize, int filterCount, LayerSize layerSize, LayerSize previousLayerSize, LayerSize nextLayerSize, double *previousLayerOutput, double *nextLayerOutput, double *output, int pad, double learnRate, int* backFilterLookUp, int backFilterLookUpSize)
 {
 	// TODO: I ASSUME THE PAD IS 1!!
 
-	dim3 blocks(layerSize.width, layerSize.height, filterCount);
-	ConvLayer_Backward_update_back_filters_cu <<<blocks, 1>>>(node, filters, backFilterCollation, backFilters, filterSize, filterCount, layerSize, previousLayerSize, nextLayerSize, previousLayerOutput, nextLayerOutput, output, pad, learnRate);
-	//ConvLayer_Backward_cu_2 << <1, 1 >> >(node, filters, backFilters, filterSize, filterCount, layerSize, previousLayerSize, nextLayerSize, previousLayerOutput, nextLayerOutput, output, pad, learnRate);
+	dim3 bffblocks(filterSize.width, filterSize.height, filterCount);
+	ConvLayer_Backward_back_filters_cu2 <<<bffblocks, filterSize.depth>>>(backFilters, filterSize, layerSize, previousLayerSize, previousLayerOutput, nextLayerSize, nextLayerOutput, pad, backFilterLookUp);
 
 	LayerSynchronize();
 
-	dim3 bfblocks(filterSize.width, filterSize.height, filterCount);
-	ConvLayer_Backward_update_back_filters_collate<<<bfblocks , 1>>>(backFilterCollation, backFilters, filterSize, layerSize);
-
-	LayerSynchronize();
-
-	//dim3 bfblocks(filterSize.width, filterSize.height, filterCount);
-	//dim3 bthreads(layerSize.width, layerSize.height, 1);
-//	ConvLayer_Backward_update_back_filters_cu <<<bfblocks, bthreads >>>(node, filters, backFilterCollation, backFilters, filterSize, filterCount, layerSize, previousLayerSize, nextLayerSize, previousLayerOutput, nextLayerOutput, output, pad, learnRate);
-	
 	dim3 bblocks(layerSize.width, layerSize.height, filterSize.depth);
-	//dim3 bthreads2(filterSize.width, filterSize.height, 1);
-	ConvLayer_Backward_update_output_cu <<<bblocks, 1 >>>(node, filters, backFilters, filterSize, filterCount, layerSize, previousLayerSize, nextLayerSize, previousLayerOutput, nextLayerOutput, output, pad, learnRate);
-	//ConvLayer_Backward_cu_2 << <1, 1 >> >(node, filters, backFilters, filterSize, filterCount, layerSize, previousLayerSize, nextLayerSize, previousLayerOutput, nextLayerOutput, output, pad, learnRate);
+	ConvLayer_Backward_update_output_cu << <bblocks, 1 >> >(node, filters, backFilters, filterSize, filterCount, layerSize, previousLayerSize, nextLayerSize, previousLayerOutput, nextLayerOutput, output, pad, learnRate);
 
 	LayerSynchronize();
 
-	//ConvLayer_Backward_cu_2 << <1, 1 >> >(node, filters, backFilters, filterSize, filterCount, layerSize, previousLayerSize, nextLayerSize, previousLayerOutput, nextLayerOutput, output, pad, learnRate);
 	ConvLayer_Update_Backward_filter_cu <<<filterCount, 1 >>>(filters, backFilters, filterSize, learnRate);
 
 	LayerSynchronize();

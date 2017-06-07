@@ -1,9 +1,8 @@
 #include "convlayerconfig.h"
 
-ConvLayerConfig::ConvLayerConfig(int filterWidth, int filterHeight, int filterDepth, int filterCount, int pad, int stride) :
+ConvLayerConfig::ConvLayerConfig(int filterWidth, int filterHeight, int filterCount, int pad, int stride) :
 	filterWidth(filterWidth),
 	filterHeight(filterHeight),
-	filterDepth(filterDepth),
 	filterCount(filterCount),
 	pad(pad),
 	stride(stride)
@@ -18,11 +17,6 @@ int ConvLayerConfig::GetFilterWidth()
 int ConvLayerConfig::GetFilterHeight()
 {
 	return filterHeight;
-}
-
-int ConvLayerConfig::GetFilterDepth()
-{
-	return filterDepth;
 }
 
 int ConvLayerConfig::GetStride()

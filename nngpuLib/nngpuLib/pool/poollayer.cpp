@@ -89,7 +89,7 @@ void PoolLayer::Forward(INNetworkLayer* previousLayer, INNetworkLayer* nextLayer
 	}
 */
 #ifdef _UNITTEST
-	DebugPrint();
+	//DebugPrint();
 #endif
 }
 
@@ -121,7 +121,7 @@ void PoolLayer::Backward(INNetworkLayer* previousLayer, INNetworkLayer* nextLaye
 */
 
 #ifdef _UNITTEST
-	DebugPrint();
+	//DebugPrint();
 #endif
 }
 

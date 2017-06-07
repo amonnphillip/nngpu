@@ -73,17 +73,17 @@
     <ClCompile Include="testlayer.cpp">
       <Filter>test</Filter>
     </ClCompile>
-    <ClCompile Include="convutest.cpp">
-      <Filter>conv</Filter>
-    </ClCompile>
-    <ClCompile Include="convutestreference.cpp">
-      <Filter>conv</Filter>
-    </ClCompile>
     <ClCompile Include="pool\poolutest.cpp">
       <Filter>pool</Filter>
     </ClCompile>
     <ClCompile Include="pool\poolutestreference.cpp">
       <Filter>pool</Filter>
+    </ClCompile>
+    <ClCompile Include="conv\convutest.cpp">
+      <Filter>conv</Filter>
+    </ClCompile>
+    <ClCompile Include="conv\convutestreference.cpp">
+      <Filter>conv</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -99,12 +99,12 @@
     <CudaCompile Include="relu\relulayer.cu">
       <Filter>relu</Filter>
     </CudaCompile>
-    <CudaCompile Include="convutestreference.cu">
-      <Filter>conv</Filter>
-    </CudaCompile>
     <CudaCompile Include="layer.cu" />
     <CudaCompile Include="pool\poolutestreference.cu">
       <Filter>pool</Filter>
+    </CudaCompile>
+    <CudaCompile Include="conv\convutestreference.cu">
+      <Filter>conv</Filter>
     </CudaCompile>
   </ItemGroup>
   <ItemGroup>
@@ -159,18 +159,18 @@
     <ClInclude Include="testlayer.h">
       <Filter>test</Filter>
     </ClInclude>
-    <ClInclude Include="convutest.h">
-      <Filter>conv</Filter>
-    </ClInclude>
-    <ClInclude Include="convutestreference.h">
-      <Filter>conv</Filter>
-    </ClInclude>
     <ClInclude Include="testutils.h" />
     <ClInclude Include="pool\poolutest.h">
       <Filter>pool</Filter>
     </ClInclude>
     <ClInclude Include="pool\poolutestreference.h">
       <Filter>pool</Filter>
+    </ClInclude>
+    <ClInclude Include="conv\convutest.h">
+      <Filter>conv</Filter>
+    </ClInclude>
+    <ClInclude Include="conv\convutestreference.h">
+      <Filter>conv</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

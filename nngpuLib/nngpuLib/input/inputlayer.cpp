@@ -38,7 +38,7 @@ void InputLayer::Forward(double* input, int inputSize)
 	}
 
 #ifdef _UNITTEST
-	DebugPrint();
+	//DebugPrint();
 #endif
 }
 

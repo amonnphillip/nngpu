@@ -5,8 +5,12 @@
 
 bool PoolUTest::Test()
 {
+	const int LAYER_WIDTH = 28;
+	const int LAYER_HEIGHT = 28;
+	const int LAYER_DEPTH = 32;
+
 	// Set up out test network
-	TestLayer* previousLayer = new TestLayer(10, 10, 1);
+	TestLayer* previousLayer = new TestLayer(LAYER_WIDTH, LAYER_HEIGHT, LAYER_DEPTH);
 	previousLayer->ResetForwardAndBackward();
 
 	PoolLayerConfig poolConfig = PoolLayerConfig(1, 1);
@@ -14,7 +18,7 @@ bool PoolUTest::Test()
 
 	PoolUTestReference* PoolLayerReference = new PoolUTestReference(&poolConfig, previousLayer);
 
-	TestLayer* nextLayer = new TestLayer(10, 10, 1);
+	TestLayer* nextLayer = new TestLayer(LAYER_WIDTH, LAYER_HEIGHT, LAYER_DEPTH);
 	nextLayer->ResetForwardAndBackward();
 
 	// Test forward

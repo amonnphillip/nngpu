@@ -18,7 +18,10 @@ int main()
 
 	// Run tests on the network as a whole
 	AddInputLayer(nn, 28, 28, 1);
-	AddConvLayer(nn, 3, 3, 1, 32, 1, 1);
+	AddConvLayer(nn, 3, 3, 32, 1, 1);
+	AddReluLayer(nn);
+	AddPoolLayer(nn, 2, 2);
+	AddConvLayer(nn, 3, 3, 32, 1, 1);
 	AddReluLayer(nn);
 	AddPoolLayer(nn, 2, 2);
 	AddFullyConnected(nn, 10);

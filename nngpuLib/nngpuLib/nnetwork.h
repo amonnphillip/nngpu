@@ -13,9 +13,14 @@ public:
 	void Add(layerConfigType* config)
 	{
 		INNetworkLayer* previousLayer = nullptr;
+		INNetworkLayer* nextLayer = nullptr;
 		if (layers.size() > 0)
 		{
 			previousLayer = layers.at(layers.size() - 1);
+		}
+		if (layers.size() < layers.size())
+		{
+			nextLayer = layers.at(layers.size() - 1);
 		}
 
 		layertype* layer = new layertype(config, previousLayer);
@@ -25,6 +30,7 @@ public:
 	void Add()
 	{
 		INNetworkLayer* previousLayer = nullptr;
+		INNetworkLayer* nextLayer = nullptr;
 		if (layers.size() > 0)
 		{
 			previousLayer = layers.at(layers.size() - 1);

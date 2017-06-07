@@ -90,10 +90,12 @@ public:
 	static bool HasElementOutOfRange(double* src, int count, double lowValue, double highValue)
 	{
 		for (int i = 0; i < count; i++) {
-			if (*src < lowValue || *src > highValue)
+			if (*src < lowValue || 
+				*src > highValue)
 			{
 				return true;
 			}
+			src++;
 		}
 
 		return false;
@@ -115,6 +117,8 @@ public:
 			}
 			std::cout << "\r\n";
 		}
+
+		std::cout.flush();
 	}
 
 	template<typename T>
@@ -126,5 +130,6 @@ public:
 			src++;
 		}
 		std::cout << "\r\n";
+		std::cout.flush();
 	}
 };

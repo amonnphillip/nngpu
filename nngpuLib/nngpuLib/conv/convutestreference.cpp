@@ -87,6 +87,6 @@ void ConvUTestReference::ReferenceBackward(INNetworkLayer* previousLayer, INNetw
 	}
 
 #ifdef _UNITTEST
-	DebugPrint();
+	//DebugPrint();
 #endif
 }

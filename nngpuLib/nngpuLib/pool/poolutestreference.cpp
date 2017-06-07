@@ -35,7 +35,7 @@ void PoolUTestReference::ReferenceForward(INNetworkLayer* previousLayer, INNetwo
 	}
 	
 #ifdef _UNITTEST
-	DebugPrint();
+	//DebugPrint();
 #endif
 }
 
@@ -61,6 +61,6 @@ void PoolUTestReference::ReferenceBackward(INNetworkLayer* previousLayer, INNetw
 	}
 	
 #ifdef _UNITTEST
-	DebugPrint();
+	//DebugPrint();
 #endif
 }

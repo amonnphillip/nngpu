@@ -102,7 +102,7 @@ void FullyConnectedLayer::Forward(INNetworkLayer* previousLayer, INNetworkLayer*
 #endif
 
 #ifdef _UNITTEST
-	DebugPrint();
+	//DebugPrint();
 #endif
 }
 
@@ -151,13 +151,13 @@ void FullyConnectedLayer::Backward(INNetworkLayer* previousLayer, INNetworkLayer
 	}
 
 #ifdef _UNITTEST
-	if (TestUtils::HasElementOutOfRange(GetBackwardHostMem(true), GetBackwardNodeCount(), -10, 10))
+	if (TestUtils::HasElementOutOfRange(GetBackwardHostMem(true), GetBackwardNodeCount(), -1000, 1000))
 	{
 		DebugPrint();
 		throw "FullyConnected: Backward memory out of range";
 	}
 
-	if (TestUtils::HasElementOutOfRange(weightsHostMem.get(), weightCount * nodeCount * sizeof(double), -10, 10))
+	if (TestUtils::HasElementOutOfRange(weightsHostMem.get(), weightCount * nodeCount * sizeof(double), -1000, 1000))
 	{
 		DebugPrint();
 		throw "FullyConnected: Backward memory out of range";
@@ -165,7 +165,7 @@ void FullyConnectedLayer::Backward(INNetworkLayer* previousLayer, INNetworkLayer
 #endif
 
 #ifdef _UNITTEST
-	DebugPrint();
+	//DebugPrint();
 #endif
 }
 
@@ -313,7 +313,7 @@ void FullyConnectedLayer::DebugPrint()
 	std::cout << "fully connected layer:\r\n";
 
 	std::cout << "weights:\r\n";
-	/*
+	
 	for (int index = 0; index < nodeCount; index++)
 	{
 		double* weight = GetWeightsForNode(index);
@@ -330,7 +330,7 @@ void FullyConnectedLayer::DebugPrint()
 			}
 			weight++;
 		}
-	}*/
+	}
 
 	std::cout << "\r\n";
 	std::cout << "bias:\r\n";

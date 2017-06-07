@@ -10,7 +10,7 @@ class NnGpu
 public:
 	void InitializeNetwork();
 	void AddInputLayer(int width, int height, int depth);
-	void AddConvLayer(int filterWidth, int filterHeight, int filterDepth, int filterCount, int pad, int stride);
+	void AddConvLayer(int filterWidth, int filterHeight, int filterCount, int pad, int stride);
 	void AddReluLayer();
 	void AddPoolLayer(int spatialExtent, int stride);
 	void AddFullyConnected(int size);

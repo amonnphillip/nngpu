@@ -31,8 +31,22 @@ protected:
 		this->layerType = layerType;
 
 		nodeHostMem = std::unique_ptr<nodetype>(new nodetype[nodeSize]); // TODO: MAKE THIS OPTIONAL?
+		if (nodeHostMem.get() == nullptr)
+		{
+			throw std::bad_alloc();
+		}
+
 		forwardHostMem = std::unique_ptr<forwardtype>(new forwardtype[forwardSize]);
+		if (forwardHostMem.get() == nullptr)
+		{
+			throw std::bad_alloc();
+		}
+
 		backwardHostMem = std::unique_ptr<backwardtype>(new backwardtype[backwardSize]);
+		if (backwardHostMem.get() == nullptr)
+		{
+			throw std::bad_alloc();
+		}
 
 		if (hasDeviceMemory)
 		{

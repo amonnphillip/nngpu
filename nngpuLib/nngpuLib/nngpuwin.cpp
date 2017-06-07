@@ -40,9 +40,9 @@ void AddInputLayer(NnGpu* nn, int width, int height, int depth)
 	nn->AddInputLayer(width, height, depth);
 }
 
-void AddConvLayer(NnGpu* nn, int filterWidth, int filterHeight, int filterDepth, int filterCount, int pad, int stride)
+void AddConvLayer(NnGpu* nn, int filterWidth, int filterHeight, int filterCount, int pad, int stride)
 {
-	nn->AddConvLayer(filterWidth, filterHeight, filterDepth, filterCount, pad, stride);
+	nn->AddConvLayer(filterWidth, filterHeight, filterCount, pad, stride);
 }
 
 void AddReluLayer(NnGpu* nn)

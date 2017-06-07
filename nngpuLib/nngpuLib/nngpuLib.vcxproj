@@ -27,10 +27,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="convutest.cpp" />
-    <ClCompile Include="convutestreference.cpp" />
     <ClCompile Include="conv\convlayer.cpp" />
     <ClCompile Include="conv\convlayerconfig.cpp" />
+    <ClCompile Include="conv\convutest.cpp" />
+    <ClCompile Include="conv\convutestreference.cpp" />
     <ClCompile Include="fullyconnected\fullyconnectedlayer.cpp" />
     <ClCompile Include="fullyconnected\fullyconnectedlayerconfig.cpp" />
     <ClCompile Include="input\inputlayer.cpp" />
@@ -53,8 +53,8 @@
     <ClCompile Include="testlayer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <CudaCompile Include="convutestreference.cu" />
     <CudaCompile Include="conv\convlayer.cu" />
+    <CudaCompile Include="conv\convutestreference.cu" />
     <CudaCompile Include="fullyconnected\fullyconnectedlayer.cu" />
     <CudaCompile Include="layer.cu" />
     <CudaCompile Include="pool\poollayer.cu" />
@@ -62,10 +62,10 @@
     <CudaCompile Include="relu\relulayer.cu" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="convutest.h" />
-    <ClInclude Include="convutestreference.h" />
     <ClInclude Include="conv\convlayer.h" />
     <ClInclude Include="conv\convlayerconfig.h" />
+    <ClInclude Include="conv\convutest.h" />
+    <ClInclude Include="conv\convutestreference.h" />
     <ClInclude Include="fullyconnected\fullyconnectedlayer.h" />
     <ClInclude Include="fullyconnected\fullyconnectedlayerconfig.h" />
     <ClInclude Include="innetworklayer.h" />

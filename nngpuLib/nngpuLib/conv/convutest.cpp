@@ -9,17 +9,18 @@ bool ConvUTest::Test()
 	const int LAYER_WIDTH = 28;
 	const int LAYER_HEIGHT = 28;
 	const int LAYER_DEPTH = 32;
+	const int LAYER_FILTERS = 32;
 
 	// Set up out test network
-	TestLayer* previousLayer = new TestLayer(LAYER_WIDTH, LAYER_HEIGHT, 1);
+	TestLayer* previousLayer = new TestLayer(LAYER_WIDTH, LAYER_HEIGHT, LAYER_DEPTH);
 	previousLayer->ResetForwardAndBackward();
 
-	ConvLayerConfig convConfig = ConvLayerConfig(3, 3, 1, LAYER_DEPTH, 1, 1);
+	ConvLayerConfig convConfig = ConvLayerConfig(3, 3, LAYER_FILTERS, 1, 1);
 	ConvLayer* convLayer = new ConvLayer(&convConfig, previousLayer);
 
 	ConvUTestReference* convLayerReference = new ConvUTestReference(&convConfig, previousLayer);
 
-	TestLayer* nextLayer = new TestLayer(LAYER_WIDTH, LAYER_HEIGHT, 1);
+	TestLayer* nextLayer = new TestLayer(LAYER_WIDTH, LAYER_HEIGHT, LAYER_DEPTH);
 	nextLayer->ResetForwardAndBackward();
 
 	// Test forward
@@ -39,7 +40,7 @@ bool ConvUTest::Test()
 
 	isSame[3] = convLayer->GetBackwardWidth() == LAYER_WIDTH;
 	isSame[4] = convLayer->GetBackwardHeight() == LAYER_HEIGHT;
-	isSame[5] = convLayer->GetBackwardDepth() == 1;
+	isSame[5] = convLayer->GetBackwardDepth() == LAYER_DEPTH;
 
 	isSame[6] = TestUtils::CompareRectangularMemory(convLayer->GetForwardHostMem(true), convLayerReference->GetForwardHostMem(true), convLayer->GetForwardWidth(), convLayer->GetForwardHeight(), convLayer->GetForwardDepth(), &errorx, &errory, &errord);
 	isSame[7] = TestUtils::CompareMemory(convLayer->GetFilterHostMem(true), convLayerReference->GetFilterHostMem(true), convLayer->GetFilterMemNodeCount());
