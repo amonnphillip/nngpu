@@ -45,5 +45,6 @@ public:
 	virtual int GetDepth();
 	virtual void GetLayerData(LayerDataList& layerDataList);
 	virtual LayerType GetLayerType();
+	void DebugPrint();
 };
 

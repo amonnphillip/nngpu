@@ -76,7 +76,7 @@ void OutputLayer::Backward(double* input, int inputSize, double learnRate)
 	}
 
 #ifdef _UNITTEST
-	DebugPrint(nullptr, 0);
+	//DebugPrint(nullptr, 0);
 #endif
 }
 
@@ -198,6 +198,7 @@ void OutputLayer::DebugPrint(double* expected, int expectedCount)
 		std::cout << forward[index] << " ";
 	}
 
+	std::cout << "\r\n";
 	double* backward = GetBackwardHostMem(false);
 	int backwardCount = GetBackwardNodeCount();
 	std::cout << "backward:\r\n";
@@ -206,6 +207,7 @@ void OutputLayer::DebugPrint(double* expected, int expectedCount)
 		std::cout << backward[index] << " ";
 	}
 
+	std::cout << "\r\n";
 	if (expected != nullptr)
 	{
 		std::cout << "\r\n";

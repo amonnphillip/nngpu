@@ -21,7 +21,7 @@ namespace nngpuVisualization
         public static extern void AddInputLayer(IntPtr nn, int width, int height, int depth);
 
         [DllImport("nngpuLib.dll")]
-        public static extern void AddConvLayer(IntPtr nn, int filterWidth, int filterHeight, int filterDepth, int filterCount, int pad, int stride);
+        public static extern void AddConvLayer(IntPtr nn, int filterWidth, int filterHeight, int filterCount, int pad, int stride);
 
         [DllImport("nngpuLib.dll")]
         public static extern void AddReluLayer(IntPtr nn);

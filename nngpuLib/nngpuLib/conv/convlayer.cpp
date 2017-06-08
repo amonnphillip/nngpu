@@ -53,7 +53,8 @@ ConvLayer::ConvLayer(ConvLayerConfig* config, INNetworkLayer* previousLayer)
 		throw std::bad_alloc();
 	}
 
-	std::fill_n(filterHostMem.get(), filterSize * filterDepth * filterCount, (double)0.5);
+	double filterValue = 1.0 / (double)(filterSize * filterDepth);
+	std::fill_n(filterHostMem.get(), filterSize * filterDepth * filterCount, (double)filterValue);
 	if (cudaMalloc((void**)&filterDeviceMem, filterSize * filterDepth * filterCount * sizeof(double)) != cudaError::cudaSuccess)
 	{
 		throw std::bad_alloc();
@@ -126,8 +127,6 @@ void ConvLayer::Forward(INNetworkLayer* previousLayer, INNetworkLayer* nextLayer
 		throw std::runtime_error("ConvLayer forward cudaMemcpy returned an error");
 	}
 
-	//LayerSynchronize();
-
 	ConvLayer_Forward(
 		nodeDeviceMem, 
 		filterDeviceMem, 
@@ -139,6 +138,7 @@ void ConvLayer::Forward(INNetworkLayer* previousLayer, INNetworkLayer* nextLayer
 		forwardDeviceMem, 
 		pad);
 		
+/*
 	if (cudaMemcpy(forwardHostMem.get(), forwardDeviceMem, forwardCount * sizeof(double), cudaMemcpyDeviceToHost) != cudaError::cudaSuccess)
 	{
 		throw std::runtime_error("ConvLayer forward cudaMemcpy returned an error");
@@ -147,7 +147,7 @@ void ConvLayer::Forward(INNetworkLayer* previousLayer, INNetworkLayer* nextLayer
 	if (cudaMemcpy(filterHostMem.get(), filterDeviceMem, filterSize * filterDepth * filterCount * sizeof(double), cudaMemcpyDeviceToHost) != cudaError::cudaSuccess)
 	{
 		throw std::runtime_error("ConvLayer forward cudaMemcpy returned an error");
-	}
+	}*/
 
 
 
@@ -179,8 +179,6 @@ void ConvLayer::Backward(INNetworkLayer* previousLayer, INNetworkLayer* nextLaye
 	{
 		throw std::runtime_error("ConvLayer cudaMemcpy returned an error");
 	}
-
-	//LayerSynchronize();
 
 	ConvLayer_Backward(
 		nodeDeviceMem,

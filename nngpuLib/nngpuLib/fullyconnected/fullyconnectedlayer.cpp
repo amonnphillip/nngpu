@@ -94,7 +94,7 @@ void FullyConnectedLayer::Forward(INNetworkLayer* previousLayer, INNetworkLayer*
 	}	
 
 #ifdef _UNITTEST
-	if (TestUtils::HasElementOutOfRange(GetForwardHostMem(true), GetForwardNodeCount(), -1000, 1000))
+	if (TestUtils::HasElementOutOfRange(GetForwardHostMem(true), GetForwardNodeCount(), -100, 100))
 	{
 		DebugPrint();
 		throw "Fullyconnected: Forward memory out of range";
@@ -118,10 +118,10 @@ void FullyConnectedLayer::Backward(INNetworkLayer* previousLayer, INNetworkLayer
 
 
 #ifdef _UNITTEST
-	if (TestUtils::HasElementOutOfRange(previousLayer->GetForwardHostMem(true), previousLayer->GetForwardNodeCount(), -1000, 1000))
+	if (TestUtils::HasElementOutOfRange(previousLayer->GetForwardHostMem(true), previousLayer->GetForwardNodeCount(), -100, 100))
 	{
 		DebugPrint();
-		throw "Conv: Backward memory out of range";
+		throw "FullyConnected: Backward memory out of range";
 	}
 #endif
 
@@ -131,10 +131,9 @@ void FullyConnectedLayer::Backward(INNetworkLayer* previousLayer, INNetworkLayer
 		throw std::runtime_error("FullyConnectedLayer backward cudaMemcpy returned an error");
 	}
 
-	//LayerSynchronize();
-
 	FullyConnectedLayer_Backward(nodeDeviceMem, weightsDeviceMem, weightCount, forwardDeviceMem, previousLayer->GetForwardDeviceMem(), nextLayer->GetBackwardDeviceMem(), backwardDeviceMem, nodeCount, learnRate);
 
+/*
 	if (cudaMemcpy(weightsHostMem.get(), weightsDeviceMem, weightCount * nodeCount * sizeof(double), cudaMemcpyDeviceToHost) != cudaError::cudaSuccess)
 	{
 		throw std::runtime_error("FullyConnectedLayer backward cudaMemcpy returned an error");
@@ -148,16 +147,16 @@ void FullyConnectedLayer::Backward(INNetworkLayer* previousLayer, INNetworkLayer
 	if (cudaMemcpy(nodeHostMem.get(), nodeDeviceMem, nodeCount * sizeof(FullyConnectedNode), cudaMemcpyDeviceToHost) != cudaError::cudaSuccess)
 	{
 		throw std::runtime_error("FullyConnectedLayer backward cudaMemcpy returned an error");
-	}
+	}*/
 
 #ifdef _UNITTEST
-	if (TestUtils::HasElementOutOfRange(GetBackwardHostMem(true), GetBackwardNodeCount(), -1000, 1000))
+	if (TestUtils::HasElementOutOfRange(GetBackwardHostMem(true), GetBackwardNodeCount(), -100, 100))
 	{
 		DebugPrint();
 		throw "FullyConnected: Backward memory out of range";
 	}
 
-	if (TestUtils::HasElementOutOfRange(weightsHostMem.get(), weightCount * nodeCount * sizeof(double), -1000, 1000))
+	if (TestUtils::HasElementOutOfRange(weightsHostMem.get(), weightCount * nodeCount, -100, 100))
 	{
 		DebugPrint();
 		throw "FullyConnected: Backward memory out of range";

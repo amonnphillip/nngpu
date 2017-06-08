@@ -88,6 +88,15 @@ void PoolLayer::Forward(INNetworkLayer* previousLayer, INNetworkLayer* nextLayer
 		throw std::runtime_error("PoolLayer forward cudaMemcpy returned an error");
 	}
 */
+
+#ifdef _UNITTEST
+	if (TestUtils::HasElementOutOfRange(GetForwardHostMem(true), GetForwardNodeCount(), -100, 100))
+	{
+		DebugPrint();
+		throw "Pool: Forward memory out of range";
+	}
+#endif
+
 #ifdef _UNITTEST
 	//DebugPrint();
 #endif
@@ -119,6 +128,13 @@ void PoolLayer::Backward(INNetworkLayer* previousLayer, INNetworkLayer* nextLaye
 		throw std::runtime_error("PoolLayer backward cudaMemcpy returned an error");
 	}
 */
+#ifdef _UNITTEST
+	if (TestUtils::HasElementOutOfRange(GetBackwardHostMem(true), GetBackwardNodeCount(), -100, 100))
+	{
+		DebugPrint();
+		throw "Pool: Backward memory out of range";
+	}
+#endif
 
 #ifdef _UNITTEST
 	//DebugPrint();

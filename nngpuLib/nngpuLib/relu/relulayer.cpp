@@ -2,6 +2,7 @@
 
 #include "relulayer.h"
 #include "layerexception.h"
+#include "testutils.h"
 
 extern void ReluLayer_Forward(double *previousLayerForward, double *output, int nodeCount);
 extern void ReluLayer_Backward(double *forward, double* nextlayerBackward, double *output, int nodeCount, double learnRate);
@@ -55,6 +56,14 @@ void ReluLayer::Forward(INNetworkLayer* previousLayer, INNetworkLayer* nextLayer
 		throw std::runtime_error("ReluLayer forward cudaMemcpy returned an error");
 	}
 */
+
+#ifdef _UNITTEST
+	if (TestUtils::HasElementOutOfRange(GetForwardHostMem(true), GetForwardNodeCount(), -100, 100))
+	{
+		DebugPrint();
+		throw "Relu: Forward memory out of range";
+	}
+#endif
 }
 
 void ReluLayer::Backward(double* input, int inputSize, double learnRate)
@@ -80,6 +89,14 @@ void ReluLayer::Backward(INNetworkLayer* previousLayer, INNetworkLayer* nextLaye
 		throw std::runtime_error("ReluLayer backward cudaMemcpy returned an error");
 	}
 */
+
+#ifdef _UNITTEST
+	if (TestUtils::HasElementOutOfRange(GetBackwardHostMem(true), GetBackwardNodeCount(), -100, 100))
+	{
+		DebugPrint();
+		throw "Relu: Forward memory out of range";
+	}
+#endif
 }
 
 double* ReluLayer::GetForwardHostMem(bool copyFromDevice)
@@ -198,4 +215,15 @@ void ReluLayer::GetLayerData(LayerDataList& layerDataList)
 LayerType ReluLayer::GetLayerType()
 {
 	return Layer::GetLayerType();
+}
+
+void ReluLayer::DebugPrint()
+{
+	std::cout << "Relu layer:\r\n";
+
+	std::cout << "forward:\r\n";
+	TestUtils::DebugPrintRectangularMemory(GetForwardHostMem(true), GetForwardWidth(), GetForwardHeight(), GetForwardDepth());
+
+	std::cout << "backward:\r\n";
+	TestUtils::DebugPrintRectangularMemory(GetBackwardHostMem(true), GetBackwardWidth(), GetBackwardHeight(), GetBackwardDepth());
 }

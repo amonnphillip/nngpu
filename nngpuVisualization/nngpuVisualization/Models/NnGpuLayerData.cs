@@ -102,14 +102,14 @@ namespace nngpuVisualization
 
             byte[] imageData = new byte[width * height * depth * 4];
             int i = 0;
-            for (int d = 0;d < imageDepth;d++)
-            {
-                for (int y = 0;y < imageHeight;y++)
-                {
-                    int index = ((y * imageWidth * imageDepth) + (d * imageWidth)) * 4;
 
-                    for (int x = 0; x < imageWidth;x++)
+            for (int y = 0; y < imageHeight; y++)
+            {
+                for (int x = 0; x < imageWidth; x++)
+                {
+                    for (int d = 0; d < imageDepth; d++)
                     {
+                        int index = ((y * imageWidth * imageDepth) + (d * imageWidth) + x) * 4;
                         byte c = (byte)((data[i] - floor) * scale);
                         if (c > 255)
                         {
@@ -122,7 +122,6 @@ namespace nngpuVisualization
                         imageData[index + 3] = 0xff;
 
                         i++;
-                        index += 4;
                     }
                 }
             }
