@@ -4,6 +4,7 @@
 #include "fullyconnectedlayerconfig.h"
 #include "layer.h"
 #include "layerdata.h"
+#include "layerperf.h"
 
 class FullyConnectedNode
 {
@@ -14,6 +15,9 @@ public:
 class FullyConnectedLayer : public Layer<FullyConnectedNode, double, double, double>, public INNetworkLayer
 {
 private:
+	LayerPerf layerPerf;
+
+protected:
 	int nodeCount = 0;
 	int forwardCount = 0;
 	int backwardWidth = 0;
@@ -53,6 +57,7 @@ public:
 	FullyConnectedNode* GetNodeMem();
 	virtual LayerType GetLayerType();
 	virtual void GetLayerData(LayerDataList& layerDataList);
+	virtual void GetLayerPerformance(unsigned int& averageTime, double& averageBytes);
 	void DebugPrint();
 };
 

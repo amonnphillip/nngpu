@@ -141,6 +141,11 @@ bool RunUnitTests(NnGpu* nn)
 	return nn->RunUnitTests();
 }
 
+void GetLayerPerformanceData(NnGpu* nn, int layerIndex, unsigned int* averageTimeInMs, double* averageBytes)
+{
+	nn->GetLayerPerformanceData(layerIndex, averageTimeInMs, averageBytes);
+}
+
 
 
 

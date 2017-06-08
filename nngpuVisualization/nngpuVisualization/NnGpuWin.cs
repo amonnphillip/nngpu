@@ -185,6 +185,11 @@ namespace nngpuVisualization
             return interation;
         }
 
+        public void GetLayerPerformanceData(int layerIndex, out uint averageTimeMs, out double averageBytes)
+        {
+            NnGpuWinInterop.GetLayerPerformanceData(_nn, layerIndex, out averageTimeMs, out averageBytes);
+        }
+
         public bool RunUnitTests()
         {
             return NnGpuWinInterop.RunUnitTests(_nn);

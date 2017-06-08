@@ -60,6 +60,10 @@ namespace nngpuVisualization.controls
 
         public void Update(NnGpuWin nnGpuWinInstance, int layerIndex)
         {
+            uint averageTimeMs = 0;
+            double averageBytes = 0;
+            nnGpuWinInstance.GetLayerPerformanceData(layerIndex, out averageTimeMs, out averageBytes);
+            
             NnGpuLayerDataGroup laterDataGroup = nnGpuWinInstance.GetLayerData(layerIndex);
 
             BackwardSum = "Sum: " + laterDataGroup.GetLayerOfType(NnGpuLayerDataType.Backward).Sum();

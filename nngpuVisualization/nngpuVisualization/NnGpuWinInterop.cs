@@ -63,6 +63,10 @@ namespace nngpuVisualization
         public static extern void GetLayerData(IntPtr nn, int layerIndex, [Out, MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(NnGpuMarshalLayerData))] out NnGpuLayerDataGroup data);
 
         [DllImport("nngpuLib.dll")]
+        public static extern void GetLayerPerformanceData(IntPtr nn, int layerIndex, [Out] out uint averageTimeMs, out double averageBytes);
+
+        [DllImport("nngpuLib.dll")]
         public static extern bool RunUnitTests(IntPtr nn);
+
     }
 }

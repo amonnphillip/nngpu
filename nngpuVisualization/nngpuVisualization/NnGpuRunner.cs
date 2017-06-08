@@ -55,7 +55,11 @@ namespace nngpuVisualization
                 _updateInterval = value;
             }
         }
+#if DEBUG
         private static int _updateInterval = 10;
+#else
+        private static int _updateInterval = 100;
+#endif
 
         private static int _currentInterval = 0;
 
@@ -77,13 +81,14 @@ namespace nngpuVisualization
                 _workerRunning = true;
 
                 _nnGpuWin = new NnGpuWin();
-                
+
+#if false
                 bool testResults = _nnGpuWin.RunUnitTests();
                 if (!testResults)
                 {
                     throw new Exception("NN Unit test results failed!");
                 }
-
+#endif
                 _nnGpuWin.InitializeNetwork();
 
                 _worker = new BackgroundWorker();
@@ -100,7 +105,10 @@ namespace nngpuVisualization
 
                         while(!_nnGpuWin.TrainingComplete)
                         {
+                            Performance timer = new Performance();
+                            timer.Start();
                             _nnGpuWin.TrainIteration();
+                            long ms = timer.Stop(); // TODO: MAKE THIS VALUE ACCESSIBLE
 
                             _currentInterval++;
                             if (_currentInterval >= _updateInterval)
@@ -126,7 +134,9 @@ namespace nngpuVisualization
 
                         while (!_nnGpuWin.TestingComplete)
                         {
+
                             _nnGpuWin.TestIteration();
+
 
                             _currentInterval++;
                             if (_currentInterval >= _updateInterval)

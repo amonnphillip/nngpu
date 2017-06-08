@@ -86,7 +86,9 @@ void FullyConnectedLayer::Forward(double* input, int inputSize)
 
 void FullyConnectedLayer::Forward(INNetworkLayer* previousLayer, INNetworkLayer* nextLayer)
 {
+	layerPerf.Start(layerWidth * layerHeight * layerDepth);
 	FullyConnectedLayer_Forward(nodeDeviceMem, weightsDeviceMem, weightCount, previousLayer->GetForwardDeviceMem(), forwardDeviceMem, nodeCount);
+	layerPerf.Stop();
 
 	if (cudaMemcpy(forwardHostMem.get(), forwardDeviceMem, forwardCount * sizeof(double), cudaMemcpyDeviceToHost) != cudaError::cudaSuccess)
 	{
@@ -131,8 +133,9 @@ void FullyConnectedLayer::Backward(INNetworkLayer* previousLayer, INNetworkLayer
 		throw std::runtime_error("FullyConnectedLayer backward cudaMemcpy returned an error");
 	}
 
+	//layerPerf.Start(layerWidth * layerHeight * layerDepth);
 	FullyConnectedLayer_Backward(nodeDeviceMem, weightsDeviceMem, weightCount, forwardDeviceMem, previousLayer->GetForwardDeviceMem(), nextLayer->GetBackwardDeviceMem(), backwardDeviceMem, nodeCount, learnRate);
-
+	//layerPerf.Stop();
 /*
 	if (cudaMemcpy(weightsHostMem.get(), weightsDeviceMem, weightCount * nodeCount * sizeof(double), cudaMemcpyDeviceToHost) != cudaError::cudaSuccess)
 	{
@@ -302,6 +305,11 @@ void FullyConnectedLayer::GetLayerData(LayerDataList& layerDataList)
 	layerData->height = GetBackwardHeight();
 	layerData->depth = GetBackwardDepth();
 	layerData->data = GetBackwardHostMem(true);
+}
+
+void FullyConnectedLayer::GetLayerPerformance(unsigned int& averageTime, double& averageBytes)
+{
+	layerPerf.CalculateAverages(averageTime, averageBytes);
 }
 
 void FullyConnectedLayer::DebugPrint()

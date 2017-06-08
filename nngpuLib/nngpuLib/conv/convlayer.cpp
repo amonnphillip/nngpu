@@ -127,6 +127,7 @@ void ConvLayer::Forward(INNetworkLayer* previousLayer, INNetworkLayer* nextLayer
 		throw std::runtime_error("ConvLayer forward cudaMemcpy returned an error");
 	}
 
+	layerPerf.Start(layerWidth * layerHeight * layerDepth);
 	ConvLayer_Forward(
 		nodeDeviceMem, 
 		filterDeviceMem, 
@@ -137,6 +138,7 @@ void ConvLayer::Forward(INNetworkLayer* previousLayer, INNetworkLayer* nextLayer
 		previousLayer->GetForwardDeviceMem(), 
 		forwardDeviceMem, 
 		pad);
+	layerPerf.Stop();
 		
 /*
 	if (cudaMemcpy(forwardHostMem.get(), forwardDeviceMem, forwardCount * sizeof(double), cudaMemcpyDeviceToHost) != cudaError::cudaSuccess)
@@ -180,6 +182,7 @@ void ConvLayer::Backward(INNetworkLayer* previousLayer, INNetworkLayer* nextLaye
 		throw std::runtime_error("ConvLayer cudaMemcpy returned an error");
 	}
 
+	//layerPerf.Start(layerWidth * layerHeight * layerDepth);
 	ConvLayer_Backward(
 		nodeDeviceMem,
 		filterDeviceMem,
@@ -196,6 +199,7 @@ void ConvLayer::Backward(INNetworkLayer* previousLayer, INNetworkLayer* nextLaye
 		learnRate,
 		backFilterLookUpDeviceMem,
 		backFilterLookupSize);
+	//layerPerf.Stop();
 	/*
 	if (cudaMemcpy(backwardHostMem.get(), backwardDeviceMem, GetBackwardNodeCount() * sizeof(double), cudaMemcpyDeviceToHost) != cudaError::cudaSuccess)
 	{
@@ -395,42 +399,7 @@ void ConvLayer::ComputeBackFilterLookUp(INNetworkLayer* previousLayer, INNetwork
 	LayerSize filterSize = LayerSize(filterWidth, filterHeight, filterDepth);
 	LayerSize previousLayerSize = LayerSize(previousLayer->GetForwardWidth(), previousLayer->GetForwardHeight(), previousLayer->GetForwardDepth());
 	LayerSize nextLayerSize = LayerSize(nextLayer->GetBackwardWidth(), nextLayer->GetBackwardHeight(), nextLayer->GetBackwardDepth());
-	/*
-	int i = 0;
-	int size = 0;
-	for (int y = 0; y<layerSize.height; y++)
-	{
-		for (int x = 0; x<layerSize.width; x++)
-		{
-			int posx = x - pad;
-			int posy = y - pad;
-			//double* filter = filters + (filterSize.width * filterSize.height * filterSize.depth * d2);
-			//double* backFilter = backFilters + (filterSize.width * filterSize.height * filterSize.depth * d2);
-			//double gradient = nextLayerOutput[((layerSize.width * y) + x) * nextLayerSize.depth + d2];
 
-			for (int filterPosy = 0; filterPosy < filterSize.height; filterPosy++)
-			{
-				for (int filterPosx = 0; filterPosx < filterSize.width; filterPosx++)
-				{
-					if (filterPosy + posy >= 0 &&
-						filterPosy + posy < layerSize.height &&
-						filterPosx + posx >= 0 &&
-						filterPosx + posx < layerSize.width)
-					{
-
-						int index1 = ((layerSize.width * (filterPosy + posy)) + filterPosx + posx) * previousLayerSize.depth;
-						int index2 = ((filterSize.width * filterPosy) + filterPosx) * filterSize.depth;
-
-						//index2
-						size++;
-					}
-
-					i++;
-				}
-			}
-		}
-	}
-	*/
 	int lookupSize = layerSize.width * layerSize.height * filterSize.width * filterSize.height;
 	int maxHits = layerSize.width * layerSize.height;
 
@@ -443,17 +412,13 @@ void ConvLayer::ComputeBackFilterLookUp(INNetworkLayer* previousLayer, INNetwork
 
 	int* backFilterLookUp = backFilterLookUpHostMem.get();
 
-	int i2m = 0;
-	int i = 0;
 	for (int y = 0; y<layerSize.height; y++)
 	{
 		for (int x = 0; x<layerSize.width; x++)
 		{
 			int posx = x - pad;
 			int posy = y - pad;
-			//double* filter = filters + (filterSize.width * filterSize.height * filterSize.depth * d2);
-			//double* backFilter = backFilters + (filterSize.width * filterSize.height * filterSize.depth * d2);
-			//double gradient = nextLayerOutput[((layerSize.width * y) + x) * nextLayerSize.depth + d2];
+
 			int gradIndex = ((layerSize.width * y) + x) * nextLayerSize.depth;
 
 			for (int filterPosy = 0; filterPosy < filterSize.height; filterPosy++)
@@ -468,22 +433,6 @@ void ConvLayer::ComputeBackFilterLookUp(INNetworkLayer* previousLayer, INNetwork
 
 						int index1 = ((layerSize.width * (filterPosy + posy)) + filterPosx + posx) * previousLayerSize.depth;
 						int index2 = ((filterSize.width * filterPosy) + filterPosx);
-
-						if (index2 == 0)
-						{
-							//std:cout << "index1: " << index1 << "\n";
-							i++;
-						}
-
-						if (i2m < index2)
-						{
-							i2m = index2;
-						}
-
-						if (backFilterLookUp[(index2 * maxHits * 2) + (hitCount[index2] * 2)] >= 0 || backFilterLookUp[(index2 * maxHits * 2) + (hitCount[index2] * 2) + 1] >= 0)
-						{
-							i = 1000;
-						}
 
 						backFilterLookUp[(index2 * maxHits * 2) + (hitCount[index2] * 2)] = index1;
 						backFilterLookUp[(index2 * maxHits * 2) + (hitCount[index2] * 2) + 1] = gradIndex;
@@ -503,6 +452,11 @@ void ConvLayer::ComputeBackFilterLookUp(INNetworkLayer* previousLayer, INNetwork
 	{
 		throw std::runtime_error("ConvLayer cudaMemcpy returned an error");
 	}
+}
+
+void ConvLayer::GetLayerPerformance(unsigned int& averageTime, double& averageBytes)
+{
+	layerPerf.CalculateAverages(averageTime, averageBytes);
 }
 
 void ConvLayer::DebugPrint()

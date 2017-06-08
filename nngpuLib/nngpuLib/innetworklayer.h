@@ -30,4 +30,5 @@ public:
 	virtual int GetDepth() = 0;
 	virtual LayerType GetLayerType() = 0;
 	virtual void GetLayerData(LayerDataList& layerDataList) = 0;
+	virtual void GetLayerPerformance(unsigned int& averageTime, double& averageBytes) = 0;
 };

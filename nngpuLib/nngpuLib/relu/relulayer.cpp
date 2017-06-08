@@ -212,6 +212,11 @@ void ReluLayer::GetLayerData(LayerDataList& layerDataList)
 	layerData->data = GetBackwardHostMem(true);
 }
 
+void ReluLayer::GetLayerPerformance(unsigned int& averageTime, double& averageBytesPerSecond)
+{
+	// TODO: FILL THIS!
+}
+
 LayerType ReluLayer::GetLayerType()
 {
 	return Layer::GetLayerType();

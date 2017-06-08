@@ -279,6 +279,11 @@ void PoolLayer::GetLayerData(LayerDataList& layerDataList)
 	//layerData->data = backDataHostMem.get();
 }
 
+void PoolLayer::GetLayerPerformance(unsigned int& averageTime, double& averageBytesPerSecond)
+{
+	// TODO: FILL THIS!
+}
+
 LayerType PoolLayer::GetLayerType()
 {
 	return Layer::GetLayerType();

@@ -156,3 +156,19 @@ bool NnGpu::RunUnitTests()
 
 	return convTestResult && poolTestResult;
 }
+
+void NnGpu::GetLayerPerformanceData(int layerIndex, unsigned int* averageTimeInMs, double* averageBytes)
+{
+	INNetworkLayer* layer = nn->GetLayer(layerIndex);
+
+	unsigned int time = 0;
+	double bytes = 0;
+
+	if (layer != nullptr)
+	{
+		layer->GetLayerPerformance(time, bytes);
+	}
+
+	*averageTimeInMs = time;
+	*averageBytes = bytes;
+}

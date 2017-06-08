@@ -155,6 +155,11 @@ void TestLayer::GetLayerData(LayerDataList& layerDataList)
 	throw LayerException("Not implemented for TestLayer");
 }
 
+void TestLayer::GetLayerPerformance(unsigned int& averageTime, double& averageBytes)
+{
+
+}
+
 void TestLayer::ResetForwardAndBackward()
 {
 	//std::fill_n(forwardHostMem.get(), GetForwardNodeCount(), (double)1.0);

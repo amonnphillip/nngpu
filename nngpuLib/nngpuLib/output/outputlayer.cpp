@@ -186,6 +186,11 @@ void OutputLayer::GetLayerData(LayerDataList& layerDataList)
 	layerData[1].data = backwardHostMem.get();
 }
 
+void OutputLayer::GetLayerPerformance(unsigned int& averageTime, double& averageBytesPerSecond)
+{
+	// TODO: FILL THIS!
+}
+
 void OutputLayer::DebugPrint(double* expected, int expectedCount)
 {
 	assert(expectedCount == GetForwardNodeCount() || (expected == nullptr && expectedCount == 0));

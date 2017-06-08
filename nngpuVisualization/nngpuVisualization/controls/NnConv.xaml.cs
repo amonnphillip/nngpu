@@ -60,6 +60,13 @@ namespace nngpuVisualization.controls
 
         public void Update(NnGpuWin nnGpuWinInstance, int layerIndex)
         {
+            uint averageTimeMs = 0;
+            double averageBytes = 0;
+            nnGpuWinInstance.GetLayerPerformanceData(layerIndex, out averageTimeMs, out averageBytes);
+
+            Performance timer = new Performance();
+            timer.Start();
+
             NnGpuLayerDataGroup laterDataGroup = nnGpuWinInstance.GetLayerData(layerIndex);
 
             double largest = laterDataGroup.GetLayerOfType(NnGpuLayerDataType.Forward).GetLargestDataValue();
@@ -104,6 +111,7 @@ namespace nngpuVisualization.controls
                 filterImage.Source = filterLayers[filterIndex].ToImage();
                 FilterImageContainer.Children.Add(filterImage);
             }
+            long ms = timer.Stop();
         }
 
         protected void OnPropertyChanged(string name)

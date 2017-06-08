@@ -44,6 +44,7 @@ public:
 	virtual int GetHeight();
 	virtual int GetDepth();
 	virtual void GetLayerData(LayerDataList& layerDataList);
+	virtual void GetLayerPerformance(unsigned int& averageTime, double& averageBytes);
 	virtual LayerType GetLayerType();
 	void DebugPrint();
 };

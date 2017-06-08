@@ -103,12 +103,14 @@ void NNTrainer::Iterate(NNetwork* nn)
 #ifdef _UNITTEST
 	std::cout << "FORWARD PASS --------------------------------:\r\n";
 #endif
+
 	nn->Forward(input, inputCount);
 
 #ifdef _UNITTEST
 	std::cout << "BACKWARD PASS --------------------------------:\r\n";
 #endif
-	nn->Backward(expected, expectedCount, 0.001);
+
+	nn->Backward(expected, expectedCount, 0.02);
 
 	delete input;
 	delete expected;

@@ -50,6 +50,7 @@ public:
 	virtual int* GetBackDataHostMem(bool copyFromDevice);
 	virtual int GetBackDataNodeCount();
 	virtual void GetLayerData(LayerDataList& layerDataList);
+	virtual void GetLayerPerformance(unsigned int& averageTime, double& averageBytes);
 	virtual LayerType GetLayerType();
 	void DebugPrint();
 };

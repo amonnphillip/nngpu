@@ -43,6 +43,8 @@
     <ClCompile Include="nntester.cpp" />
     <ClCompile Include="output\outputlayer.cpp" />
     <ClCompile Include="output\outputlayerconfig.cpp" />
+    <ClCompile Include="performance\layerperf.cpp" />
+    <ClCompile Include="performance\layerperfnode.cpp" />
     <ClCompile Include="pool\poollayer.cpp" />
     <ClCompile Include="pool\poollayerconfig.cpp" />
     <ClCompile Include="pool\poolutest.cpp" />
@@ -82,6 +84,8 @@
     <ClInclude Include="nntester.h" />
     <ClInclude Include="output\outputlayer.h" />
     <ClInclude Include="output\outputlayerconfig.h" />
+    <ClInclude Include="performance\layerperf.h" />
+    <ClInclude Include="performance\layerperfnode.h" />
     <ClInclude Include="pool\poollayer.h" />
     <ClInclude Include="pool\poollayerconfig.h" />
     <ClInclude Include="pool\poolutest.h" />
@@ -133,11 +137,12 @@
     <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
     <PlatformToolset>v140</PlatformToolset>
+    <CLRSupport>true</CLRSupport>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -217,7 +222,7 @@ copy "$(CudaToolkitBinDir)\cudart*.dll" "$(OutDir)"</Command>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;WIN64;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(MSBuildProjectDirectory)\fullyconnected;$(MSBuildProjectDirectory)\input;$(MSBuildProjectDirectory)\output;$(MSBuildProjectDirectory)\conv;$(MSBuildProjectDirectory)\;$(MSBuildProjectDirectory)\relu;$(MSBuildProjectDirectory)\pool;%(AdditionalIncludeDirectories);$(CudaToolkitIncludeDir);$(MSBuildProjectDirectory)\test</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(MSBuildProjectDirectory)\fullyconnected;$(MSBuildProjectDirectory)\input;$(MSBuildProjectDirectory)\output;$(MSBuildProjectDirectory)\conv;$(MSBuildProjectDirectory)\;$(MSBuildProjectDirectory)\relu;$(MSBuildProjectDirectory)\pool;%(AdditionalIncludeDirectories);$(CudaToolkitIncludeDir);$(MSBuildProjectDirectory)\test;$(MSBuildProjectDirectory)\performance</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -253,7 +258,7 @@ copy "$(CudaToolkitBinDir)\cudart*.dll" "$(OutDir)"</Command>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;WIN64;_DEBUG;_CONSOLE;_UNITTEST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(MSBuildProjectDirectory)\fullyconnected;$(MSBuildProjectDirectory)\input;$(MSBuildProjectDirectory)\output;$(MSBuildProjectDirectory)\conv;$(MSBuildProjectDirectory)\;$(MSBuildProjectDirectory)\relu;$(MSBuildProjectDirectory)\pool;%(AdditionalIncludeDirectories);$(CudaToolkitIncludeDir);$(MSBuildProjectDirectory)\test</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(MSBuildProjectDirectory)\fullyconnected;$(MSBuildProjectDirectory)\input;$(MSBuildProjectDirectory)\output;$(MSBuildProjectDirectory)\conv;$(MSBuildProjectDirectory)\;$(MSBuildProjectDirectory)\relu;$(MSBuildProjectDirectory)\pool;%(AdditionalIncludeDirectories);$(CudaToolkitIncludeDir);$(MSBuildProjectDirectory)\test;$(MSBuildProjectDirectory)\performance</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -314,6 +319,9 @@ copy "$(CudaToolkitBinDir)\cudart*.dll" "$(OutDir)"</Command>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;WIN64;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(MSBuildProjectDirectory)\fullyconnected;$(MSBuildProjectDirectory)\input;$(MSBuildProjectDirectory)\output;$(MSBuildProjectDirectory)\conv;$(MSBuildProjectDirectory)\;$(MSBuildProjectDirectory)\relu;$(MSBuildProjectDirectory)\pool;%(AdditionalIncludeDirectories);$(CudaToolkitIncludeDir);$(MSBuildProjectDirectory)\performance</AdditionalIncludeDirectories>
+      <CompileAsManaged>true</CompileAsManaged>
+      <ExceptionHandling>Async</ExceptionHandling>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -329,7 +337,14 @@ copy "$(CudaToolkitBinDir)\cudart*.dll" "$(OutDir)"</Command>
     <CudaCompile>
       <TargetMachinePlatform>64</TargetMachinePlatform>
       <CodeGeneration>compute_30,sm_30</CodeGeneration>
+      <Optimization>O3</Optimization>
     </CudaCompile>
+    <CudaLink>
+      <GPUDebugInfo>false</GPUDebugInfo>
+    </CudaLink>
+    <CudaLink>
+      <Optimization>O3</Optimization>
+    </CudaLink>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

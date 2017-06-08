@@ -152,6 +152,11 @@ void InputLayer::GetLayerData(LayerDataList& layerDataList)
 	layerData->data = GetForwardHostMem(true);
 }
 
+void InputLayer::GetLayerPerformance(unsigned int& averageTime, double& averageBytesPerSecond)
+{
+	// TODO: FILL THIS!
+}
+
 void InputLayer::DebugPrint()
 {
 	double* forward = GetForwardHostMem(false);

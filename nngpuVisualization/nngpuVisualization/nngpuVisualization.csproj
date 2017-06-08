@@ -161,6 +161,7 @@
     <Compile Include="NnGpuRunner.cs" />
     <Compile Include="NnGpuWin.cs" />
     <Compile Include="NnGpuWinInterop.cs" />
+    <Compile Include="Performance.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

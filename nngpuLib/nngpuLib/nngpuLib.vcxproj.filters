@@ -85,6 +85,12 @@
     <ClCompile Include="conv\convutestreference.cpp">
       <Filter>conv</Filter>
     </ClCompile>
+    <ClCompile Include="performance\layerperf.cpp">
+      <Filter>peformance</Filter>
+    </ClCompile>
+    <ClCompile Include="performance\layerperfnode.cpp">
+      <Filter>peformance</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="conv\convlayer.cu">
@@ -171,6 +177,12 @@
     </ClInclude>
     <ClInclude Include="conv\convutestreference.h">
       <Filter>conv</Filter>
+    </ClInclude>
+    <ClInclude Include="performance\layerperf.h">
+      <Filter>peformance</Filter>
+    </ClInclude>
+    <ClInclude Include="performance\layerperfnode.h">
+      <Filter>peformance</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
