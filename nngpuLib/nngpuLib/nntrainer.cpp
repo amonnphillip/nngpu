@@ -84,7 +84,7 @@ void NNTrainer::Iterate(NNetwork* nn)
 		return;
 	}
 
-	const double learnRate = 0.01;
+	const double learnRate = 0.01; // TODO: THIS MUST BE CONFIGURED
 	const int inputCount = trainingImageWidth * trainingImageHeight;
 	const int expectedCount = 10;
 

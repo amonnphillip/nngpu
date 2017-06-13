@@ -48,15 +48,6 @@ __global__ void ConvLayer_Forward_cu_test(ConvNode *node, double* filters, Layer
 									val = 0;
 								}
 								val += filter[index1] * previousLayerOutput[index2];
-
-								/*if (x == 1 && y == 0)
-								{
-									printf("gradient x: %i, y: %i, d2: %i, layerSize.width: %i \n", x, y, d2, layerSize.width);
-									printf("filterPosx: %i, filterPosy: %i, posx: %i, posy: %i\n", filterPosx, filterPosy, posx, posy);
-									printf("filter[index1]: %f, previousLayerOutput[index2]: %f\n", filter[index1], previousLayerOutput[index2]);
-									printf("d: %i\n", d);
-									printf("index1: %i\n index2: %i\n", index1, index2);
-								}*/
 							}
 						}
 					}
@@ -68,20 +59,10 @@ __global__ void ConvLayer_Forward_cu_test(ConvNode *node, double* filters, Layer
 			}
 		}
 	}
-
-	//printf("output[1]: %f\n", output[1]);
 }
 
 __global__ void ConvLayer_Backward_cu_test(ConvNode *node, double* filters, double* backFilters, LayerSize filterSize, int filterCount, LayerSize layerSize, LayerSize previousLayerSize, LayerSize nextLayerSize, double *previousLayerOutput, double *nextLayerOutput, double *output, int pad, double learnRate)
 {
-	//printf("\n");
-	//printf("\n ConvLayer_Backward_cu_test");
-	//printf("\n");
-	//printf("previousLayerSize.width: %i, previousLayerSize.height: %i, previousLayerSize.depth: %i\n", previousLayerSize.width, previousLayerSize.height, previousLayerSize.depth);
-	//printf("layerSize.width: %i, layerSize.height: %i, layerSize.depth: %i\n", layerSize.width, layerSize.height, layerSize.depth);
-
-	int iiii = 0;
-	int ii = 0;
 	for (int d2 = 0; d2<filterCount; d2++)
 	{
 		for (int y = 0; y<layerSize.height; y++)
@@ -110,27 +91,6 @@ __global__ void ConvLayer_Backward_cu_test(ConvNode *node, double* filters, doub
 
 								backFilter[index2] += previousLayerOutput[index1] * gradient;
 								output[index1] += filter[index2] * gradient;
-								/*
-								if (index2 == 32 && d2 == 0)
-								{
-									if (ii < 4000) {
-										printf("ii: %i, index1: %i, index2: %i, filterPosx: %i, filterPosy: %i, posx: %i, posy: %i, gradient: %f, d: %i, d2: %i, x: %i, y: %i\n", ii, index1, index2, filterPosx, filterPosy, posx, posy, gradient, d, d2, x, y);
-										ii++;
-									}
-								}*/
-
-
-
-								/*
-								if (index1 == 11)
-								{
-									printf("gradient x: %i, y: %i nextLayerSize.depth: %i, d2: %i, layerSize.width: %i \n", x, y, nextLayerSize.depth, d2, layerSize.width);
-									printf("filterPosx: %i, filterPosy: %i, posx: %i, posy: %i\n", filterPosx, filterPosy, posx, posy);
-									printf("gradient %f\n", gradient);
-									printf("filter: %i\n", d2);
-									printf("d: %i\n", d);
-									printf("index1: %i\n index2: %i\n", index1, index2);
-								}*/
 							}
 						}
 					}
@@ -140,13 +100,6 @@ __global__ void ConvLayer_Backward_cu_test(ConvNode *node, double* filters, doub
 			}
 		}
 	}
-
-	//printf("output[10, 10] %f\n", output[(10 * layerSize.width) + 10]);
-	//printf("output[1] %f\n", output[11]);
-	//printf("backFilters[1] %f\n", backFilters[1]);
-	//printf("iiii %i\n", iiii);
-
-	
 }
 
 __global__ void ConvLayer_Update_Backward_filter_cu_test(double* filters, double* backFilters, LayerSize filterSize, double learnRate, int filterCount)
