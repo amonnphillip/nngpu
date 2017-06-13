@@ -9,6 +9,7 @@ extern "C"
 	__declspec(dllexport) void AddReluLayer(NnGpu* nn);
 	__declspec(dllexport) void AddPoolLayer(NnGpu* nn, int spatialExtent, int stride);
 	__declspec(dllexport) void AddFullyConnected(NnGpu* nn, int size);
+	__declspec(dllexport) void AddSoftmax(NnGpu* nn, int size);
 	__declspec(dllexport) void AddOutput(NnGpu* nn, int size);
 	__declspec(dllexport) void GetLayerType(NnGpu* nn, int layerIndex, int* layerType);
 	__declspec(dllexport) void GetLayerCount(NnGpu* nn, int* layerCount);

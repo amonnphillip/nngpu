@@ -33,6 +33,9 @@ namespace nngpuVisualization
         public static extern void AddFullyConnected(IntPtr nn, int size);
 
         [DllImport("nngpuLib.dll")]
+        public static extern void AddSoftmax(IntPtr nn, int size);
+
+        [DllImport("nngpuLib.dll")]
         public static extern void AddOutput(IntPtr nn, int size);
 
         [DllImport("nngpuLib.dll")]

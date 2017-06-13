@@ -101,7 +101,7 @@ namespace nngpuVisualization.controls
             BackwardsImageContainer.Children.Add(backwardsImage);
 
 
-            NnGpuLayerData[] filterLayers = laterDataGroup.GetLayersOfType(NnGpuLayerDataType.ConvFilter);
+            NnGpuLayerData[] filterLayers = laterDataGroup.GetLayersOfType(NnGpuLayerDataType.ConvForwardFilter);
             for (int filterIndex = 0; filterIndex < filterLayers.Length; filterIndex++)
             {
                 Image filterImage = new Image();

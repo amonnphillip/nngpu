@@ -5,6 +5,7 @@
 #include "layerexception.h"
 #include "cuda_runtime.h"
 #include "layer.h"
+#include "testutils.h"
 
 InputLayer::InputLayer(InputLayerConfig* config, INNetworkLayer* previousLayer)
 {
@@ -159,12 +160,7 @@ void InputLayer::GetLayerPerformance(unsigned int& averageTime, double& averageB
 
 void InputLayer::DebugPrint()
 {
-	double* forward = GetForwardHostMem(false);
-	int forwardCount = GetForwardNodeCount();
-
 	std::cout << "input:\r\n";
-	for (int index = 0; index < forwardCount; index++)
-	{
-		std::cout << forward[index] << " ";
-	}
+	TestUtils::DebugPrintMemory(GetForwardHostMem(true), GetForwardNodeCount());
+	std::cout << "sum: " << TestUtils::SumMemory(GetForwardHostMem(true), GetForwardNodeCount()) << "\r\n";
 }

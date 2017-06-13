@@ -4,8 +4,27 @@
 class TestUtils
 {
 public:
-	template<typename T>
-	static bool CompareMemory(T* src, T* src2, int count)
+	static bool AreSame(double a, double b) {
+		return std::fabs(a - b) < std::numeric_limits<double>::epsilon();
+	}
+
+	static bool CompareMemory(double* src, double* src2, int count)
+	{
+		for (int i = 0; i < count; i++)
+		{
+			if (!AreSame(*src, *src2))
+			{
+				return false;
+			}
+
+			src++;
+			src2++;
+		}
+
+		return true;
+	}
+
+	static bool CompareMemory(int* src, int* src2, int count)
 	{
 		for (int i = 0; i < count; i++)
 		{
@@ -21,8 +40,7 @@ public:
 		return true;
 	}
 
-	template<typename  T>
-	static bool CompareRectangularMemory(T* src, T* src2, int sizeX, int sizeY, int sizeD, int* errorSizeX, int* errorSizeY, int* errorSizeD)
+	static bool CompareRectangularMemory(double* src, double* src2, int sizeX, int sizeY, int sizeD, int* errorSizeX, int* errorSizeY, int* errorSizeD)
 	{
 		for (int d = 0; d < sizeD; d++)
 		{
@@ -30,7 +48,7 @@ public:
 			{
 				for (int x = 0; x < sizeX; x++)
 				{
-					if (*src != *src2)
+					if (!AreSame(*src, *src2))
 					{
 						*errorSizeX = x;
 						*errorSizeY = y;

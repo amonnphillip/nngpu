@@ -53,8 +53,9 @@ public:
 	virtual int GetHeight();
 	virtual int GetDepth();
 	double* GetWeightsForNode(int index);
+	double* GetWeightHostMem(bool copyFromDevice);
 	int GetWeightCount();
-	FullyConnectedNode* GetNodeMem();
+	FullyConnectedNode* GetNodeMem(bool copyFromDevice);
 	virtual LayerType GetLayerType();
 	virtual void GetLayerData(LayerDataList& layerDataList);
 	virtual void GetLayerPerformance(unsigned int& averageTime, double& averageBytes);

@@ -7,6 +7,7 @@
 #include "layerexception.h"
 #include "cuda_runtime.h"
 #include "layer.h"
+#include "testutils.h"
 
 extern void ConvLayer_Forward(ConvNode *node, double* filters, LayerSize filterSize, int filterCount, LayerSize layerSize, LayerSize previousLayerSize, double *previousLayerOutput, double *output, int pad);
 extern void ConvLayer_Backward(ConvNode *node, double* filters, double* backFilters, LayerSize filterSize, int filterCount, LayerSize layerSize, LayerSize previousLayerSize, LayerSize nextLayerSize, double *previousLayerOutput, double *nextLayerOutput, double *output, int pad, double learnRate, int* backFilterLookUp, int backFilterLookUpSize);
@@ -81,6 +82,8 @@ ConvLayer::ConvLayer(ConvLayerConfig* config, INNetworkLayer* previousLayer)
 	{
 		throw std::runtime_error("ConvLayer cudaMemcpy returned an error");
 	}
+
+	SetMemory(forwardHostMem.get(), forwardDeviceMem, forwardCount, 0);
 }
 
 void ConvLayer::Dispose()
@@ -122,10 +125,7 @@ void ConvLayer::Forward(double* input, int inputSize)
 
 void ConvLayer::Forward(INNetworkLayer* previousLayer, INNetworkLayer* nextLayer)
 {
-	if (cudaMemcpy(forwardDeviceMem, forwardHostMem.get(), forwardCount * sizeof(double), cudaMemcpyHostToDevice) != cudaError::cudaSuccess)
-	{
-		throw std::runtime_error("ConvLayer forward cudaMemcpy returned an error");
-	}
+	SetMemory(forwardHostMem.get(), forwardDeviceMem, forwardCount, 0);
 
 	layerPerf.Start(layerWidth * layerHeight * layerDepth);
 	ConvLayer_Forward(
@@ -167,7 +167,7 @@ void ConvLayer::Backward(INNetworkLayer* previousLayer, INNetworkLayer* nextLaye
 {
 	if (backFilterLookUpHostMem.get() == nullptr)
 	{
-		ComputeBackFilterLookUp(previousLayer, nextLayer);
+		ComputeBackFilterLookUp(previousLayer, nextLayer); // TODO: PUT THIS SOME PLACE SENSIBLE!
 	}
 
 	std::fill_n(backwardHostMem.get(), GetBackwardNodeCount(), (double)0.0);
@@ -334,9 +334,9 @@ void ConvLayer::GetLayerData(LayerDataList& layerDataList)
 	layerData++;
 
 	layerData->type = LayerDataType::Backward;
-	layerData->width = GetBackwardNodeCount();
-	layerData->height = 1;
-	layerData->depth = 1;
+	layerData->width = GetBackwardWidth();
+	layerData->height = GetBackwardHeight();
+	layerData->depth = GetBackwardDepth();
 	layerData->data = GetBackwardHostMem(true);
 	layerData++;
 
@@ -345,7 +345,7 @@ void ConvLayer::GetLayerData(LayerDataList& layerDataList)
 	{
 		for (int countIndex = 0; countIndex < filterCount; countIndex++)
 		{
-			layerData->type = LayerDataType::ConvFilter;
+			layerData->type = LayerDataType::ConvForwardFilter;
 			layerData->width = filterWidth;
 			layerData->height = filterHeight;
 			layerData->depth = 1;
@@ -391,6 +391,19 @@ double* ConvLayer::GetBackFilterHostMem(bool copyFromDevice)
 int ConvLayer::GetBackFilterMemNodeCount()
 {
 	return filterSize * filterDepth * filterCount;
+}
+
+ConvNode* ConvLayer::GetNodeMem(bool copyFromDevice)
+{
+	if (copyFromDevice)
+	{
+		if (cudaMemcpy(nodeHostMem.get(), nodeDeviceMem, nodeCount * sizeof(ConvNode), cudaMemcpyDeviceToHost) != cudaError::cudaSuccess)
+		{
+			throw std::runtime_error("CudaMemcpy returned an error");
+		}
+	}
+
+	return nodeHostMem.get();
 }
 
 void ConvLayer::ComputeBackFilterLookUp(INNetworkLayer* previousLayer, INNetworkLayer* nextLayer)
@@ -462,8 +475,9 @@ void ConvLayer::GetLayerPerformance(unsigned int& averageTime, double& averageBy
 void ConvLayer::DebugPrint()
 {
 	std::cout << "conv layer:\r\n";
-
+#if 0
 	std::cout << "back filters:\r\n";
+	double sum = 0;
 	double* backFilters = GetBackFilterHostMem(true);
 	for (int c = 0; c < filterCount; c++)
 	{
@@ -474,6 +488,7 @@ void ConvLayer::DebugPrint()
 				for (int x = 0; x < filterHeight; x++)
 				{
 					std::cout << *backFilters << " ";
+					sum += *backFilters;
 					backFilters++;
 				}
 				std::cout << "\r\n";
@@ -481,11 +496,19 @@ void ConvLayer::DebugPrint()
 			std::cout << "\r\n";
 		}
 	}
-#if 0
+	std::cout << "sum: " << sum << "\r\n";
+#endif
+
+	std::cout << "backward:\r\n";
+	TestUtils::DebugPrintRectangularMemory(GetBackwardHostMem(true), backwardWidth, backwardHeight, backwardDepth);
+
+
+#if 1
 	std::cout << "forward filters:\r\n";
-	double* forwardFilters = filterHostMem.get();
+	double* forwardFilters = GetFilterHostMem(true);
 	for (int c = 0; c < filterCount; c++)
 	{
+		//sum = 0;
 		for (int d = 0; d < filterDepth; d++)
 		{
 			for (int y = 0; y < filterWidth; y++)
@@ -493,16 +516,20 @@ void ConvLayer::DebugPrint()
 				for (int x = 0; x < filterHeight; x++)
 				{
 					std::cout << *forwardFilters << " ";
+					//sum += *forwardFilters;
 					forwardFilters++;
 				}
 				std::cout << "\r\n";
 			}
 			std::cout << "\r\n";
 		}
+		//std::cout << "sum: " << sum << "\r\n";
 	}
-
+#endif
+/*
 	std::cout << "forward:\r\n";
 	double* forward = forwardHostMem.get();
+	sum = 0;
 	for (int d = 0; d < layerDepth; d++)
 	{
 		for (int y = 0; y < layerWidth; y++)
@@ -510,11 +537,17 @@ void ConvLayer::DebugPrint()
 			for (int x = 0; x < layerHeight; x++)
 			{
 				std::cout << *forward << " ";
+				sum += *forward;
 				forward++;
 			}
 			std::cout << "\r\n";
 		}
 		std::cout << "\r\n";
 	}
-#endif
+	std::cout << "sum: " << sum << "\r\n";*/
+
+
+	std::cout << "forward:\r\n";
+	TestUtils::DebugPrintRectangularMemory(GetForwardHostMem(true), layerWidth, layerHeight, layerDepth);
+
 }

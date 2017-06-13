@@ -31,7 +31,7 @@ bool ConvUTest::Test()
 	int errory;
 	int errord;
 
-	const int NUM_OF_TESTS = 10;
+	const int NUM_OF_TESTS = 11;
 	bool* isSame = new bool[NUM_OF_TESTS];
 
 	isSame[0] = convLayer->GetForwardWidth() == LAYER_WIDTH;
@@ -51,6 +51,20 @@ bool ConvUTest::Test()
 
 	isSame[8] = TestUtils::CompareRectangularMemory(convLayer->GetBackwardHostMem(true), convLayerReference->GetBackwardHostMem(true), convLayer->GetBackwardWidth(), convLayer->GetBackwardHeight(), convLayer->GetBackwardDepth(), &errorx, &errory, &errord);
 	isSame[9] = TestUtils::CompareMemory(convLayer->GetBackFilterHostMem(true), convLayerReference->GetBackFilterHostMem(true), convLayer->GetBackFilterMemNodeCount());
+
+	ConvNode* a = convLayer->GetNodeMem(true);
+	ConvNode* b = convLayerReference->GetNodeMem(true);
+	bool biasSame = true;
+	for (int index = 0; index < convLayer->GetForwardNodeCount(); index++)
+	{
+		if (a->bias != b->bias)
+		{
+			biasSame = false;
+		}
+		a++;
+		b++;
+	}
+	isSame[10] = biasSame;
 
 	bool testResult = TestUtils::AllTrue(isSame, NUM_OF_TESTS);
 	delete isSame;

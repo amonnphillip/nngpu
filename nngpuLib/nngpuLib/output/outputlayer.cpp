@@ -55,17 +55,15 @@ void OutputLayer::Backward(double* input, int inputSize, double learnRate)
 {
 	assert(inputSize == nodeCount);
 
-	double* forward = forwardHostMem.get();
 	double* backward = backwardHostMem.get();
 	for (int index = 0; index < nodeCount; index++)
 	{
-		*backward = *input - *forward;
+		*backward = *input;
 		if (isnan(*backward) ||
 			isinf(*backward))
 		{
 			*backward = 0;
 		}
-		forward++;
 		input++;
 		backward++;
 	}

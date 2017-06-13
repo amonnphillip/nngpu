@@ -58,7 +58,8 @@ __global__ void ConvLayer_Forward_cu(ConvNode *node, double* filters, LayerSize 
 		}
 	}
 
-	//val += node->bias;
+	val += node[blockIdx.z].bias;
+
 	output[((blockIdx.y * layerSize.width) + blockIdx.x) * layerSize.depth + blockIdx.z] = val;
 	/*if (blockIdx.x == 1 && blockIdx.y == 0) {
 		printf("output[1]: %f\n", output[1]);
@@ -71,7 +72,7 @@ __global__ void ConvLayer_Backward_update_output_cu(ConvNode *node, double* filt
 
 	//int posx = blockIdx.x - pad;
 	//int posy = blockIdx.y - pad;
-	int d = blockIdx.z;
+	int d = threadIdx.x;
 
 	//unsigned int index1 = ((layerSize.width * (filterPosy + posy)) + filterPosx + posx) * previousLayerSize.depth + d;
 	unsigned int index1 = ((layerSize.width * blockIdx.y) + blockIdx.x) * previousLayerSize.depth + d;
@@ -162,6 +163,19 @@ __global__ void ConvLayer_Backward_update_output_cu(ConvNode *node, double* filt
 	}*/
 
 	//node->bias += gradient * learnRate;
+}
+
+__global__ void ConvLayer_Backward_update_bias_cu(ConvNode *node, LayerSize layerSize, LayerSize nextLayerSize, double *nextLayerOutput, double learnRate)
+{
+	for (int y = 0; y < layerSize.height; y++)
+	{
+		for (int x = 0; x < layerSize.width; x++)
+		{
+			double gradient = nextLayerOutput[((layerSize.width * y) + x) * nextLayerSize.depth + blockIdx.x];
+
+			node[blockIdx.x].bias += gradient * learnRate;
+		}
+	}
 }
 
 __global__ void ConvLayer_Backward_back_filters_cu2(double* backFilters, LayerSize filterSize, LayerSize layerSize, LayerSize previousLayerSize, double *previousLayerOutput, LayerSize nextLayerSize, double *nextLayerOutput, int pad, int* backFilterLookUp)
@@ -257,12 +271,16 @@ void ConvLayer_Backward(ConvNode *node, double* filters, double* backFilters, La
 
 	LayerSynchronize();
 
-	dim3 bblocks(layerSize.width, layerSize.height, filterSize.depth);
-	ConvLayer_Backward_update_output_cu << <bblocks, 1 >> >(node, filters, backFilters, filterSize, filterCount, layerSize, previousLayerSize, nextLayerSize, previousLayerOutput, nextLayerOutput, output, pad, learnRate);
+	dim3 bblocks(layerSize.width, layerSize.height, 1);
+	ConvLayer_Backward_update_output_cu << <bblocks, filterSize.depth >> >(node, filters, backFilters, filterSize, filterCount, layerSize, previousLayerSize, nextLayerSize, previousLayerOutput, nextLayerOutput, output, pad, learnRate);
 
 	LayerSynchronize();
 
 	ConvLayer_Update_Backward_filter_cu <<<filterCount, 1 >>>(filters, backFilters, filterSize, learnRate);
+
+	LayerSynchronize();
+
+	ConvLayer_Backward_update_bias_cu<<<filterCount, 1>>>(node, layerSize, nextLayerSize, nextLayerOutput, learnRate);
 
 	LayerSynchronize();
 }

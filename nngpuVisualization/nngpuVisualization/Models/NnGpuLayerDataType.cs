@@ -10,6 +10,8 @@ namespace nngpuVisualization
     {
         Forward = 0,
         Backward = 1,
-        ConvFilter = 2
+        ConvForwardFilter = 2,
+        ConvBackwardFilter = 3,
+        PoolBackData = 4
     }
 }

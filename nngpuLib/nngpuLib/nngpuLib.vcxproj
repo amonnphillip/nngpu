@@ -33,6 +33,8 @@
     <ClCompile Include="conv\convutestreference.cpp" />
     <ClCompile Include="fullyconnected\fullyconnectedlayer.cpp" />
     <ClCompile Include="fullyconnected\fullyconnectedlayerconfig.cpp" />
+    <ClCompile Include="fullyconnected\fullyconnectedutest.cpp" />
+    <ClCompile Include="fullyconnected\fullyconnectedutestreference.cpp" />
     <ClCompile Include="input\inputlayer.cpp" />
     <ClCompile Include="input\inputlayerconfig.cpp" />
     <ClCompile Include="layer.cpp" />
@@ -52,16 +54,20 @@
     <ClCompile Include="relu\relulayer.cpp" />
     <ClCompile Include="relu\relulayerconfig.cpp" />
     <ClCompile Include="nntrainer.cpp" />
+    <ClCompile Include="softmax\softmaxlayer.cpp" />
+    <ClCompile Include="softmax\softmaxlayerconfig.cpp" />
     <ClCompile Include="testlayer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="conv\convlayer.cu" />
     <CudaCompile Include="conv\convutestreference.cu" />
     <CudaCompile Include="fullyconnected\fullyconnectedlayer.cu" />
+    <CudaCompile Include="fullyconnected\fullyconnectedutestreference.cu" />
     <CudaCompile Include="layer.cu" />
     <CudaCompile Include="pool\poollayer.cu" />
     <CudaCompile Include="pool\poolutestreference.cu" />
     <CudaCompile Include="relu\relulayer.cu" />
+    <CudaCompile Include="softmax\softmaxlayer.cu" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="conv\convlayer.h" />
@@ -70,6 +76,8 @@
     <ClInclude Include="conv\convutestreference.h" />
     <ClInclude Include="fullyconnected\fullyconnectedlayer.h" />
     <ClInclude Include="fullyconnected\fullyconnectedlayerconfig.h" />
+    <ClInclude Include="fullyconnected\fullyconnectedutest.h" />
+    <ClInclude Include="fullyconnected\fullyconnectedutestreference.h" />
     <ClInclude Include="innetworklayer.h" />
     <ClInclude Include="input\inputlayer.h" />
     <ClInclude Include="input\inputlayerconfig.h" />
@@ -94,6 +102,8 @@
     <ClInclude Include="relu\relulayerconfig.h" />
     <ClInclude Include="nntrainer.h" />
     <ClInclude Include="nntestresult.h" />
+    <ClInclude Include="softmax\softmaxlayer.h" />
+    <ClInclude Include="softmax\softmaxlayerconfig.h" />
     <ClInclude Include="testlayer.h" />
     <ClInclude Include="testutils.h" />
   </ItemGroup>
@@ -222,7 +232,7 @@ copy "$(CudaToolkitBinDir)\cudart*.dll" "$(OutDir)"</Command>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;WIN64;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(MSBuildProjectDirectory)\fullyconnected;$(MSBuildProjectDirectory)\input;$(MSBuildProjectDirectory)\output;$(MSBuildProjectDirectory)\conv;$(MSBuildProjectDirectory)\;$(MSBuildProjectDirectory)\relu;$(MSBuildProjectDirectory)\pool;%(AdditionalIncludeDirectories);$(CudaToolkitIncludeDir);$(MSBuildProjectDirectory)\test;$(MSBuildProjectDirectory)\performance</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(MSBuildProjectDirectory)\fullyconnected;$(MSBuildProjectDirectory)\input;$(MSBuildProjectDirectory)\output;$(MSBuildProjectDirectory)\conv;$(MSBuildProjectDirectory)\;$(MSBuildProjectDirectory)\relu;$(MSBuildProjectDirectory)\pool;%(AdditionalIncludeDirectories);$(CudaToolkitIncludeDir);$(MSBuildProjectDirectory)\test;$(MSBuildProjectDirectory)\performance;$(MSBuildProjectDirectory)\softmax</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -242,9 +252,10 @@ copy "$(CudaToolkitBinDir)\cudart*.dll" "$(OutDir)"</Command>
       <GenerateLineInfo>true</GenerateLineInfo>
       <Optimization>Od</Optimization>
       <RuntimeChecks>RTC1</RuntimeChecks>
-      <PtxAsOptionV>true</PtxAsOptionV>
+      <PtxAsOptionV>false</PtxAsOptionV>
       <TypeInfo>true</TypeInfo>
       <Warning>InheritFromHost</Warning>
+      <NvccCompilation>compile</NvccCompilation>
     </CudaCompile>
     <CudaLink>
       <GPUDebugInfo>true</GPUDebugInfo>
@@ -258,7 +269,7 @@ copy "$(CudaToolkitBinDir)\cudart*.dll" "$(OutDir)"</Command>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;WIN64;_DEBUG;_CONSOLE;_UNITTEST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(MSBuildProjectDirectory)\fullyconnected;$(MSBuildProjectDirectory)\input;$(MSBuildProjectDirectory)\output;$(MSBuildProjectDirectory)\conv;$(MSBuildProjectDirectory)\;$(MSBuildProjectDirectory)\relu;$(MSBuildProjectDirectory)\pool;%(AdditionalIncludeDirectories);$(CudaToolkitIncludeDir);$(MSBuildProjectDirectory)\test;$(MSBuildProjectDirectory)\performance</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(MSBuildProjectDirectory)\fullyconnected;$(MSBuildProjectDirectory)\input;$(MSBuildProjectDirectory)\output;$(MSBuildProjectDirectory)\conv;$(MSBuildProjectDirectory)\;$(MSBuildProjectDirectory)\relu;$(MSBuildProjectDirectory)\pool;%(AdditionalIncludeDirectories);$(CudaToolkitIncludeDir);$(MSBuildProjectDirectory)\test;$(MSBuildProjectDirectory)\performance;$(MSBuildProjectDirectory)\softmax</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -319,7 +330,7 @@ copy "$(CudaToolkitBinDir)\cudart*.dll" "$(OutDir)"</Command>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;WIN64;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(MSBuildProjectDirectory)\fullyconnected;$(MSBuildProjectDirectory)\input;$(MSBuildProjectDirectory)\output;$(MSBuildProjectDirectory)\conv;$(MSBuildProjectDirectory)\;$(MSBuildProjectDirectory)\relu;$(MSBuildProjectDirectory)\pool;%(AdditionalIncludeDirectories);$(CudaToolkitIncludeDir);$(MSBuildProjectDirectory)\performance</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(MSBuildProjectDirectory)\fullyconnected;$(MSBuildProjectDirectory)\input;$(MSBuildProjectDirectory)\output;$(MSBuildProjectDirectory)\conv;$(MSBuildProjectDirectory)\;$(MSBuildProjectDirectory)\relu;$(MSBuildProjectDirectory)\pool;%(AdditionalIncludeDirectories);$(CudaToolkitIncludeDir);$(MSBuildProjectDirectory)\performance;$(MSBuildProjectDirectory)\softmax</AdditionalIncludeDirectories>
       <CompileAsManaged>true</CompileAsManaged>
       <ExceptionHandling>Async</ExceptionHandling>
     </ClCompile>

@@ -112,4 +112,14 @@ protected:
 	{
 		LayerSynchronize();
 	}
+	
+	virtual void SetMemory(double* hostMem, double* deviceMem, int count, double value)
+	{
+		std::fill_n(hostMem, count, (double)value);
+
+		if (cudaMemcpy(deviceMem, hostMem, count * sizeof(double), cudaMemcpyHostToDevice) != cudaError::cudaSuccess)
+		{
+			throw std::runtime_error("CudaMemcpy returned an error");
+		}
+	}
 };

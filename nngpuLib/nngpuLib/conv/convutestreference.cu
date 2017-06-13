@@ -62,7 +62,8 @@ __global__ void ConvLayer_Forward_cu_test(ConvNode *node, double* filters, Layer
 					}
 				}
 
-				//val += node->bias;
+				val += node[d2].bias;
+
 				output[((y * layerSize.width) + x) * layerSize.depth + d2] = val;
 			}
 		}
@@ -134,6 +135,8 @@ __global__ void ConvLayer_Backward_cu_test(ConvNode *node, double* filters, doub
 						}
 					}
 				}
+
+				node[d2].bias += gradient * learnRate;
 			}
 		}
 	}
@@ -143,7 +146,7 @@ __global__ void ConvLayer_Backward_cu_test(ConvNode *node, double* filters, doub
 	//printf("backFilters[1] %f\n", backFilters[1]);
 	//printf("iiii %i\n", iiii);
 
-	//node->bias += gradient * learnRate;
+	
 }
 
 __global__ void ConvLayer_Update_Backward_filter_cu_test(double* filters, double* backFilters, LayerSize filterSize, double learnRate, int filterCount)

@@ -7,6 +7,8 @@ int main()
 	// Run unit tests on individual layers
 	NnGpu* nn = Initialize();
 	InitializeNetwork(nn);
+
+//#if _RUN_UNIT_TESTS
 	bool testResults = RunUnitTests(nn);
 
 	if (!testResults)
@@ -15,6 +17,7 @@ int main()
 		delete nn;
 		return -1;
 	}
+//#endif
 
 	// Run tests on the network as a whole
 	AddInputLayer(nn, 28, 28, 1);
@@ -25,11 +28,13 @@ int main()
 	AddReluLayer(nn);
 	AddPoolLayer(nn, 2, 2);
 	AddFullyConnected(nn, 10);
+	AddSoftmax(nn, 10);
 	AddOutput(nn, 10);
 	
 	long imageDataSize = 0;
 	unsigned char* imageData = nullptr;
-	FILE* imageDataFile = fopen("t10k-images.idx3-ubyte", "r");
+	//FILE* imageDataFile = fopen("t10k-images.idx3-ubyte", "r");
+	FILE* imageDataFile = fopen("train-images.idx3-ubyte", "r");
 	if (imageDataFile != nullptr)
 	{
 		fseek(imageDataFile, 0, SEEK_END);
@@ -42,7 +47,8 @@ int main()
 
 	long labelDataSize = 0;
 	unsigned char* labelData = nullptr;
-	FILE* labelDataFile = fopen("t10k-labels.idx1-ubyte", "r");
+	//FILE* labelDataFile = fopen("t10k-labels.idx1-ubyte", "r");
+	FILE* labelDataFile = fopen("train-labels.idx1-ubyte", "r");
 	if (labelDataFile != nullptr)
 	{
 		fseek(labelDataFile, 0, SEEK_END);

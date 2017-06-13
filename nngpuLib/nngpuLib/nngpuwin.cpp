@@ -60,6 +60,11 @@ void AddFullyConnected(NnGpu* nn, int size)
 	nn->AddFullyConnected(size);
 }
 
+void AddSoftmax(NnGpu* nn, int size)
+{
+	nn->AddSoftmax(size);
+}
+
 void AddOutput(NnGpu* nn, int size)
 {
 	nn->AddOutput(size);

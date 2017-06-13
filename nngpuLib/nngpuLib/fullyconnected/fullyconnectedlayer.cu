@@ -17,112 +17,33 @@ __global__ void FullyConnectedLayer_Forward_cu(FullyConnectedNode *node, double*
 	for (int i = 0; i < weightCount; i++)
 	{
 		val += *weightBlock * in[i];
-		if (blockIdx.x == 0)
-		{
-			//printf("val: %f, i: %i, in[i]: %f, *weightBlock: %f\n", val, i, in[i], *weightBlock);
-		}
 		weightBlock++;
 	}
 
-	out[blockIdx.x] = val + node->bias;
-	if (blockIdx.x == 0)
-	{
-		//printf("\n");
-	}
+	out[blockIdx.x] = val + node[blockIdx.x].bias;
 }
 
 __global__ void FullyConnectedLayer_Backward_cu_p1(FullyConnectedNode *node, double* weights, int weightCount, double *forward, double *previousLayerForward, double* nextlayerBackward, double *out, double learnRate, int nodeCount)
 {
-	/*
-		double error = nextlayerBackward[blockIdx.x];
-	double* weightBlock = weights + (blockIdx.x * weightCount);
-	for (int i = 0; i < weightCount; i++)
+	for (int i = 0; i < nodeCount; i++)
 	{
-		*out += *weightBlock * error;
-		out++;
-		*weightBlock += previousLayerForward[i] * error * learnRate;
-		weightBlock++;
+		double error = nextlayerBackward[i];
+		double* weightBlock = weights + (i * weightCount) + blockIdx.x;
+		out[blockIdx.x] += *weightBlock * error;
 	}
-
-	node[blockIdx.x].bias += error * learnRate;
-	*/
-
-	out += blockIdx.x;
-	//for (int nodeIndex = 0; nodeIndex < nodeCount; nodeIndex++)
-	//{
-		double error = nextlayerBackward[blockIdx.y];
-		double* weightBlock = weights + (blockIdx.y * weightCount) + blockIdx.x;
-		*out += *weightBlock * error;
-		//*out += 1;
-		//out++;
-		//*weightBlock += previousLayerForward[i] * error * learnRate;
-		//weightBlock++;
-	//}
-
-	//node[blockIdx.x].bias += error * learnRate;
 }
 
 __global__ void FullyConnectedLayer_Backward_cu_p2(FullyConnectedNode *node, double* weights, int weightCount, double *forward, double *previousLayerForward, double* nextlayerBackward, double *out, double learnRate, int nodeCount)
 {
-	/*
-	double error = nextlayerBackward[blockIdx.x];
-	double* weightBlock = weights + (blockIdx.x * weightCount);
-	for (int i = 0; i < weightCount; i++)
-	{
-	*out += *weightBlock * error;
-	out++;
-	*weightBlock += previousLayerForward[i] * error * learnRate;
-	weightBlock++;
-	}
-
-	node[blockIdx.x].bias += error * learnRate;
-	*/
-	//for (int nodeIndex = 0; nodeIndex < nodeCount; nodeIndex++)
-	//{
-		double* weightBlock = weights + (blockIdx.y * weightCount) + blockIdx.x;
-		double error = nextlayerBackward[blockIdx.y];
-		*weightBlock += previousLayerForward[blockIdx.x] * error * learnRate;
-	//}
-
-	//node[blockIdx.x].bias += error * learnRate;
+	double* weightBlock = weights + (blockIdx.y * weightCount) + blockIdx.x;
+	double error = nextlayerBackward[blockIdx.y];
+	*weightBlock += previousLayerForward[blockIdx.x] * error * learnRate;
 }
 
 __global__ void FullyConnectedLayer_Backward_cu_p3(FullyConnectedNode *node, double* nextlayerBackward, double learnRate)
 {
 	double error = nextlayerBackward[blockIdx.x];
 	node[blockIdx.x].bias += error * learnRate;
-}
-
-__global__ void FullyConnectedLayer_Backward_cu(FullyConnectedNode *node, double* weights, int weightCount, double *forward, double *previousLayerForward, double* nextlayerBackward, double *out, double learnRate)
-{
-	double error = nextlayerBackward[blockIdx.x];
-	double* weightBlock = weights + (blockIdx.x * weightCount);
-	for (int i = 0; i < weightCount; i++)
-	{
-		*out += *weightBlock * error;
-		out++;
-		*weightBlock += previousLayerForward[i] * error * learnRate;
-		weightBlock++;
-	}
-
-	node[blockIdx.x].bias += error * learnRate;
-}
-
-__global__ void FullyConnectedLayer_Backward_cu_2(FullyConnectedNode *node, double* weights, int weightCount, double *forward, double *previousLayerForward, double* nextlayerBackward, double *out, double learnRate, int nodeCount)
-{
-	for (int x = 0; x < nodeCount; x++)
-	{
-		double error = nextlayerBackward[x];
-		double* weightBlock = weights + (x * weightCount);
-		for (int i = 0; i < weightCount; i++)
-		{
-			out[i] += *weightBlock * error;
-			*weightBlock += previousLayerForward[i] * error * learnRate;
-			weightBlock++;
-		}
-
-		node[x].bias += error * learnRate;
-	}
 }
 
 void FullyConnectedLayer_Forward(FullyConnectedNode *node, double* weights, int weightCount, double *input, double *output, int nodeCount)
@@ -134,17 +55,16 @@ void FullyConnectedLayer_Forward(FullyConnectedNode *node, double* weights, int 
 
 void FullyConnectedLayer_Backward(FullyConnectedNode *node, double* weights, int weightCount, double *forward, double *previousLayerForward, double* nextlayerBackward, double *output, int nodeCount, double learnRate)
 {
-	//FullyConnectedLayer_Backward_cu <<<nodeCount, 1 >>>(node, weights, weightCount, forward, previousLayerForward, nextlayerBackward, output, learnRate);
-	//FullyConnectedLayer_Backward_cu_2 << <1, 1 >> >(node, weights, weightCount, forward, previousLayerForward, nextlayerBackward, output, learnRate, nodeCount);
-	FullyConnectedLayer_Backward_cu_p1 << <weightCount, nodeCount >> >(node, weights, weightCount, forward, previousLayerForward, nextlayerBackward, output, learnRate, nodeCount);
+	FullyConnectedLayer_Backward_cu_p1 <<<weightCount, 1 >>>(node, weights, weightCount, forward, previousLayerForward, nextlayerBackward, output, learnRate, nodeCount);
 
 	LayerSynchronize();
 
-	FullyConnectedLayer_Backward_cu_p2 << <weightCount, nodeCount >> >(node, weights, weightCount, forward, previousLayerForward, nextlayerBackward, output, learnRate, nodeCount);
+	dim3 blocks(weightCount, nodeCount, 1);
+	FullyConnectedLayer_Backward_cu_p2 <<<blocks, 1 >>>(node, weights, weightCount, forward, previousLayerForward, nextlayerBackward, output, learnRate, nodeCount);
 
 	LayerSynchronize();
 
-	FullyConnectedLayer_Backward_cu_p3 << <nodeCount, 1 >> >(node, nextlayerBackward, learnRate);
+	FullyConnectedLayer_Backward_cu_p3 <<<nodeCount, 1 >>>(node, nextlayerBackward, learnRate);
 
 	LayerSynchronize();
 }

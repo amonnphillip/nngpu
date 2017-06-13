@@ -54,6 +54,7 @@ public:
 	virtual double* GetBackwardHostMem(bool copyFromDevice);
 	virtual double* GetForwardDeviceMem();
 	virtual double* GetBackwardDeviceMem();
+	ConvNode* GetNodeMem(bool copyFromDevice);
 	virtual int GetForwardNodeCount();
 	virtual int GetForwardWidth();
 	virtual int GetForwardHeight();

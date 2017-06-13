@@ -25,6 +25,9 @@
     <Filter Include="peformance">
       <UniqueIdentifier>{04792587-7f10-4cf5-bdaf-738e77c37ede}</UniqueIdentifier>
     </Filter>
+    <Filter Include="softmax">
+      <UniqueIdentifier>{622cbbcb-73d9-4597-9dd2-60c468a71e45}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="conv\convlayer.cpp">
@@ -91,6 +94,18 @@
     <ClCompile Include="performance\layerperfnode.cpp">
       <Filter>peformance</Filter>
     </ClCompile>
+    <ClCompile Include="softmax\softmaxlayer.cpp">
+      <Filter>softmax</Filter>
+    </ClCompile>
+    <ClCompile Include="softmax\softmaxlayerconfig.cpp">
+      <Filter>softmax</Filter>
+    </ClCompile>
+    <ClCompile Include="fullyconnected\fullyconnectedutestreference.cpp">
+      <Filter>fullyconnected</Filter>
+    </ClCompile>
+    <ClCompile Include="fullyconnected\fullyconnectedutest.cpp">
+      <Filter>fullyconnected</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="conv\convlayer.cu">
@@ -111,6 +126,12 @@
     </CudaCompile>
     <CudaCompile Include="conv\convutestreference.cu">
       <Filter>conv</Filter>
+    </CudaCompile>
+    <CudaCompile Include="softmax\softmaxlayer.cu">
+      <Filter>softmax</Filter>
+    </CudaCompile>
+    <CudaCompile Include="fullyconnected\fullyconnectedutestreference.cu">
+      <Filter>fullyconnected</Filter>
     </CudaCompile>
   </ItemGroup>
   <ItemGroup>
@@ -183,6 +204,18 @@
     </ClInclude>
     <ClInclude Include="performance\layerperfnode.h">
       <Filter>peformance</Filter>
+    </ClInclude>
+    <ClInclude Include="softmax\softmaxlayer.h">
+      <Filter>softmax</Filter>
+    </ClInclude>
+    <ClInclude Include="softmax\softmaxlayerconfig.h">
+      <Filter>softmax</Filter>
+    </ClInclude>
+    <ClInclude Include="fullyconnected\fullyconnectedutestreference.h">
+      <Filter>fullyconnected</Filter>
+    </ClInclude>
+    <ClInclude Include="fullyconnected\fullyconnectedutest.h">
+      <Filter>fullyconnected</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

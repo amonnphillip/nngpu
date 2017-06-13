@@ -103,6 +103,7 @@ namespace nngpuVisualization
             NnGpuWinInterop.AddReluLayer(_nn);
             NnGpuWinInterop.AddPoolLayer(_nn, 2, 2);
             NnGpuWinInterop.AddFullyConnected(_nn, 10);
+            NnGpuWinInterop.AddSoftmax(_nn, 10);
             NnGpuWinInterop.AddOutput(_nn, 10);
 
             NnGpuWinInterop.InitializeTraining(_nn, imageData, imageData.Length, labelData, labelData.Length);

@@ -8,5 +8,6 @@ enum LayerType
 	Input = 3,
 	Output = 4,
 	Relu = 5,
-	Test = 6
+	Softmax = 6,
+	Test = 7
 };

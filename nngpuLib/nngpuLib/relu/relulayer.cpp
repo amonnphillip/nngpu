@@ -97,6 +97,10 @@ void ReluLayer::Backward(INNetworkLayer* previousLayer, INNetworkLayer* nextLaye
 		throw "Relu: Forward memory out of range";
 	}
 #endif
+
+#ifdef _UNITTEST
+	DebugPrint();
+#endif
 }
 
 double* ReluLayer::GetForwardHostMem(bool copyFromDevice)

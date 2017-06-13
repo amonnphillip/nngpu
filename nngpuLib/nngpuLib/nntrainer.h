@@ -18,8 +18,10 @@ private:
 
 	unsigned char* trainingImageData = nullptr;
 	unsigned char* trainingLabelData = nullptr;
+	int trainingEpocCount;
 	int trainingImageCount;
 	int trainingImageWidth;
 	int trainingImageHeight;
 	int trainingLabelCount;
+	bool doneTraining;
 };

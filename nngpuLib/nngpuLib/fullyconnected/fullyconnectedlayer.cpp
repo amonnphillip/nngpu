@@ -47,12 +47,7 @@ FullyConnectedLayer::FullyConnectedLayer(FullyConnectedLayerConfig* config, INNe
 		throw std::bad_alloc();
 	}
 
-	double* weights = weightsHostMem.get();
-	for (int index = 0; index < weightCount * nodeCount; index++)
-	{
-		*weights = (double)1 / (double)weightCount;
-		weights++;
-	}
+	std::fill_n(weightsHostMem.get(), weightCount * nodeCount, (double)1 / (double)weightCount);
 
 	if (cudaMalloc((void**)&weightsDeviceMem, weightCount * nodeCount * sizeof(double)) != cudaError::cudaSuccess)
 	{
@@ -86,6 +81,8 @@ void FullyConnectedLayer::Forward(double* input, int inputSize)
 
 void FullyConnectedLayer::Forward(INNetworkLayer* previousLayer, INNetworkLayer* nextLayer)
 {
+	SetMemory(forwardHostMem.get(), forwardDeviceMem, forwardCount, 0);
+
 	layerPerf.Start(layerWidth * layerHeight * layerDepth);
 	FullyConnectedLayer_Forward(nodeDeviceMem, weightsDeviceMem, weightCount, previousLayer->GetForwardDeviceMem(), forwardDeviceMem, nodeCount);
 	layerPerf.Stop();
@@ -118,6 +115,7 @@ void FullyConnectedLayer::Backward(INNetworkLayer* previousLayer, INNetworkLayer
 	assert(previousLayer->GetForwardNodeCount() == weightCount);
 	assert(nextLayer->GetBackwardNodeCount() == nodeCount);
 
+	SetMemory(backwardHostMem.get(), backwardDeviceMem, GetBackwardNodeCount(), 0);
 
 #ifdef _UNITTEST
 	if (TestUtils::HasElementOutOfRange(previousLayer->GetForwardHostMem(true), previousLayer->GetForwardNodeCount(), -100, 100))
@@ -126,12 +124,6 @@ void FullyConnectedLayer::Backward(INNetworkLayer* previousLayer, INNetworkLayer
 		throw "FullyConnected: Backward memory out of range";
 	}
 #endif
-
-	std::fill_n(backwardHostMem.get(), GetBackwardNodeCount(), (double)0.0);
-	if (cudaMemcpy(backwardDeviceMem, backwardHostMem.get(), GetBackwardNodeCount() * sizeof(double), cudaMemcpyHostToDevice) != cudaError::cudaSuccess)
-	{
-		throw std::runtime_error("FullyConnectedLayer backward cudaMemcpy returned an error");
-	}
 
 	//layerPerf.Start(layerWidth * layerHeight * layerDepth);
 	FullyConnectedLayer_Backward(nodeDeviceMem, weightsDeviceMem, weightCount, forwardDeviceMem, previousLayer->GetForwardDeviceMem(), nextLayer->GetBackwardDeviceMem(), backwardDeviceMem, nodeCount, learnRate);
@@ -280,9 +272,30 @@ LayerType FullyConnectedLayer::GetLayerType()
 	return Layer::GetLayerType();
 }
 
-FullyConnectedNode* FullyConnectedLayer::GetNodeMem()
+FullyConnectedNode* FullyConnectedLayer::GetNodeMem(bool copyFromDevice)
 {
+	if (copyFromDevice)
+	{
+		if (cudaMemcpy(nodeHostMem.get(), nodeDeviceMem, nodeCount * sizeof(FullyConnectedNode), cudaMemcpyDeviceToHost) != cudaError::cudaSuccess)
+		{
+			throw std::runtime_error("CudaMemcpy returned an error");
+		}
+	}
+
 	return nodeHostMem.get();
+}
+
+double* FullyConnectedLayer::GetWeightHostMem(bool copyFromDevice)
+{
+	if (copyFromDevice)
+	{
+		if (cudaMemcpy(weightsHostMem.get(), weightsDeviceMem, weightCount * nodeCount * sizeof(double), cudaMemcpyDeviceToHost) != cudaError::cudaSuccess)
+		{
+			throw std::runtime_error("CudaMemcpy returned an error");
+		}
+	}
+
+	return weightsHostMem.get();
 }
 
 void FullyConnectedLayer::GetLayerData(LayerDataList& layerDataList)
@@ -341,7 +354,7 @@ void FullyConnectedLayer::DebugPrint()
 
 	std::cout << "\r\n";
 	std::cout << "bias:\r\n";
-	FullyConnectedNode* node = GetNodeMem();
+	FullyConnectedNode* node = GetNodeMem(true);
 	for (int index = 0; index < nodeCount; index++)
 	{
 		if (index + 1 != nodeCount)

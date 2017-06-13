@@ -55,6 +55,10 @@ void NNTrainer::Initialize(unsigned char* imageData, int imageDataLength, unsign
 	trainingImageHeight = GETINT((trainingImageData + NUMBER_OF_ROWS));
 
 	trainingLabelCount = GETINT((trainingLabelData + NUMBER_OF_ITEMS));
+
+	trainingEpocCount = 2;
+
+	doneTraining = false;
 }
 
 unsigned char* NNTrainer::GetImage(int imageIndex)
@@ -75,6 +79,12 @@ unsigned char NNTrainer::GetLabel(int labelIndex)
 
 void NNTrainer::Iterate(NNetwork* nn)
 {
+	if (doneTraining)
+	{
+		return;
+	}
+
+	const double learnRate = 0.01;
 	const int inputCount = trainingImageWidth * trainingImageHeight;
 	const int expectedCount = 10;
 
@@ -110,17 +120,28 @@ void NNTrainer::Iterate(NNetwork* nn)
 	std::cout << "BACKWARD PASS --------------------------------:\r\n";
 #endif
 
-	nn->Backward(expected, expectedCount, 0.02);
+	nn->Backward(expected, expectedCount, learnRate);
 
 	delete input;
 	delete expected;
 
 	iterationCount++;
+
+	if (iterationCount >= trainingImageCount)
+	{
+		iterationCount = 0;
+		trainingEpocCount--;
+
+		if (trainingEpocCount <= 0)
+		{
+			doneTraining = true;
+		}
+	}
 }
 
 bool NNTrainer::TrainingComplete()
 {
-	return iterationCount >= trainingImageCount;
+	return doneTraining;
 }
 
 int NNTrainer::GetTrainingIteration()
