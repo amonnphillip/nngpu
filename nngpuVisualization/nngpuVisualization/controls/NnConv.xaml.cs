@@ -93,7 +93,14 @@ namespace nngpuVisualization.controls
             NnGpuLayerData backward = laterDataGroup.GetLayerOfType(NnGpuLayerDataType.Backward);
             BitmapSource backwardsImageSource = backward.ToDepthImage();
             Image backwardsImage = new Image();
-            backwardsImage.Width = backward.width;
+            if (backward.depth == 1)
+            {
+                backwardsImage.Width = backward.width;
+            }
+            else
+            {
+                backwardsImage.Width = 25 * backward.depth;
+            }
             backwardsImage.Height = 25;
             backwardsImage.Stretch = Stretch.Fill;
             backwardsImage.Source = backwardsImageSource;

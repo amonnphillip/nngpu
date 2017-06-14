@@ -19,7 +19,7 @@
         </Grid.RowDefinitions>
         <TextBlock Grid.Row="0" Text="Conv Backwards" ></TextBlock>
         <TextBlock Grid.Row="1" Text="{Binding BackwardSum}" ></TextBlock>
-        <StackPanel x:Name="BackwardsImageContainer" Grid.Row="2" Background="Azure" Orientation="Horizontal" HorizontalAlignment="Stretch"></StackPanel>
+        <StackPanel x:Name="BackwardsImageContainer" Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Stretch"></StackPanel>
         <TextBlock Grid.Row="3" Text="Conv Filters" ></TextBlock>
         <StackPanel x:Name="FilterImageContainer" Grid.Row="4" Orientation="Horizontal"  HorizontalAlignment="Stretch"></StackPanel>
         <TextBlock Grid.Row="5" Text="Conv Forward" ></TextBlock>
