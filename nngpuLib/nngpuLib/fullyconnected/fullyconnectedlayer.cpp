@@ -128,21 +128,6 @@ void FullyConnectedLayer::Backward(INNetworkLayer* previousLayer, INNetworkLayer
 	//layerPerf.Start(layerWidth * layerHeight * layerDepth);
 	FullyConnectedLayer_Backward(nodeDeviceMem, weightsDeviceMem, weightCount, forwardDeviceMem, previousLayer->GetForwardDeviceMem(), nextLayer->GetBackwardDeviceMem(), backwardDeviceMem, nodeCount, learnRate);
 	//layerPerf.Stop();
-/*
-	if (cudaMemcpy(weightsHostMem.get(), weightsDeviceMem, weightCount * nodeCount * sizeof(double), cudaMemcpyDeviceToHost) != cudaError::cudaSuccess)
-	{
-		throw std::runtime_error("FullyConnectedLayer backward cudaMemcpy returned an error");
-	}
-
-	if (cudaMemcpy(backwardHostMem.get(), backwardDeviceMem, GetBackwardNodeCount() * sizeof(double), cudaMemcpyDeviceToHost) != cudaError::cudaSuccess)
-	{
-		throw std::runtime_error("FullyConnectedLayer backward cudaMemcpy returned an error");
-	}
-
-	if (cudaMemcpy(nodeHostMem.get(), nodeDeviceMem, nodeCount * sizeof(FullyConnectedNode), cudaMemcpyDeviceToHost) != cudaError::cudaSuccess)
-	{
-		throw std::runtime_error("FullyConnectedLayer backward cudaMemcpy returned an error");
-	}*/
 
 #ifdef _UNITTEST
 	if (TestUtils::HasElementOutOfRange(GetBackwardHostMem(true), GetBackwardNodeCount(), -100, 100))

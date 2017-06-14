@@ -1,15 +1,10 @@
 #pragma once
 #include <stdio.h>
 #include <stdexcept>
-
 #include <cuda_runtime.h>
 #include <math.h>
 #include <device_launch_parameters.h>
-
 #include "relulayer.h"
-
-
-
 
 __global__ void ReluLayer_Forward_cu(double *previousLayerForward, double *out)
 {

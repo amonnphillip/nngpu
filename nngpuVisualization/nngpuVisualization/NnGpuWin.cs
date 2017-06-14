@@ -96,10 +96,10 @@ namespace nngpuVisualization
             _nn = NnGpuWinInterop.Initialize();
             NnGpuWinInterop.InitializeNetwork(_nn);
             NnGpuWinInterop.AddInputLayer(_nn, 28, 28, 1);
-            NnGpuWinInterop.AddConvLayer(_nn, 3, 3, 32, 1, 1);
+            NnGpuWinInterop.AddConvLayer(_nn, 3, 3, 48, 1, 1);
             NnGpuWinInterop.AddReluLayer(_nn);
             NnGpuWinInterop.AddPoolLayer(_nn, 2, 2);
-            NnGpuWinInterop.AddConvLayer(_nn, 3, 3, 32, 1, 1);
+            NnGpuWinInterop.AddConvLayer(_nn, 3, 3, 48, 1, 1);
             NnGpuWinInterop.AddReluLayer(_nn);
             NnGpuWinInterop.AddPoolLayer(_nn, 2, 2);
             NnGpuWinInterop.AddFullyConnected(_nn, 10);

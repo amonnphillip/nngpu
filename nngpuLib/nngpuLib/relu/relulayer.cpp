@@ -50,12 +50,6 @@ void ReluLayer::Forward(INNetworkLayer* previousLayer, INNetworkLayer* nextLayer
 	}
 
 	ReluLayer_Forward(previousLayer->GetForwardDeviceMem(), forwardDeviceMem, nodeCount);
-/*
-	if (cudaMemcpy(forwardHostMem.get(), forwardDeviceMem, forwardCount * sizeof(double), cudaMemcpyDeviceToHost) != cudaError::cudaSuccess)
-	{
-		throw std::runtime_error("ReluLayer forward cudaMemcpy returned an error");
-	}
-*/
 
 #ifdef _UNITTEST
 	if (TestUtils::HasElementOutOfRange(GetForwardHostMem(true), GetForwardNodeCount(), -100, 100))
@@ -83,12 +77,6 @@ void ReluLayer::Backward(INNetworkLayer* previousLayer, INNetworkLayer* nextLaye
 	}
 
 	ReluLayer_Backward(forwardDeviceMem, nextLayer->GetBackwardDeviceMem(), backwardDeviceMem, nodeCount, learnRate);
-/*
-	if (cudaMemcpy(backwardHostMem.get(), backwardDeviceMem, backwardCount * sizeof(double), cudaMemcpyDeviceToHost) != cudaError::cudaSuccess)
-	{
-		throw std::runtime_error("ReluLayer backward cudaMemcpy returned an error");
-	}
-*/
 
 #ifdef _UNITTEST
 	if (TestUtils::HasElementOutOfRange(GetBackwardHostMem(true), GetBackwardNodeCount(), -100, 100))

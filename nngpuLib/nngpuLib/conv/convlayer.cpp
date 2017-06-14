@@ -139,19 +139,6 @@ void ConvLayer::Forward(INNetworkLayer* previousLayer, INNetworkLayer* nextLayer
 		forwardDeviceMem, 
 		pad);
 	layerPerf.Stop();
-		
-/*
-	if (cudaMemcpy(forwardHostMem.get(), forwardDeviceMem, forwardCount * sizeof(double), cudaMemcpyDeviceToHost) != cudaError::cudaSuccess)
-	{
-		throw std::runtime_error("ConvLayer forward cudaMemcpy returned an error");
-	}
-
-	if (cudaMemcpy(filterHostMem.get(), filterDeviceMem, filterSize * filterDepth * filterCount * sizeof(double), cudaMemcpyDeviceToHost) != cudaError::cudaSuccess)
-	{
-		throw std::runtime_error("ConvLayer forward cudaMemcpy returned an error");
-	}*/
-
-
 
 #ifdef _UNITTEST
 	//DebugPrint();
@@ -200,22 +187,6 @@ void ConvLayer::Backward(INNetworkLayer* previousLayer, INNetworkLayer* nextLaye
 		backFilterLookUpDeviceMem,
 		backFilterLookupSize);
 	//layerPerf.Stop();
-	/*
-	if (cudaMemcpy(backwardHostMem.get(), backwardDeviceMem, GetBackwardNodeCount() * sizeof(double), cudaMemcpyDeviceToHost) != cudaError::cudaSuccess)
-	{
-		throw std::runtime_error("ConvLayer backward cudaMemcpy returned an error");
-	}
-
-	if (cudaMemcpy(nodeHostMem.get(), nodeDeviceMem, nodeCount * sizeof(ConvNode), cudaMemcpyDeviceToHost) != cudaError::cudaSuccess)
-	{
-		throw std::runtime_error("ConvLayer backward cudaMemcpy returned an error");
-	}
-
-	if (cudaMemcpy(backFilterHostMem.get(), backFilterDeviceMem, filterSize * filterDepth * filterCount * sizeof(double), cudaMemcpyDeviceToHost) != cudaError::cudaSuccess)
-	{
-		throw std::runtime_error("ConvLayer backward cudaMemcpy returned an error");
-	}
-*/
 
 #ifdef _UNITTEST
 	//DebugPrint();
@@ -526,26 +497,6 @@ void ConvLayer::DebugPrint()
 		//std::cout << "sum: " << sum << "\r\n";
 	}
 #endif
-/*
-	std::cout << "forward:\r\n";
-	double* forward = forwardHostMem.get();
-	sum = 0;
-	for (int d = 0; d < layerDepth; d++)
-	{
-		for (int y = 0; y < layerWidth; y++)
-		{
-			for (int x = 0; x < layerHeight; x++)
-			{
-				std::cout << *forward << " ";
-				sum += *forward;
-				forward++;
-			}
-			std::cout << "\r\n";
-		}
-		std::cout << "\r\n";
-	}
-	std::cout << "sum: " << sum << "\r\n";*/
-
 
 	std::cout << "forward:\r\n";
 	TestUtils::DebugPrintRectangularMemory(GetForwardHostMem(true), layerWidth, layerHeight, layerDepth);

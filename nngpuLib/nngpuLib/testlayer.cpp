@@ -162,14 +162,12 @@ void TestLayer::GetLayerPerformance(unsigned int& averageTime, double& averageBy
 
 void TestLayer::ResetForwardAndBackward()
 {
-	//std::fill_n(forwardHostMem.get(), GetForwardNodeCount(), (double)1.0);
 	TestUtils::GradualFill(forwardHostMem.get(), GetForwardNodeCount());
 	if (cudaMemcpy(forwardDeviceMem, forwardHostMem.get(), GetForwardNodeCount() * sizeof(double), cudaMemcpyHostToDevice) != cudaError::cudaSuccess)
 	{
 		throw std::runtime_error("TestLayer forward cudaMemcpy returned an error");
 	}
 
-	//std::fill_n(backwardHostMem.get(), GetBackwardNodeCount(), (double)1.0);
 	TestUtils::GradualFill(backwardHostMem.get(), GetBackwardNodeCount());
 	if (cudaMemcpy(backwardDeviceMem, backwardHostMem.get(), GetBackwardNodeCount() * sizeof(double), cudaMemcpyHostToDevice) != cudaError::cudaSuccess)
 	{

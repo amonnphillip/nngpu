@@ -103,6 +103,7 @@ protected:
 		}
 	}
 
+public:
 	virtual LayerType GetLayerType()
 	{
 		return layerType;

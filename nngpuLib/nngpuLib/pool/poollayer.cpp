@@ -82,12 +82,6 @@ void PoolLayer::Forward(INNetworkLayer* previousLayer, INNetworkLayer* nextLayer
 	}
 
 	PoolLayer_Forward(previousLayer->GetForwardDeviceMem(), forwardDeviceMem, backDataDeviceMem, nodeCount, layerWidth, layerHeight, layerDepth, stride, previousLayer->GetWidth(), previousLayer->GetHeight(), previousLayer->GetDepth());
-/*
-	if (cudaMemcpy(forwardHostMem.get(), forwardDeviceMem, forwardCount * sizeof(double), cudaMemcpyDeviceToHost) != cudaError::cudaSuccess)
-	{
-		throw std::runtime_error("PoolLayer forward cudaMemcpy returned an error");
-	}
-*/
 
 #ifdef _UNITTEST
 	if (TestUtils::HasElementOutOfRange(GetForwardHostMem(true), GetForwardNodeCount(), -100, 100))
@@ -117,17 +111,7 @@ void PoolLayer::Backward(INNetworkLayer* previousLayer, INNetworkLayer* nextLaye
 	}
 
 	PoolLayer_Backward(nextLayer->GetBackwardDeviceMem(), backwardDeviceMem, backDataDeviceMem, nodeCount);
-/*
-	if (cudaMemcpy(backwardHostMem.get(), backwardDeviceMem, backwardCount * sizeof(double), cudaMemcpyDeviceToHost) != cudaError::cudaSuccess)
-	{
-		throw std::runtime_error("PoolLayer backward cudaMemcpy returned an error");
-	}
 
-	if (cudaMemcpy(backDataHostMem.get(), backDataDeviceMem, nodeCount * sizeof(int), cudaMemcpyDeviceToHost) != cudaError::cudaSuccess)
-	{
-		throw std::runtime_error("PoolLayer backward cudaMemcpy returned an error");
-	}
-*/
 #ifdef _UNITTEST
 	if (TestUtils::HasElementOutOfRange(GetBackwardHostMem(true), GetBackwardNodeCount(), -100, 100))
 	{
