@@ -65,6 +65,8 @@ namespace nngpuVisualization
 
         private static int _threadDelayMs = 10;
 
+        private static bool _shownInitialProgress = false;
+
 
         public static void StartRunner(
             NnGpuRunnerTrainingStarted trainingStartedDelegate, 
@@ -109,6 +111,13 @@ namespace nngpuVisualization
                             timer.Start();
                             _nnGpuWin.TrainIteration();
                             long ms = timer.Stop(); // TODO: MAKE THIS VALUE ACCESSIBLE
+
+
+                            if (!_shownInitialProgress)
+                            {
+                                backgroundWorker.ReportProgress(0);
+                                _shownInitialProgress = true;
+                            }
 
                             _currentInterval++;
                             if (_currentInterval >= _updateInterval)

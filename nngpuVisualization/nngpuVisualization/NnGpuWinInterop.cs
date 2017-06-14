@@ -45,7 +45,7 @@ namespace nngpuVisualization
         public static extern void GetLayerCount(IntPtr nn, out int layerCount);
 
         [DllImport("nngpuLib.dll")]
-        public static extern void InitializeTraining(IntPtr nn, [In, MarshalAs(UnmanagedType.LPArray)] byte[] imageData, int imageDataLength, [In, MarshalAs(UnmanagedType.LPArray)] byte[] labelData, int labelDataLength);
+        public static extern void InitializeTraining(IntPtr nn, [In, MarshalAs(UnmanagedType.LPArray)] byte[] imageData, int imageDataLength, [In, MarshalAs(UnmanagedType.LPArray)] byte[] labelData, int labelDataLength, int epocMax);
 
         [DllImport("nngpuLib.dll")]
         public static extern bool TrainNetworkInteration(IntPtr nn);

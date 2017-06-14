@@ -13,7 +13,7 @@ extern "C"
 	__declspec(dllexport) void AddOutput(NnGpu* nn, int size);
 	__declspec(dllexport) void GetLayerType(NnGpu* nn, int layerIndex, int* layerType);
 	__declspec(dllexport) void GetLayerCount(NnGpu* nn, int* layerCount);
-	__declspec(dllexport) void InitializeTraining(NnGpu* nn, unsigned char* imageData, int imageDataLength, unsigned char* labelData, int labelDataLength);
+	__declspec(dllexport) void InitializeTraining(NnGpu* nn, unsigned char* imageData, int imageDataLength, unsigned char* labelData, int labelDataLength, int epocMax);
 	__declspec(dllexport) bool TrainNetworkInteration(NnGpu* nn);
 	__declspec(dllexport) void InitializeTesting(NnGpu* nn, unsigned char* imageData, int imageDataLength, unsigned char* labelData, int labelDataLength);
 	__declspec(dllexport) bool TestNetworkInteration(NnGpu* nn, NNTestResult** testresult);

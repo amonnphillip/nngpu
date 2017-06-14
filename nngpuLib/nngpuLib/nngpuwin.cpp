@@ -80,9 +80,9 @@ void GetLayerCount(NnGpu* nn, int* layerCount)
 	nn->GetLayerCount(layerCount);
 }
 
-void InitializeTraining(NnGpu* nn, unsigned char* imageData, int imageDataLength, unsigned char* labelData, int labelDataLength)
+void InitializeTraining(NnGpu* nn, unsigned char* imageData, int imageDataLength, unsigned char* labelData, int labelDataLength, int epocMax)
 {
-	nn->InitializeTraining(imageData, imageDataLength, labelData, labelDataLength);
+	nn->InitializeTraining(imageData, imageDataLength, labelData, labelDataLength, epocMax);
 }
 
 bool TrainNetworkInteration(NnGpu* nn)

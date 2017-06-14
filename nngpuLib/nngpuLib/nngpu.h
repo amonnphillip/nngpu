@@ -18,7 +18,7 @@ public:
 	void AddSoftmax(int size);
 	void GetLayerType(int layerIndex, int* layerType);
 	void GetLayerCount(int* layerCount);
-	void InitializeTraining(unsigned char* imageData, int imageDataLength, unsigned char* labelData, int labelDataLength);
+	void InitializeTraining(unsigned char* imageData, int imageDataLength, unsigned char* labelData, int labelDataLength, int epocMax);
 	bool TrainNetworkInteration();
 	void InitializeTesting(unsigned char* imageData, int imageDataLength, unsigned char* labelData, int labelDataLength);
 	bool TestNetworkInteration(NNTestResult* testresult);

@@ -106,7 +106,7 @@ namespace nngpuVisualization
             NnGpuWinInterop.AddSoftmax(_nn, 10);
             NnGpuWinInterop.AddOutput(_nn, 10);
 
-            NnGpuWinInterop.InitializeTraining(_nn, imageData, imageData.Length, labelData, labelData.Length);
+            NnGpuWinInterop.InitializeTraining(_nn, imageData, imageData.Length, labelData, labelData.Length, 2);
         }
 
         public void InitializeTesting()

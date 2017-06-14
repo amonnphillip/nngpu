@@ -42,7 +42,7 @@ NNTrainer::~NNTrainer()
 	}
 }
 
-void NNTrainer::Initialize(unsigned char* imageData, int imageDataLength, unsigned char* labelData, int labelDataLength)
+void NNTrainer::Initialize(unsigned char* imageData, int imageDataLength, unsigned char* labelData, int labelDataLength, int epocMax)
 {
 	trainingImageData = new unsigned char[imageDataLength];
 	memcpy(trainingImageData, imageData, (size_t)imageDataLength);
@@ -56,7 +56,7 @@ void NNTrainer::Initialize(unsigned char* imageData, int imageDataLength, unsign
 
 	trainingLabelCount = GETINT((trainingLabelData + NUMBER_OF_ITEMS));
 
-	trainingEpocCount = 2;
+	trainingEpocCount = epocMax;
 
 	doneTraining = false;
 }

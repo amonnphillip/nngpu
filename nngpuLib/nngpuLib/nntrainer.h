@@ -6,7 +6,7 @@ class NNTrainer
 public:
 	NNTrainer();
 	~NNTrainer();
-	void Initialize(unsigned char* imageData, int imageDataLength, unsigned char* labelData, int labelDataLength);
+	void Initialize(unsigned char* imageData, int imageDataLength, unsigned char* labelData, int labelDataLength, int epocMax);
 	void Iterate(NNetwork* nn);
 	bool TrainingComplete();
 	int GetTrainingIteration();
