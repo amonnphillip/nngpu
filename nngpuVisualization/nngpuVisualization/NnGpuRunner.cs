@@ -84,9 +84,14 @@ namespace nngpuVisualization
 
                 _nnGpuWin = new NnGpuWin();
 
+                bool performanceTestResults = _nnGpuWin.RunPerformanceTests();
+                if (!performanceTestResults)
+                {
+                    throw new Exception("NN Performance test results failed!");
+                }
 #if false
-                bool testResults = _nnGpuWin.RunUnitTests();
-                if (!testResults)
+                bool unitTestResults = _nnGpuWin.RunUnitTests();
+                if (!unitTestResults)
                 {
                     throw new Exception("NN Unit test results failed!");
                 }
@@ -110,7 +115,9 @@ namespace nngpuVisualization
                             Performance timer = new Performance();
                             timer.Start();
                             _nnGpuWin.TrainIteration();
-                            long ms = timer.Stop(); // TODO: MAKE THIS VALUE ACCESSIBLE
+                            long ms = timer.Stop(); // TODO: MAKE THIS VALUE ACCESSIBLE.. 
+
+                            // TODO: NEED TO SHOW PERFORMANCE IN THE UI SOME HOW??
 
 
                             if (!_shownInitialProgress)

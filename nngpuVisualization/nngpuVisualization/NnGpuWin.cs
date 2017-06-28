@@ -195,5 +195,10 @@ namespace nngpuVisualization
         {
             return NnGpuWinInterop.RunUnitTests(_nn);
         }
+
+        public bool RunPerformanceTests()
+        {
+            return NnGpuWinInterop.RunPerformanceTests(_nn);
+        }
     }
 }

@@ -28,6 +28,7 @@ public:
 	void GetLayerData(int layerIndex, LayerDataType dataType, LayerDataList& layerData);
 	bool RunUnitTests();
 	void GetLayerPerformanceData(int layerIndex, unsigned int* averageTimeInMs, double* averageBytes);
+	bool RunPerformanceTests();
 
 private:
 	NNetwork* nn;

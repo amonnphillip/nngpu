@@ -151,7 +151,12 @@ void GetLayerPerformanceData(NnGpu* nn, int layerIndex, unsigned int* averageTim
 	nn->GetLayerPerformanceData(layerIndex, averageTimeInMs, averageBytes);
 }
 
+bool RunPerformanceTests(NnGpu* nn)
+{
+	return nn->RunPerformanceTests();
+}
 
+//TODO: THERE ARE TOO MANY LAYERS FOR INTEROP!
 
 
 

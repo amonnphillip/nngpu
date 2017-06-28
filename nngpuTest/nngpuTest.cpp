@@ -59,7 +59,7 @@ int main()
 		fclose(labelDataFile);
 	}
 
-	InitializeTraining(nn, imageData, imageDataSize, labelData, labelDataSize);
+	InitializeTraining(nn, imageData, imageDataSize, labelData, labelDataSize, 1);
 
 	bool trainError = false;
 	int numIterations = 100;

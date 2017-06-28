@@ -22,4 +22,5 @@ extern "C"
 	__declspec(dllexport) void GetLayerData(NnGpu* nn, int layerIndex, int** data);
 	__declspec(dllexport) void GetLayerPerformanceData(NnGpu* nn, int layerIndex, unsigned int* averageTimeInMs, double* averageBytes);
 	__declspec(dllexport) bool RunUnitTests(NnGpu* nn);
+	__declspec(dllexport) bool RunPerformanceTests(NnGpu* nn);
 }

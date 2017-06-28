@@ -71,5 +71,7 @@ namespace nngpuVisualization
         [DllImport("nngpuLib.dll")]
         public static extern bool RunUnitTests(IntPtr nn);
 
+        [DllImport("nngpuLib.dll")]
+        public static extern bool RunPerformanceTests(IntPtr nn);
     }
 }

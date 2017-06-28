@@ -38,6 +38,8 @@ namespace nngpuVisualization.controls
 
         public void Update(NnGpuWin nnGpuWinInstance, int layerIndex)
         {
+            // TODO: NEED TO FIX THE OUTPUT. NEED TO SHOW THE AVERAGE ERRORS PER X UINTS OF TIME
+
             NnGpuLayerDataGroup laterDataGroup = nnGpuWinInstance.GetLayerData(layerIndex);
 
             double largest = laterDataGroup.GetLayerOfType(NnGpuLayerDataType.Forward).GetLargestDataValue();

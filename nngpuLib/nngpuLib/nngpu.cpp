@@ -155,7 +155,6 @@ void NnGpu::GetLayerData(int layerIndex, LayerDataType dataType, LayerDataList& 
 
 bool NnGpu::RunUnitTests()
 {
-#if 0
 	ConvUTest* convTest = new ConvUTest();
 	bool convTestResult = convTest->Test();
 	delete convTest;
@@ -163,12 +162,12 @@ bool NnGpu::RunUnitTests()
 	PoolUTest* poolTest = new PoolUTest();
 	bool poolTestResult = poolTest->Test();
 	delete poolTest;
-#endif
+
 	FullyConnectedUTest* fullyConnectedTest = new FullyConnectedUTest();
 	bool fullyConnectedTestResult = fullyConnectedTest->Test();
 	delete fullyConnectedTest;
 
-	return true;// convTestResult && poolTestResult && fullyConnectedTestResult;
+	return convTestResult && poolTestResult && fullyConnectedTestResult;
 }
 
 void NnGpu::GetLayerPerformanceData(int layerIndex, unsigned int* averageTimeInMs, double* averageBytes)
@@ -185,4 +184,9 @@ void NnGpu::GetLayerPerformanceData(int layerIndex, unsigned int* averageTimeInM
 
 	*averageTimeInMs = time;
 	*averageBytes = bytes;
+}
+
+bool NnGpu::RunPerformanceTests()
+{
+	return true;
 }

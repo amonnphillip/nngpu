@@ -36,19 +36,6 @@ namespace nngpuVisualization.controls
             NnGpuLayerData layerData = laterDataGroup.GetLayerOfType(NnGpuLayerDataType.Forward);
             BitmapSource image = layerData.ToImage();
 
-            // TODO: REMOVE!!
-            double largest = layerData.GetLargestDataValue();
-            double smallest = layerData.GetSmallestDataValue();
-
-            if (largest > 1)
-            {
-                new Exception();
-            }
-            if (smallest < -1)
-            {
-                new Exception();
-            }
-
             layerInputImg.Source = image;
         }
     }
